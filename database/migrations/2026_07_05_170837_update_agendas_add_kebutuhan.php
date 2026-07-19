@@ -6,36 +6,25 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up()
-{
-    Schema::table('agendas', function (Blueprint $table) {
+    public function up(): void
+    {
+        // Cek apakah kolom 'kebutuhan' sudah ada di tabel agendas
+        if (Schema::hasColumn('agendas', 'kebutuhan')) {
+            // Jika sudah ada, biarkan saja agar tidak memicu error duplikasi
+        } else {
+            // Jika belum ada, buat langsung tanpa peduli posisi 'after' kolom 'materi'
+            Schema::table('agendas', function (Blueprint $table) {
+                $table->text('kebutuhan')->nullable();
+            });
+        }
+    }
 
-        $table->text('kebutuhan')->nullable()->after('materi');
-
-        $table->string('status_wa')
-              ->default('Belum Dikirim')
-              ->after('kebutuhan');
-
-        $table->string('penanggung_jawab')
-              ->nullable()
-              ->after('status_wa');
-
-    });
-}
-
-public function down()
-{
-    Schema::table('agendas', function (Blueprint $table) {
-
-        $table->dropColumn([
-            'kebutuhan',
-            'status_wa',
-            'penanggung_jawab'
-        ]);
-
-    });
-}
+    public function down(): void
+    {
+        Schema::table('agendas', function (Blueprint $table) {
+            if (Schema::hasColumn('agendas', 'kebutuhan')) {
+                $table->dropColumn('kebutuhan');
+            }
+        });
+    }
 };
