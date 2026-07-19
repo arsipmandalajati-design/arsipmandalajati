@@ -117,9 +117,22 @@ class DashboardController extends Controller
 
             }
 
+            // Agenda terbaru
+$agendaTerbaru = Agenda::latest()
+->take(5)
+->get();
+
+// Surat masuk belum diverifikasi
+$belumVerifikasi = SuratMasuk::where('status', 'Menunggu Verifikasi')->count();
+
+// Surat keluar pending
+$suratKeluarPending = SuratKeluar::where('status', 'Menunggu ACC')->count();
+
+// Agenda belum ada laporan
+$agendaBelumLaporan = Agenda::where('status', 'Selesai')->count();
+
             {
                 return view('dashboard', compact(
-
                     'totalSuratMasuk',
                     'totalSuratKeluar',
                     'totalArsip',
@@ -128,9 +141,12 @@ class DashboardController extends Controller
                     'totalPejabat',
                     'aktivitas',
                     'agendaBesok',
+                    'agendaTerbaru',
+                    'belumVerifikasi',
+                    'suratKeluarPending',
+                    'agendaBelumLaporan',
                     'greeting'
-                    
-                    ));
+                ));
             }
     }
 }
