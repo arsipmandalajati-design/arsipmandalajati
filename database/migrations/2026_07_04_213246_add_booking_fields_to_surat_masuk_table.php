@@ -8,34 +8,36 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('surat_masuks', function (Blueprint $table) {
+        // Cek dulu apakah kolom 'tempat' belum ada di tabel 'surat_masuks'
+        if (!Schema::hasColumn('surat_masuks', 'tempat')) {
+            Schema::table('surat_masuks', function (Blueprint $table) {
 
-            $table->string('tempat')->nullable();
-            $table->date('tanggal_kegiatan')->nullable();
+                $table->string('tempat')->nullable();
+                $table->date('tanggal_kegiatan')->nullable();
 
-            $table->time('jam_mulai')->nullable();
-            $table->time('jam_selesai')->nullable();
+                $table->time('jam_mulai')->nullable();
+                $table->time('jam_selesai')->nullable();
 
-            $table->string('materi')->nullable();
+                $table->string('materi')->nullable();
 
-            $table->integer('jumlah_peserta')->default(0);
+                $table->integer('jumlah_peserta')->default(0);
 
-            $table->integer('kursi')->default(0);
-            $table->integer('meja')->default(0);
-            $table->integer('proyektor')->default(0);
-            $table->integer('mic')->default(0);
-            $table->integer('sound_system')->default(0);
-            $table->integer('kabel_roll')->default(0);
+                $table->integer('kursi')->default(0);
+                $table->integer('meja')->default(0);
+                $table->integer('proyektor')->default(0);
+                $table->integer('mic')->default(0);
+                $table->integer('sound_system')->default(0);
+                $table->integer('kabel_roll')->default(0);
 
-            $table->string('lainnya')->nullable();
+                $table->string('lainnya')->nullable();
 
-        });
+            });
+        }
     }
 
     public function down(): void
     {
         Schema::table('surat_masuks', function (Blueprint $table) {
-
             $table->dropColumn([
                 'tempat',
                 'tanggal_kegiatan',
@@ -51,7 +53,6 @@ return new class extends Migration
                 'kabel_roll',
                 'lainnya'
             ]);
-
         });
     }
 };
