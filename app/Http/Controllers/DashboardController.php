@@ -122,14 +122,21 @@ $agendaTerbaru = Agenda::latest()
 ->take(5)
 ->get();
 
-// Surat masuk belum diverifikasi
-$belumVerifikasi = SuratMasuk::where('status', 'Menunggu Verifikasi')->count();
+$agendaTerbaru = Agenda::latest()
+    ->take(5)
+    ->get();
 
-// Surat keluar pending
-$suratKeluarPending = SuratKeluar::where('status', 'Menunggu ACC')->count();
+$belumVerifikasi = SuratMasuk::where(
+    'status',
+    'Belum Disposisi'
+)->count();
 
-// Agenda belum ada laporan
-$agendaBelumLaporan = Agenda::where('status', 'Selesai')->count();
+$suratKeluarPending = 0;
+
+$agendaBelumLaporan = Agenda::where(
+    'status',
+    'Selesai'
+)->count();
 
             {
                 return view('dashboard', compact(
