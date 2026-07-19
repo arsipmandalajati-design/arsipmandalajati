@@ -1012,45 +1012,45 @@ transform:translateY(-6px);
 
 }
 
-/*==================================
-RESPONSIVE MOBILE
-==================================*/
+/*=========================================
+RESPONSIVE SIDEBAR
+=========================================*/
 
-.sidebar-overlay{
+.menu-toggle{
 
-display:none;
+width:45px;
 
-}
+height:45px;
 
-@media(max-width:991px){
+border:none;
 
-.sidebar{
+border-radius:12px;
 
-position:fixed;
+background:#0b5563;
 
-top:0;
+color:#fff;
 
-left:-280px;
+font-size:22px;
 
-width:270px;
+display:flex;
 
-height:100vh;
+align-items:center;
 
-transition:.35s;
+justify-content:center;
 
-z-index:1050;
+box-shadow:0 8px 20px rgba(0,0,0,.12);
 
-}
-
-.sidebar.show{
-
-left:0;
+transition:.3s;
 
 }
 
-.sidebar-overlay{
+.menu-toggle:hover{
 
-display:block;
+background:#0e6d7f;
+
+}
+
+.overlay{
 
 position:fixed;
 
@@ -1062,7 +1062,7 @@ width:100%;
 
 height:100%;
 
-background:rgba(0,0,0,.45);
+background:rgba(0,0,0,.35);
 
 opacity:0;
 
@@ -1070,11 +1070,11 @@ visibility:hidden;
 
 transition:.3s;
 
-z-index:1040;
+z-index:998;
 
 }
 
-.sidebar-overlay.show{
+.overlay.show{
 
 opacity:1;
 
@@ -1082,60 +1082,29 @@ visibility:visible;
 
 }
 
-.main-content{
+@media(max-width:991px){
 
-margin-left:0;
+.sidebar{
 
-width:100%;
-
-padding:18px;
-
-}
-
-.topbar{
-
-flex-wrap:wrap;
-
-gap:15px;
-
-padding:15px;
-
-}
-
-.topbar,
-.main-content{
+transform:translateX(-100%);
 
 transition:.35s;
 
-}
-
-.main-content.shift{
-
-transform:translateX(270px);
+z-index:999;
 
 }
 
-.topbar.shift{
+.sidebar.show{
 
-transform:translateX(270px);
-
-}
-
-.page-header{
-
-padding:25px;
+transform:translateX(0);
 
 }
 
-.page-header h2{
+.main-content{
 
-font-size:24px;
+margin-left:0!important;
 
-}
-
-.page-title{
-
-font-size:24px;
+width:100%!important;
 
 }
 
@@ -1532,6 +1501,7 @@ body.dark-mode .page-title{
 
 <body>
 
+    <div id="overlay" class="overlay"></div>
     <!-- ==========================================================
     SIDEBAR
     =========================================================== -->
@@ -1832,18 +1802,18 @@ body.dark-mode .page-title{
     MAIN CONTENT
     =========================================================== -->
     
-    <div class="main-content">
+    <div class="main-content" id="mainContent">
 
 <!-- =====================================================
 TOPBAR
 ====================================================== -->
 
 <div class="topbar">
-    <button
-    class="btn btn-primary d-lg-none me-3"
-    id="toggleSidebar">
+
+    <button class="menu-toggle d-lg-none"
+            id="menuToggle">
     
-    <i class="bi bi-list fs-4"></i>
+        <i class="bi bi-list"></i>
     
     </button>
     <!-- ================= LEFT ================= -->
@@ -2390,51 +2360,39 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 <script>
 
-    document.addEventListener("DOMContentLoaded",function(){
+    document.addEventListener("DOMContentLoaded",()=>{
     
     const sidebar=document.getElementById("sidebar");
-    const topbar=document.querySelector(".topbar");
-    const content=document.querySelector(".main-content");
     
-    const overlay=document.getElementById("sidebarOverlay");
+    const overlay=document.getElementById("overlay");
     
-    const toggle=document.getElementById("toggleSidebar");
+    const toggle=document.getElementById("menuToggle");
     
-    // buka sidebar
-    toggle.addEventListener("click",function(){
+    toggle.onclick=()=>{
     
-        sidebar.classList.toggle("show");
-overlay.classList.toggle("show");
-
-topbar.classList.toggle("shift");
-content.classList.toggle("shift");
+    sidebar.classList.toggle("show");
     
-    });
+    overlay.classList.toggle("show");
     
-    // klik overlay
-    overlay.addEventListener("click",function(){
-    
-    sidebar.classList.remove("show");
-    
-    overlay.classList.remove("show");
-    
-    });
-    
-    // klik menu
-    document.querySelectorAll(".sidebar-menu a").forEach(function(menu){
-    
-    menu.addEventListener("click",function(){
-    
-    if(window.innerWidth<992){
-    
-    sidebar.classList.remove("show");
-    
-    overlay.classList.remove("show");
-    topbar.classList.remove("shift");
-content.classList.remove("shift");
     }
     
-    });
+    overlay.onclick=()=>{
+    
+    sidebar.classList.remove("show");
+    
+    overlay.classList.remove("show");
+    
+    }
+    
+    window.addEventListener("resize",()=>{
+    
+    if(window.innerWidth>991){
+    
+    sidebar.classList.remove("show");
+    
+    overlay.classList.remove("show");
+    
+    }
     
     });
     
