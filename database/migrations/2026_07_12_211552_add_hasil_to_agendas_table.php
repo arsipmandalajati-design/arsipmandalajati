@@ -9,26 +9,19 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('agendas', function (Blueprint $table) {
-
-            $table->text('hasil_kegiatan')->nullable();
-
-            $table->text('hasil_materi')->nullable();
-
-            $table->text('catatan')->nullable();
-
+            // Cek dulu apakah kolom hasil_kegiatan sudah ada atau belum
+            if (!Schema::hasColumn('agendas', 'hasil_kegiatan')) {
+                $table->text('hasil_kegiatan')->nullable();
+            }
         });
     }
 
     public function down(): void
     {
         Schema::table('agendas', function (Blueprint $table) {
-
-            $table->dropColumn([
-                'hasil_kegiatan',
-                'hasil_materi',
-                'catatan'
-            ]);
-
+            if (Schema::hasColumn('agendas', 'hasil_kegiatan')) {
+                $table->dropColumn('hasil_kegiatan');
+            }
         });
     }
 };
