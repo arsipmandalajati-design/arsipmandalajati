@@ -8,14 +8,12 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('surat_keluars', function (Blueprint $table) {
-
-            $table->foreignId('kode_arsip_id')
-                  ->nullable()
-                  ->constrained('arsips')
-                  ->onDelete('cascade');
-
-        });
+        // Pastikan nama tabelnya 'surat_keluars'
+        if (!Schema::hasColumn('surat_keluars', 'kode_arsip_id')) {
+            Schema::table('surat_keluars', function (Blueprint $table) {
+                $table->foreignId('kode_arsip_id')->nullable()->constrained('kode_arsips')->nullOnDelete();
+            });
+        }
     }
 
     public function down(): void
