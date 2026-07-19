@@ -1055,72 +1055,32 @@ background:#0e6d7f;
 }
 
 .overlay{
-
-position:fixed;
-
-top:0;
-
-left:0;
-
-width:100%;
-
-height:100%;
-
-background:rgba(0,0,0,.35);
-
-opacity:0;
-
-visibility:hidden;
-
-transition:.3s;
-
-z-index:1050;
-
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,.4);
+    opacity:0;
+    visibility:hidden;
+    transition:.3s;
+    z-index:1099;
 }
 
 .overlay.show{
-
-opacity:1;
-
-visibility:visible;
-
-}
-
-@media (min-width:992px){
-
-.sidebar{
-
-transform:none !important;
-
-}
-
+    opacity:1;
+    visibility:visible;
 }
 
 @media(max-width:991px){
 
     .sidebar{
-
-transform:translateX(-100%);
-
+    transform:translateX(-100%);
+    transition:.35s;
 }
 
 .sidebar.show{
-
-transform:translateX(0);
-
-}
-
-.main-content{
-
-margin-left:0 !important;
-
-width:100% !important;
-
-}
-
-.topbar{
-
-margin-left:0;
+    transform:translateX(0);
 }
 }
 
@@ -1515,7 +1475,7 @@ body.dark-mode .page-title{
 
 <body>
 
-    <div id="overlay" class="overlay"></div>
+    <div class="overlay" id="overlay"></div>
     <!-- ==========================================================
     SIDEBAR
     =========================================================== -->
@@ -1824,11 +1784,8 @@ TOPBAR
 
 <div class="topbar">
 
-    <button class="menu-toggle d-lg-none"
-            id="menuToggle">
-    
+    <button class="menu-toggle d-lg-none" id="menuToggle">
         <i class="bi bi-list"></i>
-    
     </button>
     <!-- ================= LEFT ================= -->
 
@@ -2329,45 +2286,39 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 </script>
 <script>
-
-    document.addEventListener("DOMContentLoaded",()=>{
+    document.addEventListener("DOMContentLoaded", function () {
     
-    const sidebar=document.getElementById("sidebar");
+        const btn = document.getElementById("menuToggle");
+        const sidebar = document.getElementById("sidebar");
+        const overlay = document.getElementById("overlay");
     
-    const overlay=document.getElementById("overlay");
+        // Pastikan elemennya ada
+        if (!btn || !sidebar || !overlay) {
+            console.error("Menu Toggle / Sidebar / Overlay tidak ditemukan!");
+            return;
+        }
     
-    const toggle=document.getElementById("menuToggle");
+        // Klik tombol ☰
+        btn.addEventListener("click", function () {
+            sidebar.classList.toggle("show");
+            overlay.classList.toggle("show");
+        });
     
-    btn.onclick=function(){
+        // Klik area gelap
+        overlay.addEventListener("click", function () {
+            sidebar.classList.remove("show");
+            overlay.classList.remove("show");
+        });
     
-    sidebar.classList.toggle("show");
-    
-    overlay.classList.toggle("show");
-    
-    }
-    
-    overlay.onclick=function(){
-    
-    sidebar.classList.remove("show");
-    
-    overlay.classList.remove("show");
-    
-    }
-    
-    window.addEventListener("resize",()=>{
-    
-    if(window.innerWidth>991){
-    
-    sidebar.classList.remove("show");
-    
-    overlay.classList.remove("show");
-    
-    }
+        // Jika layar kembali ke desktop
+        window.addEventListener("resize", function () {
+            if (window.innerWidth >= 992) {
+                sidebar.classList.remove("show");
+                overlay.classList.remove("show");
+            }
+        });
     
     });
-    
-    });
-    
     </script>
 </body>
 
