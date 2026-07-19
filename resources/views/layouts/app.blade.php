@@ -1082,6 +1082,16 @@ background:#0e6d7f;
 .sidebar.show{
     transform:translateX(0);
 }
+
+.main-content{
+
+margin-left:0 !important;
+
+width:100% !important;
+
+padding:20px;
+
+}
 }
 
 .running-box{
