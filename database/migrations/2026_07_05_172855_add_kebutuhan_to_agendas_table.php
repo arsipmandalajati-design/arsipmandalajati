@@ -6,45 +6,25 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up()
+    public function up(): void
     {
-        // Cek dulu apakah kolom 'kursi' belum ada di tabel 'agendas'
-        if (!Schema::hasColumn('agendas', 'kursi')) {
+        // Cek apakah kolom 'kebutuhan' sudah ada di tabel agendas
+        if (Schema::hasColumn('agendas', 'kebutuhan')) {
+            // Jika sudah ada, biarkan saja atau modifikasi jika perlu
+        } else {
+            // Jika belum ada, buat langsung tanpa peduli posisi 'after' kolom 'materi'
             Schema::table('agendas', function (Blueprint $table) {
-        
-                $table->integer('kursi')->default(0);
-        
-                $table->integer('meja')->default(0);
-        
-                $table->integer('proyektor')->default(0);
-        
-                $table->integer('mic')->default(0);
-        
-                $table->integer('sound_system')->default(0);
-        
-                $table->integer('kabel_roll')->default(0);
-        
-                $table->text('lainnya')->nullable();
-        
+                $table->text('kebutuhan')->nullable();
             });
         }
     }
-    
-    public function down()
+
+    public function down(): void
     {
         Schema::table('agendas', function (Blueprint $table) {
-            $table->dropColumn([
-                'kursi',
-                'meja',
-                'proyektor',
-                'mic',
-                'sound_system',
-                'kabel_roll',
-                'lainnya'
-            ]);
+            if (Schema::hasColumn('agendas', 'kebutuhan')) {
+                $table->dropColumn('kebutuhan');
+            }
         });
     }
 };
