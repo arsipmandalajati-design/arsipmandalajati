@@ -145,6 +145,10 @@ display:block;
 SIDEBAR
 ========================================*/
 
+/*==================================
+SIDEBAR
+==================================*/
+
 .sidebar{
 
 position:fixed;
@@ -159,17 +163,17 @@ height:100vh;
 
 background:#003844;
 
-border-right:none;
-
 display:flex;
 
 flex-direction:column;
 
+overflow:hidden;
+
 box-shadow:var(--shadow);
 
-z-index:1;
+transition:transform .35s ease;
 
-overflow:hidden;
+z-index:1100;
 
 }
 
@@ -440,7 +444,7 @@ TOPBAR
     box-shadow:0 8px 25px rgba(0,56,68,.08);
 
     position:relative;
-    z-index:9999;
+    z-index:100;
 }
 
 /*==========================================
@@ -1070,7 +1074,7 @@ visibility:hidden;
 
 transition:.3s;
 
-z-index:998;
+z-index:1050;
 
 }
 
@@ -1082,15 +1086,21 @@ visibility:visible;
 
 }
 
-@media(max-width:991px){
+@media (min-width:992px){
 
 .sidebar{
 
+transform:none !important;
+
+}
+
+}
+
+@media(max-width:991px){
+
+    .sidebar{
+
 transform:translateX(-100%);
-
-transition:.35s;
-
-z-index:999;
 
 }
 
@@ -1102,12 +1112,16 @@ transform:translateX(0);
 
 .main-content{
 
-margin-left:0!important;
+margin-left:0 !important;
 
-width:100%!important;
+width:100% !important;
 
 }
 
+.topbar{
+
+margin-left:0;
+}
 }
 
 .running-box{
@@ -2368,7 +2382,7 @@ document.addEventListener("DOMContentLoaded", function () {
     
     const toggle=document.getElementById("menuToggle");
     
-    toggle.onclick=()=>{
+    btn.onclick=function(){
     
     sidebar.classList.toggle("show");
     
@@ -2376,7 +2390,7 @@ document.addEventListener("DOMContentLoaded", function () {
     
     }
     
-    overlay.onclick=()=>{
+    overlay.onclick=function(){
     
     sidebar.classList.remove("show");
     
