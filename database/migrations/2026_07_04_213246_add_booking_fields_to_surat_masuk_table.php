@@ -8,12 +8,11 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Dikosongkan karena kolom-kolom booking sudah dibuat oleh file migrasi bertanggal 4 Juli.
-        // Ini menghindari konflik duplikasi skema pada database produksi di Railway.
+        // Kosong total untuk bypass duplikasi tempat
     }
 
     public function down(): void
     {
-        // Dikosongkan untuk keamanan rollback
+        // Kosong
     }
 };
