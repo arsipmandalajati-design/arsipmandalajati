@@ -783,273 +783,180 @@ height:auto;
     
     <br>
 
-{{-- ===========================
-MENU CEPAT
-=========================== --}}
+    <div class="row">
 
-<div class="chart-box mt-5">
-
-    <div class="d-flex justify-content-between align-items-center mb-4">
-
-        <h5>
-
-            ⚡ Menu Cepat
-
+        <div class="col-lg-7 mb-4">
+        
+        <div class="card border-0 shadow-sm rounded-4">
+        
+        <div class="card-header bg-white">
+        
+        <h5 class="fw-bold mb-0">
+        
+        <i class="bi bi-calendar-event me-2 text-primary"></i>
+        
+        Agenda Terbaru
+        
         </h5>
-
-        <small class="text-muted">
-
-            Pilih menu yang ingin dibuka
-
-        </small>
-
-    </div>
-
-    <div class="row g-4">
-
-        <div class="col-lg-2 col-md-4 col-6">
-
-            <a href="{{ route('suratmasuk.index') }}"
-               class="quick-card">
-
-                <i class="bi bi-envelope-fill text-success"></i>
-
-                <h6>Surat Masuk</h6>
-
-            </a>
-
-        </div>
-
-        <div class="col-lg-2 col-md-4 col-6">
-
-            <a href="{{ route('suratkeluar.index') }}"
-               class="quick-card">
-
-                <i class="bi bi-send-fill text-primary"></i>
-
-                <h6>Surat Keluar</h6>
-
-            </a>
-
-        </div>
-
-        <div class="col-lg-2 col-md-4 col-6">
-
-            <a href="{{ route('arsip.index') }}"
-               class="quick-card">
-
-                <i class="bi bi-folder-fill text-warning"></i>
-
-                <h6>Arsip</h6>
-
-            </a>
-
-        </div>
-
-        <div class="col-lg-2 col-md-4 col-6">
-
-            <a href="{{ route('agenda.index') }}"
-            class="quick-card">
-         
-             <i class="bi bi-calendar-event-fill text-danger"></i>
-         
-             <h6>Agenda</h6>
-         
-         </a>
-        </div>
-
-        @if(Auth::user()->role_id == 1)
-
-        <div class="col-lg-2 col-md-4 col-6">
-
-            <a href="{{ route('users.index') }}"
-            class="quick-card">
-
-                <i class="bi bi-people-fill text-info"></i>
-
-                <h6>User</h6>
-
-            </a>
-
-        </div>
-
-        @endif
-
-                @if(Auth::user()->role_id == 1)
-
-        <div class="col-lg-2 col-md-4 col-6">
-
-            <a href="{{ route('laporan.index') }}"
-            class="quick-card">
-
-                <i class="bi bi-file-earmark-text-fill text-secondary"></i>
-
-                <h6>Laporan</h6>
-
-            </a>
-
-        </div>
-
-        @endif
-    </div>
-
-</div>
-
-
-{{-- ===========================
-RINGKASAN DATA
-=========================== --}}
-
-<div class="progress-box mt-5">
-
-    <h5>
-    
-    📈 Ringkasan Data
-    
-    </h5>
-    
-    <div class="progress-item">
-
-        <div class="progress-title">
-
-            <span>📥 Surat Masuk</span>
-        
-            <span>{{ $totalSuratMasuk }}</span>
         
         </div>
-    
-        <div class="progress mt-2">
-    
-            <div class="progress-bar bg-success"
-                 style="width:{{ min($totalSuratMasuk,100) }}%">
-            </div>
-    
+        
+        <div class="card-body">
+        
+        <table class="table align-middle">
+        
+        <thead>
+        
+        <tr>
+        
+        <th>Kegiatan</th>
+        
+        <th>Tanggal</th>
+        
+        <th>Status</th>
+        
+        </tr>
+        
+        </thead>
+        
+        <tbody>
+        
+        @forelse($agendaTerbaru as $agenda)
+        
+        <tr>
+        
+        <td>{{ $agenda->nama_kegiatan }}</td>
+        
+        <td>{{ \Carbon\Carbon::parse($agenda->tanggal)->format('d M Y') }}</td>
+        
+        <td>
+        
+        <span class="badge bg-success">
+        
+        {{ $agenda->status }}
+        
+        </span>
+        
+        </td>
+        
+        </tr>
+        
+        @empty
+        
+        <tr>
+        
+        <td colspan="3" class="text-center text-muted">
+        
+        Belum ada agenda.
+        
+        </td>
+        
+        </tr>
+        
+        @endforelse
+        
+        </tbody>
+        
+        </table>
+        
         </div>
-    
-    </div>
-    
-    <div class="progress-item">
+        
+        </div>
+        
+        </div>
 
-        <div class="progress-title">
+        <div class="col-lg-5">
 
-            <span>📥 Surat Masuk</span>
-    
-            <span>{{ $totalSuratKeluar }}</span>
-    
-    </div>
-    
-        <div class="progress mt-2">
-    
-             <div class="progress-bar bg-primary"
-    
-                style="width:{{ min($totalSuratKeluar,100) }}%">
-    
-            </div>
-    
-         </div>
-    
-    </div>
-    
-    <div class="progress-item mt-4">
-    
-        <div class="progress-title">
-    
-            <span>📂 Arsip</span>
+            <div class="card border-0 shadow-sm rounded-4">
             
-            <span>{{ $totalArsip }}</span>
-    
-        </div>
-    
-        <div class="progress mt-2">
-    
-            <div class="progress-bar bg-warning"
-    
-                style="width:{{ min($totalArsip,100) }}%">
-    
-            </div>
-    
-        </div>
-    
-    </div>
-    
-    <div class="progress-item mt-4">
-    
-        <div class="progress-title">
-    
-            <span>📅 Agenda</span>
+            <div class="card-header bg-white">
             
-            <span>{{ $totalAgenda }}</span>
-        
-        </div>
-    
-        <div class="progress mt-2">
-    
-            <div class="progress-bar bg-danger"
-    
-                style="width:{{ min($totalAgenda,100) }}%">
-    
+            <h5 class="fw-bold mb-0">
+            
+            🔔 Pengingat
+            
+            </h5>
+            
             </div>
-    
-        </div>
-    
-    </div>
-    
-</div>
+            
+            <div class="card-body">
+            
+            <div class="alert alert-warning">
+            
+            Surat Masuk belum diverifikasi
+            
+            <strong>{{ $belumVerifikasi }}</strong>
+            
+            </div>
+            
+            <div class="alert alert-info">
+            
+            Surat Keluar menunggu ACC
+            
+            <strong>{{ $suratKeluarPending }}</strong>
+            
+            </div>
+            
+            <div class="alert alert-danger">
+            
+            Agenda belum dibuat laporan
+            
+            <strong>{{ $agendaBelumLaporan }}</strong>
+            
+            </div>
+            
+            </div>
+            
+            </div>
+            
+            </div>
+            
+            </div>
 
     {{-- Aktivitas --}}
-    <div class="col-lg-6">
+    <div class="row">
 
-        <div class="activity-box h-100">
-
-            <h5 class="fw-bold mb-4">
-
-                📝 Aktivitas Terbaru
-
-            </h5>
-
-            @foreach($aktivitas as $item)
-
-<div class="activity-item">
-
-    <div class="activity-icon">
-
-        <i class="bi {{ $item['icon'] }} text-{{ $item['warna'] }}"></i>
-
-    </div>
-
-    <div class="activity-content">
-
-        <div class="activity-title">
-
-            {{ $item['judul'] }}
-
+        <div class="col-lg-6">
+        
+        <div class="card border-0 shadow-sm rounded-4">
+        
+        <div class="card-header bg-white">
+        
+        Aktivitas Terbaru
+        
         </div>
-
-        <div class="activity-desc">
-
-            {{ $item['isi'] }}
-
+        
+        <div class="card-body">
+        
+        Belum ada aktivitas.
+        
         </div>
-
-        <div class="activity-time">
-
-            <i class="bi bi-clock"></i>
-
-            {{ $item['waktu']->diffForHumans() }}
-
+        
         </div>
-
-    </div>
-
-</div>
-
-@endforeach
-
+        
         </div>
-
-    </div>
-
-</div>
+        
+        <div class="col-lg-6">
+        
+        <div class="card border-0 shadow-sm rounded-4">
+        
+        <div class="card-header bg-white">
+        
+        Notifikasi Sistem
+        
+        </div>
+        
+        <div class="card-body">
+        
+        Belum ada notifikasi.
+        
+        </div>
+        
+        </div>
+        
+        </div>
+        
+        </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
