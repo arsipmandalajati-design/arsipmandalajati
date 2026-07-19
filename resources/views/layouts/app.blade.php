@@ -1103,6 +1103,25 @@ padding:15px;
 
 }
 
+.topbar,
+.main-content{
+
+transition:.35s;
+
+}
+
+.main-content.shift{
+
+transform:translateX(270px);
+
+}
+
+.topbar.shift{
+
+transform:translateX(270px);
+
+}
+
 .page-header{
 
 padding:25px;
@@ -2382,6 +2401,8 @@ document.addEventListener("DOMContentLoaded", function () {
     document.addEventListener("DOMContentLoaded",function(){
     
     const sidebar=document.getElementById("sidebar");
+    const topbar=document.querySelector(".topbar");
+    const content=document.querySelector(".main-content");
     
     const overlay=document.getElementById("sidebarOverlay");
     
@@ -2390,9 +2411,11 @@ document.addEventListener("DOMContentLoaded", function () {
     // buka sidebar
     toggle.addEventListener("click",function(){
     
-    sidebar.classList.toggle("show");
-    
-    overlay.classList.toggle("show");
+        sidebar.classList.toggle("show");
+overlay.classList.toggle("show");
+
+topbar.classList.toggle("shift");
+content.classList.toggle("shift");
     
     });
     
@@ -2415,7 +2438,8 @@ document.addEventListener("DOMContentLoaded", function () {
     sidebar.classList.remove("show");
     
     overlay.classList.remove("show");
-    
+    topbar.classList.remove("shift");
+content.classList.remove("shift");
     }
     
     });
