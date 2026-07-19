@@ -20,9 +20,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
 {
-    // Paksa HTTPS jika aplikasi berjalan di environment production (seperti Railway)
-    if (config('app.env') === 'production') {
-        URL::forceScheme('https');
-    }
+    \Illuminate\Support\Facades\URL::forceScheme('https');
 }
 }

@@ -1014,16 +1014,32 @@ transform:translateY(-6px);
 }
 
 /*==================================
-RESPONSIVE
+RESPONSIVE MOBILE
 ==================================*/
+
+.sidebar-overlay{
+
+display:none;
+
+}
 
 @media(max-width:991px){
 
 .sidebar{
 
-left:-270px;
+position:fixed;
+
+top:0;
+
+left:-280px;
+
+width:270px;
+
+height:100vh;
 
 transition:.35s;
+
+z-index:1050;
 
 }
 
@@ -1033,13 +1049,47 @@ left:0;
 
 }
 
+.sidebar-overlay{
+
+display:block;
+
+position:fixed;
+
+top:0;
+
+left:0;
+
+width:100%;
+
+height:100%;
+
+background:rgba(0,0,0,.45);
+
+opacity:0;
+
+visibility:hidden;
+
+transition:.3s;
+
+z-index:1040;
+
+}
+
+.sidebar-overlay.show{
+
+opacity:1;
+
+visibility:visible;
+
+}
+
 .main-content{
 
 margin-left:0;
 
 width:100%;
 
-padding:20px;
+padding:18px;
 
 }
 
@@ -1048,6 +1098,26 @@ padding:20px;
 flex-wrap:wrap;
 
 gap:15px;
+
+padding:15px;
+
+}
+
+.page-header{
+
+padding:25px;
+
+}
+
+.page-header h2{
+
+font-size:24px;
+
+}
+
+.page-title{
+
+font-size:24px;
 
 }
 
@@ -1447,8 +1517,8 @@ body.dark-mode .page-title{
     <!-- ==========================================================
     SIDEBAR
     =========================================================== -->
-    
-    <div class="sidebar">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="sidebar" id="sidebar">
     
         <!-- ================= LOGO ================= -->
     
@@ -1751,7 +1821,13 @@ TOPBAR
 ====================================================== -->
 
 <div class="topbar">
-
+    <button
+    class="btn btn-primary d-lg-none me-3"
+    id="toggleSidebar">
+    
+    <i class="bi bi-list fs-4"></i>
+    
+    </button>
     <!-- ================= LEFT ================= -->
 
     <div>
@@ -2121,7 +2197,7 @@ switch ($route) {
 <!-- ============================================
 JQUERY
 ============================================= -->
-
+<script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
 <!-- Bootstrap -->
@@ -2301,7 +2377,54 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 </script>
+<script>
 
+    document.addEventListener("DOMContentLoaded",function(){
+    
+    const sidebar=document.getElementById("sidebar");
+    
+    const overlay=document.getElementById("sidebarOverlay");
+    
+    const toggle=document.getElementById("toggleSidebar");
+    
+    // buka sidebar
+    toggle.addEventListener("click",function(){
+    
+    sidebar.classList.toggle("show");
+    
+    overlay.classList.toggle("show");
+    
+    });
+    
+    // klik overlay
+    overlay.addEventListener("click",function(){
+    
+    sidebar.classList.remove("show");
+    
+    overlay.classList.remove("show");
+    
+    });
+    
+    // klik menu
+    document.querySelectorAll(".sidebar-menu a").forEach(function(menu){
+    
+    menu.addEventListener("click",function(){
+    
+    if(window.innerWidth<992){
+    
+    sidebar.classList.remove("show");
+    
+    overlay.classList.remove("show");
+    
+    }
+    
+    });
+    
+    });
+    
+    });
+    
+    </script>
 </body>
 
 </html>
