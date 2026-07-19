@@ -2148,50 +2148,6 @@ CONTENT
         </div>
     
     </div>
-    @php
-
-$route = Route::currentRouteName();
-
-switch ($route) {
-
-    case 'dashboard':
-        $runningText = "👋 Selamat datang di Dashboard Sistem Informasi E-Arsip Kecamatan Mandalajati • Pantau statistik surat, agenda, arsip dan aktivitas terbaru secara real-time.";
-        break;
-
-    case 'suratmasuk.index':
-        $runningText = "📥 Kelola Surat Masuk dengan mudah • Pastikan seluruh surat telah diverifikasi dan didisposisikan kepada pegawai yang bersangkutan.";
-        break;
-
-    case 'suratkeluar.index':
-        $runningText = "📤 Kelola Surat Keluar • Pastikan nomor surat, tujuan dan lampiran telah sesuai sebelum dicetak atau dikirim.";
-        break;
-
-    case 'arsip.index':
-        $runningText = "📂 Arsip Digital memudahkan pencarian dokumen • Simpan seluruh dokumen secara aman dan terstruktur.";
-        break;
-
-    case 'agenda.index':
-        $runningText = "📅 Jangan lupa memeriksa Agenda Kegiatan • Pastikan jadwal rapat maupun kegiatan telah sesuai.";
-        break;
-
-    case 'users.index':
-        $runningText = "👥 Kelola Data Pengguna berdasarkan hak akses (RBAC) • Admin memiliki akses penuh sedangkan Pegawai hanya dapat mengakses menu sesuai kewenangannya.";
-        break;
-
-    case 'laporan.index':
-        $runningText = "📊 Gunakan menu Laporan untuk melihat rekap Surat Masuk, Surat Keluar, Arsip dan Agenda.";
-        break;
-
-    case 'pejabat.index':
-        $runningText = "🏢 Kelola Data Pejabat Kecamatan Mandalajati agar informasi penanggung jawab selalu diperbarui.";
-        break;
-
-    default:
-        $runningText = "📢 Selamat Datang di Sistem Informasi E-Arsip Kecamatan Mandalajati • Terima kasih telah menggunakan aplikasi ini.";
-        break;
-}
-
-@endphp
 
     @yield('content')
 </div>
