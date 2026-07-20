@@ -95,25 +95,26 @@ Registrasikan surat fisik maupun dokumen digital yang diterima Kecamatan sebagai
             @csrf
 
             {{-- ========================================= --}}
-{{-- INFORMASI ARSIP --}}
-{{-- ========================================= --}}
-<div class="section-title">Informasi Arsip</div>
-<div class="row mb-3">
-    <div class="mb-3">
-        <label for="kode_arsip_id" class="form-label">Kode Arsip</label>
-        <select class="form-select" id="kode_arsip_id" name="kode_arsip_id" required>
-            <option value="">-- Pilih Kode Arsip --</option>
-            @foreach($kodearsip as $item)
-                <option value="{{ $item->id }}">{{ $item->kode }} - {{ $item->nama_kategori }}</option>
-            @endforeach
-        </select>
-    </div>
+            {{-- INFORMASI ARSIP --}}
+            {{-- ========================================= --}}
+            <div class="section-title">Informasi Arsip</div>
+            <div class="row mb-3">
+                <div class="col-md-6 mb-3">
+                    <label for="kode_arsip_id" class="form-label fw-semibold text-secondary">Kode Arsip <span class="required">*</span></label>
+                    <select class="form-select" id="kode_arsip_id" name="kode_arsip_id" required>
+                        <option value="">-- Pilih Kode Arsip --</option>
+                        @foreach($kodearsip as $item)
+                            <option value="{{ $item->id }}">{{ $item->kode }} - {{ $item->nama_kategori }}</option>
+                        @endforeach
+                    </select>
+                </div>
 
-    <div class="mb-3">
-        <label for="nomor_registrasi" class="form-label">Nomor Registrasi</label>
-        <input type="text" class="form-control" id="nomor_registrasi" name="nomor_registrasi" readonly placeholder="Otomatis terisi setelah memilih Kode Arsip">
-        <small class="text-muted">Nomor ini di-generate otomatis oleh sistem berdasarkan nomor urut terbesar.</small>
-    </div>
+                <div class="col-md-6 mb-3">
+                    <label for="nomor_registrasi" class="form-label fw-semibold text-secondary">Nomor Registrasi</label>
+                    <input type="text" class="form-control" id="nomor_registrasi" name="nomor_registrasi" readonly placeholder="Otomatis terisi setelah memilih Kode Arsip">
+                    <small class="text-muted">Nomor ini di-generate otomatis oleh sistem berdasarkan nomor urut terbesar.</small>
+                </div>
+            </div>
 
             {{-- ========================================= --}}
             {{-- INFORMASI SURAT --}}
@@ -138,7 +139,7 @@ Registrasikan surat fisik maupun dokumen digital yang diterima Kecamatan sebagai
                     </select>
                 </div>
 
-                <div class="col-md-6 mb-3">
+                <div class="col-md-12 mb-3">
                     <label class="form-label fw-semibold text-secondary">Nomor Surat Fisik / Instansi <span class="required">*</span></label>
                     <input type="text" name="nomor_surat" id="nomor_surat" class="form-control" value="{{ old('nomor_surat') }}" placeholder="Contoh: 045.2/123-Kec" required>
                     <div class="invalid-feedback">Nomor surat fisik wajib diisi.</div>
@@ -162,7 +163,7 @@ Registrasikan surat fisik maupun dokumen digital yang diterima Kecamatan sebagai
                     <div class="invalid-feedback">Asal instansi pengirim wajib diisi.</div>
                 </div>
 
-                <div class="col-md-6 mb-3">
+                <div class="col-md-12 mb-3">
                     <label class="form-label fw-semibold text-secondary">Tanggal Surat <span class="required">*</span></label>
                     <input type="date" name="tanggal_surat" class="form-control" value="{{ old('tanggal_surat') }}" required>
                     <div class="invalid-feedback">Tanggal pada surat fisik wajib dipilih.</div>
@@ -199,7 +200,7 @@ Registrasikan surat fisik maupun dokumen digital yang diterima Kecamatan sebagai
                         <div>Formulir ini terbuka karena jenis surat berupa <strong>Internal</strong>. Digunakan apabila kegiatan internal Kecamatan membutuhkan reservasi ruangan.</div>
                     </div>
                     
-                    <div id="bookingAlertContainer" class="mb-3"></div> <!-- Wadah Notifikasi AJAX Real-Time -->
+                    <div id="bookingAlertContainer" class="mb-3"></div>
 
                     <div class="row">
                         <div class="col-md-12 mb-3">
@@ -327,7 +328,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const form = document.getElementById("formRegistrasiSurat");
     const btnSimpan = document.getElementById("btnSimpan");
 
-    // Jalankan pengecekan toggle & nomor saat pertama kali dimuat
     toggleBooking();
     if(kodeArsip.value !== ""){
         ambilNomorRegistrasi();
@@ -336,9 +336,7 @@ document.addEventListener("DOMContentLoaded", function () {
     jenisSurat.addEventListener("change", toggleBooking);
     kodeArsip.addEventListener("change", ambilNomorRegistrasi);
 
-    // ======================================
-    // 1. SUBMIT FORM DENGAN VALIDASI & SWAL LOADING
-    // ======================================
+    // 1. SUBMIT FORM
     form.addEventListener("submit", function(e){
         if(!form.checkValidity()){
             e.preventDefault();
@@ -362,9 +360,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    // ======================================
-    // 2. DYNAMIC TOGGLE BOOKING CARD
-    // ======================================
+    // 2. TOGGLE BOOKING CARD
     function toggleBooking(){
         let booking = document.getElementById("bookingCard");
         if(!booking) return;
@@ -389,9 +385,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // ======================================
-    // 3. GENERATE NOMOR REGISTRASI VIA FETCH API
-    // ======================================
+    // 3. FETCH NOMOR REGISTRASI
     function ambilNomorRegistrasi(){
         let id = kodeArsip.value;
 
@@ -415,9 +409,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // ======================================
-    // 4. CEK BENTROK JADWAL RUANGAN (AJAX JQUERY OPTIMIZED)
-    // ======================================
+    // 4. CEK BENTROK JADWAL
     $("#tempat, #tanggal_kegiatan, #jam_mulai, #jam_selesai").on("change", function(){
         let tempat = $("#tempat").val();
         let tanggal = $("#tanggal_kegiatan").val();
@@ -475,6 +467,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 btnSimpan.disabled = false;
             }
         });
-    }); // Kode PHP lama di dalam sini sudah dihapus bersih
+    });
 });
 </script>
+@endsection
