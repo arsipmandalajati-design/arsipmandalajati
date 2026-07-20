@@ -130,21 +130,24 @@ class SuratMasukController extends Controller
             }
 
             // 3. Simpan Entri Utama ke Tabel surat_masuks
-            $surat = SuratMasuk::create([
-                'user_id'           => Auth::id(),
-                'kode_arsip_id'     => $request->kode_arsip_id,
-                'nomor_urut'        => $nomorUrut,
-                'nomor_registrasi'  => $nomorRegistrasi, // Diaktifkan penuh
-                'nomor_surat'       => $request->nomor_surat,
-                'jenis_surat'       => $request->jenis_surat,
-                'sumber_arsip'      => $request->sumber_arsip,
-                'judul'             => $request->judul,
-                'pengirim'          => $request->pengirim,
-                'tanggal_surat'     => $request->tanggal_surat,
-                'perihal'           => $request->perihal,
-                'file_surat'        => $file,
-                'status'            => 'Belum Disposisi',
-            ]);
+$surat = SuratMasuk::create([
+    'user_id'           => Auth::id(),
+    'kode_arsip_id'     => $request->kode_arsip_id,
+    'nomor_urut'        => $nomorUrut,
+    
+    // HAPUS ATAU KOMENTARI BARIS INI JIKA KOLOMNYA TIDAK ADA DI DB RAILWAY:
+    // 'nomor_registrasi'  => $nomorRegistrasi, 
+    
+    'nomor_surat'       => $request->nomor_surat,
+    'jenis_surat'       => $request->jenis_surat,
+    'sumber_arsip'      => $request->sumber_arsip,
+    'judul'             => $request->judul,
+    'pengirim'          => $request->pengirim,
+    'tanggal_surat'     => $request->tanggal_surat,
+    'perihal'           => $request->perihal,
+    'file_surat'        => $file,
+    'status'            => 'Belum Disposisi',
+]);
 
             // 4. Jika Surat Internal, Simpan Logistik ke Tabel agendas secara otomatis
             if ($request->jenis_surat === 'Internal') {

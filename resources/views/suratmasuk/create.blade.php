@@ -104,8 +104,10 @@ Registrasikan surat fisik maupun dokumen digital yang diterima Kecamatan sebagai
                     <select class="form-select" id="kode_arsip_id" name="kode_arsip_id" required>
                         <option value="">-- Pilih Kode Arsip --</option>
                         @foreach($kodearsip as $item)
-                            <option value="{{ $item->id }}" {{ old('kode_arsip_id') == $item->id ? 'selected' : '' }}>{{ $item->kode }} - {{ $item->nama_kategori }}</option>
-                        @endforeach
+    <option value="{{ $item->id }}" {{ old('kode_arsip_id') == $item->id ? 'selected' : '' }}>
+        {{ $item->kode }} - {{ $item->nama_arsip }}
+    </option>
+@endforeach
                     </select>
                     <div class="invalid-feedback">Kode arsip wajib dipilih.</div>
                 </div>
