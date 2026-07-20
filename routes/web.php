@@ -14,258 +14,82 @@ use App\Http\Controllers\PejabatController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\NotificationController;
 
-
-
 /*
 |--------------------------------------------------------------------------
 | HALAMAN AWAL
 |--------------------------------------------------------------------------
 */
-
 Route::redirect('/', '/login');
 
 /*
 |--------------------------------------------------------------------------
-| AUTH USER
+| AUTH USER (SEMUA USER YANG LOGIN)
 |--------------------------------------------------------------------------
 */
-
 Route::middleware('auth')->group(function () {
 
+    /* --- Dashboard --- */
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Dashboard
-    |--------------------------------------------------------------------------
-    */
+    /* --- Profile --- */
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 
-    Route::get('/dashboard',
-        [DashboardController::class,'index']
-    )->name('dashboard');
+    /* --- Arsip Global --- */
+    Route::resource('arsip', ArsipController::class);
 
+    /* --- Notifications --- */
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/read/{id}', [NotificationController::class, 'read'])->name('notifications.read');
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | Profile
-    |--------------------------------------------------------------------------
-    */
-
-    Route::get('/profile',
-        [ProfileController::class,'edit']
-    )->name('profile.edit');
-
-
-    Route::patch('/profile',
-        [ProfileController::class,'update']
-    )->name('profile.update');
-
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Arsip
-    |--------------------------------------------------------------------------
-    */
-
-    Route::resource('arsip',
-        ArsipController::class
-    );
-
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | NOTIFICATION
-    |--------------------------------------------------------------------------
-    */
-
-    Route::get('/notifications',
-        [NotificationController::class,'index']
-    )->name('notifications.index');
-
-
-    Route::post('/notifications/read/{id}',
-        [NotificationController::class,'read']
-    )->name('notifications.read');
-
-
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | SURAT MASUK
-    |--------------------------------------------------------------------------
-    */
-
-
-    // PRINT
-    Route::get('/suratmasuk/print',
-        [SuratMasukController::class,'print']
-    )->name('suratmasuk.print');
-
-
-
-    // DISPOSISI
-
-    Route::get('/suratmasuk/{id}/disposisi',
-        [SuratMasukController::class,'disposisi']
-    )->name('suratmasuk.disposisi');
-
-
-    Route::post('/suratmasuk/{id}/disposisi',
-        [SuratMasukController::class,'kirimDisposisi']
-    )->name('suratmasuk.kirimDisposisi');
-
-
-
-    // VERIFIKASI
-
-    Route::post('/suratmasuk/{id}/verifikasi',
-        [SuratMasukController::class,'verifikasi']
-    )->name('suratmasuk.verifikasi');
-
-
-    Route::get(
-        '/kodearsip/{id}/nomor-registrasi',
-        [SuratMasukController::class, 'getNomorRegistrasi']
-    )->name('kodearsip.nomor');
-
-    /*
-    |--------------------------------------------------------------------------
-    | RESOURCE SURAT MASUK
-    |--------------------------------------------------------------------------
-    */
-
-    Route::resource('suratmasuk',
-        SuratMasukController::class
-    );
+    /* --- SURAT MASUK --- */
+    // Catatan: Rute custom HARUS di atas Route::resource agar tidak terbaca sebagai {suratmasuk} ID
+    Route::get('/suratmasuk/print', [SuratMasukController::class, 'print'])->name('suratmasuk.print');
+    Route::get('/suratmasuk/get-nomor-registrasi/{id}', [SuratMasukController::class, 'getNomorRegistrasi'])->name('suratmasuk.getNomorRegistrasi');
     
+    // Alur Disposisi & Agenda
+    Route::get('/suratmasuk/{id}/disposisi', [SuratMasukController::class, 'disposisi'])->name('suratmasuk.disposisi');
+    Route::post('/suratmasuk/{id}/disposisi', [SuratMasukController::class, 'kirimDisposisi'])->name('suratmasuk.kirimDisposisi');
+    Route::post('/suratmasuk/{id}/verifikasi', [SuratMasukController::class, 'verifikasi'])->name('suratmasuk.verifikasi');
+    Route::get('/suratmasuk/{id}/pilih-agenda', [SuratMasukController::class, 'pilihAgenda'])->name('suratmasuk.pilihAgenda');
 
+    Route::resource('suratmasuk', SuratMasukController::class);
 
+    /* --- SURAT KELUAR --- */
+    Route::get('/suratkeluar/print', [SuratKeluarController::class, 'print'])->name('suratkeluar.print');
+    Route::resource('suratkeluar', SuratKeluarController::class);
 
+    /* --- AGENDA --- */
+    // Fitur Cek Ruangan via AJAX (Duplikasi dibersihkan menjadi satu rute yang jelas)
+    Route::get('/agenda/cek-booking', [AgendaController::class, 'cekBooking'])->name('agenda.cekBooking');
+    
+    // Pembuatan agenda khusus yang ditarik dari disposisi surat masuk
+    Route::get('/agenda/create/{id}', [AgendaController::class, 'create'])->name('agenda.create');
+    Route::post('/agenda/store/{id}', [AgendaController::class, 'store'])->name('agenda.store');
+    
+    // Fitur Tambahan Agenda
+    Route::get('/agenda/print', [AgendaController::class, 'print'])->name('agenda.print');
+    Route::get('/agenda/{agenda}/whatsapp', [AgendaController::class, 'whatsapp'])->name('agenda.whatsapp');
+    Route::get('/agenda/{agenda}/hasil', [AgendaController::class, 'hasil'])->name('agenda.hasil');
+    Route::post('/agenda/{agenda}/hasil', [AgendaController::class, 'simpanHasil'])->name('agenda.simpanHasil');
+    
+    Route::resource('agenda', AgendaController::class)->except(['create', 'store']);
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | SURAT KELUAR
-    |--------------------------------------------------------------------------
-    */
-
-
-    Route::get('/suratkeluar/print',
-        [SuratKeluarController::class,'print']
-    )->name('suratkeluar.print');
-
-
-    Route::resource('suratkeluar',
-        SuratKeluarController::class
-    );
-
-
-
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | AGENDA
-    |--------------------------------------------------------------------------
-    */
-
-
-    Route::get('/cek-booking',
-        [AgendaController::class,'cekBooking']
-    )->name('agenda.cekBooking');
-
-
-    Route::get('/agenda/create/{id}',
-        [AgendaController::class,'create']
-    )->name('agenda.create');
-
-
-    Route::post('/agenda/store/{id}',
-        [AgendaController::class,'store']
-    )->name('agenda.store');
-
-
-    Route::get('/agenda/{agenda}/whatsapp',
-    [AgendaController::class,'whatsapp']
-)->name('agenda.whatsapp');
-
-
-Route::get('/agenda/{agenda}/hasil',
-    [AgendaController::class,'hasil']
-)->name('agenda.hasil');
-
-Route::post(
-    '/agenda/{agenda}/hasil',
-    [AgendaController::class,'simpanHasil']
-)->name('agenda.simpanHasil');
-
-Route::get('/agenda/print',
-    [AgendaController::class,'print']
-)->name('agenda.print');
-
-    Route::resource('agenda',
-        AgendaController::class
-    )->except([
-        'create',
-        'store'
-    ]);
-
-
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | LOGOUT
-    |--------------------------------------------------------------------------
-    */
-
-    Route::post('/logout',
-        [AuthenticatedSessionController::class,'destroy']
-    )->name('logout');
-
+    /* --- LOGOUT --- */
+    Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 });
-
-
-
-
 
 /*
 |--------------------------------------------------------------------------
-| ADMIN ONLY
+| ADMIN ONLY (KHUSUS HAK AKSES ADMIN)
 |--------------------------------------------------------------------------
 */
-
-
-Route::middleware([
-    'auth',
-    'role:admin'
-])->group(function(){
-
-
-    Route::resource('users',
-        UserController::class
-    );
-
-
-    Route::resource('pejabat',
-        PejabatController::class
-    );
-
-
-    Route::resource('laporan', LaporanController::class)
-    ->except(['show']);
-
-
-    Route::get('/laporan/print',
-        [LaporanController::class,'print']
-    )->name('laporan.print');
-
-
+Route::middleware(['auth', 'role:admin'])->group(function() {
+    Route::resource('users', UserController::class);
+    Route::resource('pejabat', PejabatController::class);
+    
+    Route::get('/laporan/print', [LaporanController::class, 'print'])->name('laporan.print');
+    Route::resource('laporan', LaporanController::class)->except(['show']);
 });
-
-
 
 require __DIR__.'/auth.php';
