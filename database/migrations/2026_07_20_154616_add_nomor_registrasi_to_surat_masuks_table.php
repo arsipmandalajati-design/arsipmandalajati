@@ -10,19 +10,16 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    {
-        Schema::table('surat_masuks', function (Blueprint $table) {
-            //
-        });
-    }
+{
+    Schema::table('surat_masuks', function (Blueprint $table) {
+        $table->string('nomor_registrasi')->nullable()->after('id'); // Sesuaikan posisi kolom jika perlu
+    });
+}
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::table('surat_masuks', function (Blueprint $table) {
-            //
-        });
-    }
+public function down(): void
+{
+    Schema::table('surat_masuks', function (Blueprint $table) {
+        $table->dropColumn('nomor_registrasi');
+    });
+}
 };
