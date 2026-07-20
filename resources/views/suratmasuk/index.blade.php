@@ -304,51 +304,8 @@ document.addEventListener('DOMContentLoaded',function(){
                             {{-- AKSI --}}
                             <td class="text-center">
                                 <div class="d-flex gap-1 justify-content-center">
-                                    {{-- ================= ADMIN ================= --}}
+                                    {{-- ================= ADMIN (DIUBAH MENJADI FITUR PEGAWAI) ================= --}}
                                     @if(Auth::user()->role == 'admin')
-                                        {{-- Tombol Detail memicu Modal --}}
-                                        <button type="button" 
-                                                class="btn btn-info btn-sm text-white btn-preview" 
-                                                data-bs-toggle="modal" 
-                                                data-bs-target="#previewModalSuratMasuk"
-                                                data-kode="{{ $item->kodearsip->kode ?? '-' }}"
-                                                data-nomor="{{ $item->nomor_surat }}"
-                                                data-judul="{{ $item->judul }}"
-                                                data-pengirim="{{ $item->pengirim }}"
-                                                data-tanggal="{{ \Carbon\Carbon::parse($item->tanggal_surat)->format('d M Y') }}"
-                                                data-status="{{ $item->status }}"
-                                                data-perihal="{{ $item->perihal }}"
-                                                data-file="{{ $item->file_surat ? asset('storage/' . $item->file_surat) : '' }}"
-                                                title="Detail & Preview Surat">
-                                            <i class="bi bi-eye"></i>
-                                        </button>
-
-                                        <a href="{{ route('suratmasuk.disposisi', $item->id) }}" class="btn btn-primary btn-sm" title="Kirim Disposisi">
-                                            <i class="bi bi-send-fill"></i>
-                                        </a>
-                                        
-                                        @if($item->status == 'Menunggu Verifikasi')
-                                            <a href="{{ route('suratmasuk.edit', $item->id) }}" class="btn btn-warning btn-sm text-white" title="Edit Surat">
-                                                <i class="bi bi-pencil-square"></i>
-                                            </a>
-                                            <form action="{{ route('suratmasuk.verifikasi', $item->id) }}" method="POST" style="display:inline;">
-                                                @csrf
-                                                <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Verifikasi surat ini?')" title="Verifikasi Surat">
-                                                    <i class="bi bi-patch-check-fill"></i>
-                                                </button>
-                                            </form>
-                                        @endif
-                                    
-                                        <form action="{{ route('suratmasuk.destroy', $item->id) }}" method="POST" style="display:inline;">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus data ini?')" title="Hapus">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </form>
-
-                                    {{-- ================= PEGAWAI ================= --}}
-                                    @elseif(Auth::user()->role == 'pegawai')
                                         {{-- Tombol Detail memicu Modal --}}
                                         <button type="button" 
                                                 class="btn btn-info btn-sm text-white btn-preview" 
@@ -390,6 +347,49 @@ document.addEventListener('DOMContentLoaded',function(){
                                                 </button>
                                             </form>
                                         @endif
+
+                                    {{-- ================= PEGAWAI (DIUBAH MENJADI FITUR ADMIN) ================= --}}
+                                    @elseif(Auth::user()->role == 'pegawai')
+                                        {{-- Tombol Detail memicu Modal --}}
+                                        <button type="button" 
+                                                class="btn btn-info btn-sm text-white btn-preview" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#previewModalSuratMasuk"
+                                                data-kode="{{ $item->kodearsip->kode ?? '-' }}"
+                                                data-nomor="{{ $item->nomor_surat }}"
+                                                data-judul="{{ $item->judul }}"
+                                                data-pengirim="{{ $item->pengirim }}"
+                                                data-tanggal="{{ \Carbon\Carbon::parse($item->tanggal_surat)->format('d M Y') }}"
+                                                data-status="{{ $item->status }}"
+                                                data-perihal="{{ $item->perihal }}"
+                                                data-file="{{ $item->file_surat ? asset('storage/' . $item->file_surat) : '' }}"
+                                                title="Detail & Preview Surat">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+
+                                        <a href="{{ route('suratmasuk.disposisi', $item->id) }}" class="btn btn-primary btn-sm" title="Kirim Disposisi">
+                                            <i class="bi bi-send-fill"></i>
+                                        </a>
+                                        
+                                        @if($item->status == 'Menunggu Verifikasi')
+                                            <a href="{{ route('suratmasuk.edit', $item->id) }}" class="btn btn-warning btn-sm text-white" title="Edit Surat">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </a>
+                                            <form action="{{ route('suratmasuk.verifikasi', $item->id) }}" method="POST" style="display:inline;">
+                                                @csrf
+                                                <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Verifikasi surat ini?')" title="Verifikasi Surat">
+                                                    <i class="bi bi-patch-check-fill"></i>
+                                                </button>
+                                            </form>
+                                        @endif
+                                    
+                                        <form action="{{ route('suratmasuk.destroy', $item->id) }}" method="POST" style="display:inline;">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus data ini?')" title="Hapus">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
                                     @endif
                                 </div>
                             </td>
