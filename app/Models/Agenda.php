@@ -13,12 +13,22 @@ class Agenda extends Model
     protected $table = 'agendas';
 
     protected $fillable = [
+
         'surat_masuk_id',
         'user_id',
+    
+        'nama_kegiatan',
+        'tanggal',
         'tempat',
         'jam_mulai',
         'jam_selesai',
+    
+        'penyelenggara',
+        'keterangan',
+        'status',
+    
         'materi',
+    
         'jumlah_peserta',
         'kursi',
         'meja',
@@ -27,6 +37,7 @@ class Agenda extends Model
         'sound_system',
         'kabel_roll',
         'lainnya',
+    
     ];
 
     protected $casts = [
