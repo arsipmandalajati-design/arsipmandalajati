@@ -425,14 +425,16 @@ class SuratMasukController extends Controller
     |--------------------------------------------------------------------------
     */
     public function getNomorRegistrasi($id)
-    {
-        $kode = KodeArsip::findOrFail($id);
-        $last = SuratMasuk::where('kode_arsip_id', $id)->latest()->first();
-        $nomor = $last ? $last->nomor_urut + 1 : 1;
+{
+    $kode = KodeArsip::findOrFail($id);
+    $last = SuratMasuk::where('kode_arsip_id', $id)->latest()->first();
+    $nomor = $last ? $last->nomor_urut + 1 : 1;
 
-        return response()->json([
-            'nomor_urut'       => $nomor,
-            'nomor_registrasi' => $kode->kode . '/' . str_pad($nomor, 3, '0', STR_PAD_LEFT)
-        ]);
-    }
+    // Generate format nomor registrasi secara lengkap
+    $nomorLengkap = $kode->kode . '/' . str_pad($nomor, 3, '0', STR_PAD_LEFT);
+
+    return response()->json([
+        'nomor_registrasi' => $nomorLengkap
+    ]);
+}
 }
