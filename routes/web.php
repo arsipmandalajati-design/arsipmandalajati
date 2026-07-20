@@ -47,13 +47,17 @@ Route::middleware('auth')->group(function () {
     Route::get('/suratmasuk/print', [SuratMasukController::class, 'print'])->name('suratmasuk.print');
     Route::get('/suratmasuk/get-nomor-registrasi/{kode_arsip_id}', [SuratMasukController::class, 'getNomorRegistrasi'])->name('suratmasuk.getNomor');
 
-    // Alur Disposisi & Agenda
-    Route::get('/suratmasuk/{id}/disposisi', [SuratMasukController::class, 'disposisi'])->name('suratmasuk.disposisi');
-    Route::post('/suratmasuk/{id}/disposisi', [SuratMasukController::class, 'kirimDisposisi'])->name('suratmasuk.kirimDisposisi');
+    // Alur Disposisi & Agenda (Hanya Admin yang bisa mengakses halaman & kirim disposisi)
+    Route::middleware(['role:admin'])->group(function () {
+        Route::get('/suratmasuk/{id}/disposisi', [SuratMasukController::class, 'disposisi'])->name('suratmasuk.disposisi');
+        Route::post('/suratmasuk/{id}/disposisi', [SuratMasukController::class, 'kirimDisposisi'])->name('suratmasuk.kirimDisposisi');
+    });
+
     Route::post('/suratmasuk/{id}/verifikasi', [SuratMasukController::class, 'verifikasi'])->name('suratmasuk.verifikasi');
     Route::get('/suratmasuk/{id}/pilih-agenda', [SuratMasukController::class, 'pilihAgenda'])->name('suratmasuk.pilihAgenda');
 
-    Route::resource('suratmasuk', SuratMasukController::class);
+    // Resource surat masuk tanpa destroy di grup umum, karena destroy khusus admin
+    Route::resource('suratmasuk', SuratMasukController::class)->except(['destroy']);
 
     /* --- SURAT KELUAR --- */
     Route::get('/suratkeluar/print', [SuratKeluarController::class, 'print'])->name('suratkeluar.print');
@@ -89,6 +93,9 @@ Route::middleware(['auth', 'role:admin'])->group(function() {
     Route::resource('users', UserController::class);
     Route::resource('pejabat', PejabatController::class);
     
+    // Tambahkan destroy surat masuk di sini agar hanya bisa diakses admin
+    Route::delete('/suratmasuk/{suratmasuk}', [SuratMasukController::class, 'destroy'])->name('suratmasuk.destroy');
+
     Route::get('/laporan/print', [LaporanController::class, 'print'])->name('laporan.print');
     Route::resource('laporan', LaporanController::class)->except(['show']);
 });

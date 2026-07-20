@@ -362,6 +362,11 @@ class SuratMasukController extends Controller
     */
     public function destroy($id)
     {
+        // Batasi hanya untuk admin
+        if (Auth::user()->role !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
+
         $surat = SuratMasuk::findOrFail($id);
 
         DB::beginTransaction();
@@ -450,6 +455,11 @@ class SuratMasukController extends Controller
     */
     public function disposisi($id)
     {
+        // Batasi hanya untuk admin
+        if (Auth::user()->role !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
+
         $surat = SuratMasuk::with([
             'kodearsip',
             'user',
@@ -470,6 +480,11 @@ class SuratMasukController extends Controller
     */
     public function kirimDisposisi(Request $request, $id)
     {
+        // Batasi hanya untuk admin
+        if (Auth::user()->role !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
+
         $request->validate([
             'user_disposisi_id' => 'required|exists:users,id',
             'catatan_admin'     => 'required'
