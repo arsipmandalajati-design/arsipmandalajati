@@ -436,15 +436,28 @@ class SuratMasukController extends Controller
     |--------------------------------------------------------------------------
     |*/
     public function getNomorRegistrasi($id)
-    {
-        $kode = KodeArsip::findOrFail($id);
-        
-        $maxNomorUrut = SuratMasuk::where('kode_arsip_id', $id)->max('nomor_urut');
-        $nomor = $maxNomorUrut ? $maxNomorUrut + 1 : 1;
-        $nomorLengkap = $kode->kode . '/' . str_pad($nomor, 3, '0', STR_PAD_LEFT);
-
-        return response()->json([
-            'nomor_registrasi' => $nomorLengkap
-        ]);
+{
+    // 1. Cari data kode arsipnya dulu
+    $kodeArsip = KodeArsip::find($id);
+    
+    if (!$kodeArsip) {
+        return response()->json(['nomor_registrasi' => '']);
     }
+
+    // 2. Hitung ada berapa surat masuk yang menggunakan kode arsip ini
+    $counter = SuratMasuk::where('kode_arsip_id', $id)->count();
+    
+    // 3. Urutan berikutnya adalah jumlah saat ini + 1
+    $nomorUrut = $counter + 1;
+    
+    // 4. Format nomor urutnya jadi 3 digit (contoh: 001, 002, dst.)
+    $nomorUrutFormat = str_pad($nomorUrut, 3, '0', STR_PAD_LEFT);
+    
+    // 5. Gabungkan Kode Arsip dengan Nomor Urut (Contoh hasil: SU.01/001)
+    $nomorRegistrasi = $kodeArsip->kode . '/' . $nomorUrutFormat;
+
+    return response()->json([
+        'nomor_registrasi' => $nomorRegistrasi
+    ]);
+}
 }
