@@ -22,7 +22,7 @@ class SuratMasukController extends Controller
     |--------------------------------------------------------------------------
     | DATA SURAT MASUK
     |--------------------------------------------------------------------------
-    */
+    |*/
     public function index(Request $request)
     {
         $suratmasuk = SuratMasuk::with('kodearsip');
@@ -59,7 +59,7 @@ class SuratMasukController extends Controller
     |--------------------------------------------------------------------------
     | FORM TAMBAH SURAT
     |--------------------------------------------------------------------------
-    */
+    |*/
     public function create()
     {
         $kodearsip = KodeArsip::all();
@@ -70,7 +70,7 @@ class SuratMasukController extends Controller
     |--------------------------------------------------------------------------
     | SIMPAN SURAT MASUK
     |--------------------------------------------------------------------------
-    */
+    |*/
     public function store(Request $request)
     {
         $request->merge([
@@ -103,8 +103,10 @@ class SuratMasukController extends Controller
         ]);
 
         $kode = KodeArsip::findOrFail($request->kode_arsip_id);
-        $last = SuratMasuk::where('kode_arsip_id', $request->kode_arsip_id)->latest()->first();
-        $nomorUrut = $last ? $last->nomor_urut + 1 : 1;
+        
+        // Menggunakan max untuk mengambil angka urutan paling akhir/tertinggi
+        $maxNomorUrut = SuratMasuk::where('kode_arsip_id', $request->kode_arsip_id)->max('nomor_urut');
+        $nomorUrut = $maxNomorUrut ? $maxNomorUrut + 1 : 1;
         $nomorRegistrasi = $kode->kode . '/' . str_pad($nomorUrut, 3, '0', STR_PAD_LEFT);
 
         $file = null;
@@ -116,7 +118,7 @@ class SuratMasukController extends Controller
             'user_id'           => Auth::id(),
             'kode_arsip_id'     => $request->kode_arsip_id,
             'nomor_urut'        => $nomorUrut,
-           // 'nomor_registrasi'  => $nomorRegistrasi,//
+            'nomor_registrasi'  => $nomorRegistrasi, // Diaktifkan kembali agar tersimpan ke database
             'nomor_surat'       => $request->nomor_surat,
             'jenis_surat'       => $request->jenis_surat,
             'sumber_arsip'      => $request->sumber_arsip,
@@ -170,7 +172,7 @@ class SuratMasukController extends Controller
     |--------------------------------------------------------------------------
     | FORM EDIT SURAT
     |--------------------------------------------------------------------------
-    */
+    |*/
     public function edit($id)
     {
         $surat = SuratMasuk::findOrFail($id);
@@ -183,7 +185,7 @@ class SuratMasukController extends Controller
     |--------------------------------------------------------------------------
     | UPDATE SURAT MASUK
     |--------------------------------------------------------------------------
-    */
+    |*/
     public function update(Request $request, $id)
     {
         $request->merge([
@@ -204,14 +206,13 @@ class SuratMasukController extends Controller
 
         $surat = SuratMasuk::findOrFail($id);
         
-        // Simpan nomor registrasi lama untuk acuan update tabel Arsip nanti
         $oldNomorRegistrasi = $surat->nomor_registrasi;
 
-        // Jika kode arsip diubah, generate nomor registrasi baru
+        // Jika kode arsip diubah, hitung ulang nomor urutan terbesarnya
         if ($surat->kode_arsip_id != $request->kode_arsip_id) {
             $kode = KodeArsip::findOrFail($request->kode_arsip_id);
-            $last = SuratMasuk::where('kode_arsip_id', $request->kode_arsip_id)->latest()->first();
-            $nomorUrut = $last ? $last->nomor_urut + 1 : 1;
+            $maxNomorUrut = SuratMasuk::where('kode_arsip_id', $request->kode_arsip_id)->max('nomor_urut');
+            $nomorUrut = $maxNomorUrut ? $maxNomorUrut + 1 : 1;
             $nomorRegistrasi = $kode->kode . '/' . str_pad($nomorUrut, 3, '0', STR_PAD_LEFT);
         } else {
             $nomorUrut = $surat->nomor_urut;
@@ -253,7 +254,6 @@ class SuratMasukController extends Controller
             'lainnya'          => $request->lainnya,
         ]);
 
-        // Perbaikan: Cari arsip menggunakan kode_arsip unik lama, bukan menggunakan judul
         Arsip::where('kode_arsip', $oldNomorRegistrasi)->update([
             'kode_arsip'    => $nomorRegistrasi,
             'nama_arsip'    => $request->judul,
@@ -269,7 +269,7 @@ class SuratMasukController extends Controller
     |--------------------------------------------------------------------------
     | HAPUS SURAT
     |--------------------------------------------------------------------------
-    */
+    |*/
     public function destroy($id)
     {
         $surat = SuratMasuk::findOrFail($id);
@@ -278,9 +278,7 @@ class SuratMasukController extends Controller
             Storage::disk('public')->delete($surat->file_surat);
         }
 
-        // Perbaikan: Hapus data arsip berdasarkan acuan unik kode_arsip
         Arsip::where('kode_arsip', $surat->nomor_registrasi)->delete();
-
         Agenda::where('surat_masuk_id', $surat->id)->delete();
 
         $surat->delete();
@@ -292,7 +290,7 @@ class SuratMasukController extends Controller
     |--------------------------------------------------------------------------
     | VERIFIKASI SURAT
     |--------------------------------------------------------------------------
-    */
+    |*/
     public function verifikasi($id)
     {
         $surat = SuratMasuk::findOrFail($id);
@@ -317,7 +315,7 @@ class SuratMasukController extends Controller
     |--------------------------------------------------------------------------
     | PRINT
     |--------------------------------------------------------------------------
-    */
+    |*/
     public function print()
     {
         $suratmasuk = SuratMasuk::with([
@@ -333,7 +331,7 @@ class SuratMasukController extends Controller
     |--------------------------------------------------------------------------
     | DETAIL SURAT
     |--------------------------------------------------------------------------
-    */
+    |*/
     public function show($id)
     {
         $suratmasuk = SuratMasuk::with([
@@ -350,7 +348,7 @@ class SuratMasukController extends Controller
     |--------------------------------------------------------------------------
     | HALAMAN DISPOSISI
     |--------------------------------------------------------------------------
-    */
+    |*/
     public function disposisi($id)
     {
         $surat = SuratMasuk::with([
@@ -370,11 +368,11 @@ class SuratMasukController extends Controller
     |--------------------------------------------------------------------------
     | KIRIM DISPOSISI
     |--------------------------------------------------------------------------
-    */
+    |*/
     public function kirimDisposisi(Request $request, $id)
     {
         $request->validate([
-            'user_disposisi_id' => 'required|exists:users,id', // Ditambahkan pengaman exists
+            'user_disposisi_id' => 'required|exists:users,id',
             'catatan_admin'     => 'required'
         ]);
 
@@ -402,7 +400,7 @@ class SuratMasukController extends Controller
     |--------------------------------------------------------------------------
     | KIRIM KE AGENDA
     |--------------------------------------------------------------------------
-    */
+    |*/
     public function pilihAgenda($id)
     {
         $surat = SuratMasuk::findOrFail($id);
@@ -423,18 +421,19 @@ class SuratMasukController extends Controller
     |--------------------------------------------------------------------------
     | AJAX NOMOR REGISTRASI
     |--------------------------------------------------------------------------
-    */
+    |*/
     public function getNomorRegistrasi($id)
-{
-    $kode = KodeArsip::findOrFail($id);
-    $last = SuratMasuk::where('kode_arsip_id', $id)->latest()->first();
-    $nomor = $last ? $last->nomor_urut + 1 : 1;
+    {
+        $kode = KodeArsip::findOrFail($id);
+        
+        // Menggunakan max() untuk memastikan urutan didasarkan pada angka terbesar di database
+        $maxNomorUrut = SuratMasuk::where('kode_arsip_id', $id)->max('nomor_urut');
+        $nomor = $maxNomorUrut ? $maxNomorUrut + 1 : 1;
 
-    // Generate format nomor registrasi secara lengkap
-    $nomorLengkap = $kode->kode . '/' . str_pad($nomor, 3, '0', STR_PAD_LEFT);
+        $nomorLengkap = $kode->kode . '/' . str_pad($nomor, 3, '0', STR_PAD_LEFT);
 
-    return response()->json([
-        'nomor_registrasi' => $nomorLengkap
-    ]);
-}
+        return response()->json([
+            'nomor_registrasi' => $nomorLengkap
+        ]);
+    }
 }

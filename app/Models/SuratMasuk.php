@@ -11,28 +11,24 @@ use App\Models\Agenda;
 class SuratMasuk extends Model
 {
     protected $fillable = [
-
         'user_id',
         'kode_arsip_id',
+        'pejabat_id', // Tambahkan ini jika tabel surat_masuk memiliki kolom pejabat_id
         'nomor_surat',
         'jenis_surat',
         'sumber_arsip',
-    
-'nomor_urut',
-'nomor_registrasi',
-
+        'nomor_urut',
+        'nomor_registrasi',
         'judul',
         'pengirim',
         'tanggal_surat',
         'perihal',
         'file_surat',
-    
         'tempat',
         'tanggal_kegiatan',
         'jam_mulai',
         'jam_selesai',
         'materi',
-    
         'jumlah_peserta',
         'kursi',
         'meja',
@@ -41,11 +37,9 @@ class SuratMasuk extends Model
         'sound_system',
         'kabel_roll',
         'lainnya',
-    
         'status',
         'user_disposisi_id',
-    
-        'catatan_admin',   // TAMBAHKAN
+        'catatan_admin',
     ];
 
     /*
@@ -53,13 +47,9 @@ class SuratMasuk extends Model
     | Relasi Kode Arsip
     |--------------------------------------------------------------------------
     */
-
     public function kodearsip()
     {
-        return $this->belongsTo(
-            KodeArsip::class,
-            'kode_arsip_id'
-        );
+        return $this->belongsTo(KodeArsip::class, 'kode_arsip_id');
     }
 
     /*
@@ -67,24 +57,19 @@ class SuratMasuk extends Model
     | Relasi Pejabat
     |--------------------------------------------------------------------------
     */
-
     public function pejabat()
-{
-    return $this->belongsTo(Pejabat::class, 'pejabat_id');
-}
+    {
+        return $this->belongsTo(Pejabat::class, 'pejabat_id');
+    }
 
     /*
     |--------------------------------------------------------------------------
     | Pegawai Pembuat Surat
     |--------------------------------------------------------------------------
     */
-
     public function user()
     {
-        return $this->belongsTo(
-            User::class,
-            'user_id'
-        );
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     /*
@@ -92,7 +77,6 @@ class SuratMasuk extends Model
     | Pegawai Tujuan Disposisi
     |--------------------------------------------------------------------------
     */
-
     public function userDisposisi()
     {
         return $this->belongsTo(User::class, 'user_disposisi_id');
@@ -103,11 +87,8 @@ class SuratMasuk extends Model
     | Agenda
     |--------------------------------------------------------------------------
     */
-
     public function agenda()
-{
-    return $this->hasOne(Agenda::class,'surat_masuk_id');
-}
-
-
+    {
+        return $this->hasOne(Agenda::class, 'surat_masuk_id');
+    }
 }

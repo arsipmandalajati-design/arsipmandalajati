@@ -95,29 +95,25 @@ Registrasikan surat fisik maupun dokumen digital yang diterima Kecamatan sebagai
             @csrf
 
             {{-- ========================================= --}}
-            {{-- INFORMASI ARSIP --}}
-            {{-- ========================================= --}}
-            <div class="section-title">Informasi Arsip</div>
-            <div class="row mb-3">
-                <div class="col-md-6 mb-3">
-                    <label class="form-label fw-semibold text-secondary">Kode Arsip <span class="required">*</span></label>
-                    <select name="kode_arsip_id" id="kode_arsip_id" class="form-select" required>
-                        <option value="">-- Pilih Kode Arsip --</option>
-                        @foreach($kodearsip as $item)
-                            <option value="{{ $item->id }}" data-kode="{{ $item->kode }}" {{ old('kode_arsip_id') == $item->id ? 'selected' : '' }}>
-                                {{ $item->kode }} - {{ $item->nama_kode ?? 'Tanpa Nama Klasifikasi' }}
-                            </option>
-                        @endforeach
-                    </select>
-                    <div class="invalid-feedback">Silakan pilih kode klasifikasi arsip.</div>
-                </div>
+{{-- INFORMASI ARSIP --}}
+{{-- ========================================= --}}
+<div class="section-title">Informasi Arsip</div>
+<div class="row mb-3">
+    <div class="mb-3">
+        <label for="kode_arsip_id" class="form-label">Kode Arsip</label>
+        <select class="form-select" id="kode_arsip_id" name="kode_arsip_id" required>
+            <option value="">-- Pilih Kode Arsip --</option>
+            @foreach($kodearsip as $item)
+                <option value="{{ $item->id }}">{{ $item->kode }} - {{ $item->nama_kategori }}</option>
+            @endforeach
+        </select>
+    </div>
 
-                <div class="col-md-6 mb-3">
-                    <label class="form-label fw-semibold text-secondary">Nomor Registrasi</label>
-                    <input type="text" id="nomor_registrasi" class="form-control bg-light fw-bold text-muted" readonly placeholder="Akan terisi otomatis...">
-                    <input type="hidden" name="nomor_registrasi" id="nomor_registrasi_hidden">
-                </div>
-            </div>
+    <div class="mb-3">
+        <label for="nomor_registrasi" class="form-label">Nomor Registrasi</label>
+        <input type="text" class="form-control" id="nomor_registrasi" name="nomor_registrasi" readonly placeholder="Otomatis terisi setelah memilih Kode Arsip">
+        <small class="text-muted">Nomor ini di-generate otomatis oleh sistem berdasarkan nomor urut terbesar.</small>
+    </div>
 
             {{-- ========================================= --}}
             {{-- INFORMASI SURAT --}}
@@ -297,8 +293,35 @@ Registrasikan surat fisik maupun dokumen digital yang diterima Kecamatan sebagai
 {{-- ========================================= --}}
 {{-- JAVASCRIPT LOGIC --}}
 {{-- ========================================= --}}
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+$(document).ready(function() {
+    $('#kode_arsip_id').on('change', function() {
+        var kodeArsipId = $(this).val();
+        
+        if (kodeArsipId) {
+            // Lakukan hit ke rute yang sudah kita buat di web.php
+            $.ajax({
+                url: '/suratmasuk/get-nomor-registrasi/' + kodeArsipId,
+                type: "GET",
+                dataType: "json",
+                success: function(data) {
+                    // Masukkan hasilnya ke dalam input nomor_registrasi
+                    $('#nomor_registrasi').val(data.nomor_registrasi);
+                },
+                error: function(xhr) {
+                    console.error("Gagal mengambil nomor registrasi:", xhr.responseText);
+                    alert("Gagal memuat nomor registrasi otomatis.");
+                }
+            });
+        } else {
+            // Kosongkan kembali jika user tidak memilih kode arsip apapun
+            $('#nomor_registrasi').val('');
+        }
+    });
+});
+</script>
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
@@ -381,11 +404,10 @@ function ambilNomorRegistrasi(){
 
     if(id === ""){
         document.getElementById("nomor_registrasi").value = "";
-        document.getElementById("nomor_registrasi_hidden").value = "";
         return;
     }
 
-    // URL SUDAH DISARASKAN DENGAN ROUTE WEB.PHP BARU
+    // Mengambil data real-time dari controller
     fetch("/suratmasuk/get-nomor-registrasi/" + id)
     .then(function(response){
         if(!response.ok){
@@ -394,8 +416,8 @@ function ambilNomorRegistrasi(){
         return response.json();
     })
     .then(function(data){
+        // Cukup set nilai ke satu input utama yang memiliki atribut name
         document.getElementById("nomor_registrasi").value = data.nomor_registrasi;
-        document.getElementById("nomor_registrasi_hidden").value = data.nomor_registrasi;
     })
     .catch(function(error){
         console.error("Gagal mengambil nomor registrasi:", error);
