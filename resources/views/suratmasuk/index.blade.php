@@ -318,7 +318,7 @@ document.addEventListener('DOMContentLoaded',function(){
                                                 data-tanggal="{{ \Carbon\Carbon::parse($item->tanggal_surat)->format('d M Y') }}"
                                                 data-status="{{ $item->status }}"
                                                 data-perihal="{{ $item->perihal }}"
-                                                data-file="{{ $item->file_surat ? asset('storage/' . $item->file_surat) : '' }}"
+                                                data-file="{{ $item->file_surat ? asset('storage/' . str_replace('public/', '', $item->file_surat)) : '' }}"
                                                 title="Detail & Preview Surat">
                                             <i class="bi bi-eye"></i>
                                         </button>
@@ -493,109 +493,97 @@ document.addEventListener('DOMContentLoaded',function(){
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 $(document).ready(function() {
-// ==========================================
-// 1. HANDLER MODAL PREVIEW (SURAT MASUK)
-// ==========================================
-$('.btn-preview').on('click', function() {
-    const kode = $(this).data('kode');
-    const nomor = $(this).data('nomor');
-    const judul = $(this).data('judul');
-    const pengirim = $(this).data('pengirim');
-    const tanggal = $(this).data('tanggal');
-    const status = $(this).data('status');
-    const perihal = $(this).data('perihal');
-    const fileUrl = $(this).data('file');
+    // ==========================================
+    // 1. HANDLER MODAL PREVIEW (SURAT MASUK)
+    // ==========================================
+    $('.btn-preview').on('click', function() {
+        const kode = $(this).data('kode');
+        const nomor = $(this).data('nomor');
+        const judul = $(this).data('judul');
+        const pengirim = $(this).data('pengirim');
+        const tanggal = $(this).data('tanggal');
+        const status = $(this).data('status');
+        const perihal = $(this).data('perihal');
+        const fileUrl = $(this).data('file');
 
-    // Injeksikan data teks ke modal
-    $('#md-kode').text(kode);
-    $('#md-nomor').text(nomor);
-    $('#md-judul').text(judul);
-    $('#md-pengirim').text(pengirim);
-    $('#md-tanggal').text(tanggal);
-    $('#md-perihal').text(perihal);
-    $('#md-status').text(status);
+        // Injeksikan data ke elemen modal
+        $('#md-kode').text(kode);
+        $('#md-nomor').text(nomor);
+        $('#md-judul').text(judul);
+        $('#md-pengirim').text(pengirim);
+        $('#md-tanggal').text(tanggal);
+        $('#md-perihal').text(perihal);
+        $('#md-status').text(status);
 
-    // Styling dinamis badge status di dalam modal
-    $('#md-status').removeClass('bg-secondary bg-warning text-dark bg-success bg-primary');
-    if(status === 'Sudah Disposisi') {
-        $('#md-status').addClass('bg-success text-white');
-    } else if(status === 'Diproses' || status === 'Menunggu Verifikasi') {
-        $('#md-status').addClass('bg-warning text-dark');
-    } else if(status === 'Sudah Dijadikan Agenda') {
-        $('#md-status').addClass('bg-primary text-white');
-    } else {
-        $('#md-status').addClass('bg-secondary text-white');
-    }
-
-    // Kontrol Tampilan & Preview Berkas
-    if (fileUrl && fileUrl !== '') {
-        let embedUrl = fileUrl;
-        const extension = fileUrl.split('.').pop().toLowerCase();
-
-        // Jika format dokumen Office (docx, doc, xlsx, pptx), gunakan Google Viewer
-        if (['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'].includes(extension)) {
-            embedUrl = `https://docs.google.com/gview?url=${encodeURIComponent(fileUrl)}&embedded=true`;
-        }
-
-        // Tampilkan Iframe & set tombol download
-        $('#md-pdf-viewer').removeClass('d-none').attr('src', embedUrl);
-        $('#md-direct-download').removeClass('d-none').attr('href', fileUrl);
-        $('#md-file-fallback').addClass('d-none');
-    } else {
-        // Jika file kosong / tidak ditemukan
-        $('#md-pdf-viewer').addClass('d-none').attr('src', '');
-        $('#md-direct-download').addClass('d-none').attr('href', '#');
-        $('#md-file-fallback').removeClass('d-none');
-        $('#md-download-btn').addClass('d-none').attr('href', '#');
-    }
-});
-
-// Reset iframe saat modal ditutup agar tidak membebankan memori browser
-$('#previewModalSuratMasuk').on('hidden.bs.modal', function () {
-    $('#md-pdf-viewer').attr('src', '');
-});
-
-// ==========================================
-// 2. FUNGSI CEK BOOKING JADWAL (AGENDA)
-// ==========================================
-function cekBooking(){
-    let tempat = $("#tempat").val();
-    let tanggal = $("#tanggal").val();
-    let mulai = $("#jam_mulai").val();
-    let selesai = $("#jam_selesai").val();
-
-    if(!tempat || !tanggal || !mulai || !selesai){
-        return;
-    }
-
-    $.get("{{ route('agenda.cekBooking') }}", {
-        tempat: tempat,
-        tanggal: tanggal,
-        jam_mulai: mulai,
-        jam_selesai: selesai
-    })
-    .done(function(res){
-        $('.alert-verification-jadwal').remove(); 
-
-        if(res.bentrok){
-            Swal.fire({
-                icon: 'warning',
-                title: 'Jadwal Bentrok',
-                text: 'Ruangan sudah dipakai pada jam tersebut.',
-                confirmButtonColor: '#dc3545'
-            });
-            $(".btn-save").prop("disabled", true);
+        // Styling dinamis badge status
+        $('#md-status').removeClass('bg-secondary bg-warning text-dark bg-success bg-primary');
+        if(status === 'Sudah Disposisi') {
+            $('#md-status').addClass('bg-success text-white');
+        } else if(status === 'Diproses' || status === 'Menunggu Verifikasi') {
+            $('#md-status').addClass('bg-warning text-dark');
+        } else if(status === 'Sudah Dijadikan Agenda') {
+            $('#md-status').addClass('bg-primary text-white');
         } else {
-            $(".btn-save").prop("disabled", false);
+            $('#md-status').addClass('bg-secondary text-white');
         }
-    })
-    .fail(function(xhr, status, error){
-        console.error("Gagal memverifikasi jadwal otomatis:", error);
-        $(".btn-save").prop("disabled", false);
-    });
-}
 
-$("#tempat, #tanggal_kegiatan, #jam_mulai, #jam_selesai").on("change", cekBooking);
+        // Kontrol tampilan preview berkas (Direct PDF/Image Viewer)
+        if (fileUrl && fileUrl !== '' && fileUrl !== '#') {
+            $('#md-pdf-viewer').removeClass('d-none').attr('src', fileUrl);
+            $('#md-file-fallback').addClass('d-none');
+            $('#md-download-btn').attr('href', fileUrl);
+        } else {
+            $('#md-pdf-viewer').addClass('d-none').attr('src', '');
+            $('#md-file-fallback').removeClass('d-none');
+            $('#md-download-btn').attr('href', '#');
+        }
+    });
+
+    // Reset iframe saat modal ditutup
+    $('#previewModalSuratMasuk').on('hidden.bs.modal', function () {
+        $('#md-pdf-viewer').attr('src', '');
+    });
+
+    // ==========================================
+    // 2. FUNGSI CEK BOOKING JADWAL (AGENDA)
+    // ==========================================
+    function cekBooking(){
+        let tempat = $("#tempat").val();
+        let tanggal = $("#tanggal").val();
+        let mulai = $("#jam_mulai").val();
+        let selesai = $("#jam_selesai").val();
+    
+        if(!tempat || !tanggal || !mulai || !selesai){
+            return;
+        }
+    
+        $.get("{{ route('agenda.cekBooking') }}", {
+            tempat: tempat,
+            tanggal: tanggal,
+            jam_mulai: mulai,
+            jam_selesai: selesai
+        })
+        .done(function(res){
+            $('.alert-verification-jadwal').remove(); 
+
+            if(res.bentrok){
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Jadwal Bentrok',
+                    text: 'Ruangan sudah dipakai pada jam tersebut.',
+                    confirmButtonColor: '#dc3545'
+                });
+                $(".btn-save").prop("disabled", true);
+            } else {
+                $(".btn-save").prop("disabled", false);
+            }
+        })
+        .fail(function(xhr, status, error){
+            console.error("Gagal memverifikasi jadwal otomatis:", error);
+            $(".btn-save").prop("disabled", false);
+        });
+    }
+    
+    $("#tempat, #tanggal_kegiatan, #jam_mulai, #jam_selesai").on("change", cekBooking);
 });
 </script>
-@endsection
