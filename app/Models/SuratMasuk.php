@@ -13,12 +13,11 @@ class SuratMasuk extends Model
     protected $fillable = [
         'user_id',
         'kode_arsip_id',
-        'pejabat_id', 
+        'nomor_urut',
+        'nomor_registrasi', // <--- PASTIKAN BARIS INI ADA DI PROPERTI FILLABLE
         'nomor_surat',
         'jenis_surat',
         'sumber_arsip',
-        'nomor_urut',
-        'nomor_registrasi',
         'judul',
         'pengirim',
         'tanggal_surat',
@@ -26,7 +25,7 @@ class SuratMasuk extends Model
         'file_surat',
         'status',
         'user_disposisi_id',
-        'catatan_admin',
+        'catatan_admin'
     ];
 
     /*

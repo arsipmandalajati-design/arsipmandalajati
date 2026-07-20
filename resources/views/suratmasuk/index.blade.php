@@ -548,8 +548,8 @@ $(document).ready(function() {
         let mulai = $("#jam_mulai").val();
         let selesai = $("#jam_selesai").val();
     
-        // Jika form belum terisi semua, jangan kirim request dulu
-        if(tempat == '' || tanggal == '' || mulai == '' || selesai == ''){
+        // Jika form booking belum terisi semua, abaikan pengecekan
+        if(!tempat || !tanggal || !mulai || !selesai){
             return;
         }
     
@@ -559,7 +559,11 @@ $(document).ready(function() {
             tanggal: tanggal,
             jam_mulai: mulai,
             jam_selesai: selesai
-        }, function(res){
+        })
+        .done(function(res){
+            // Hapus pesan error/warning penunjang jika ada dari request sebelumnya
+            $('.alert-verification-jadwal').remove(); 
+
             if(res.bentrok){
                 Swal.fire({
                     icon: 'warning',
@@ -571,11 +575,17 @@ $(document).ready(function() {
             } else {
                 $(".btn-save").prop("disabled", false);
             }
+        })
+        .fail(function(xhr, status, error){
+            // Jangan memblokir form simpan surat jika server-side check mengalami sedikit gangguan internal
+            console.error("Gagal memverifikasi jadwal otomatis:", error);
+            $(".btn-save").prop("disabled", false);
         });
     }
     
-    // Trigger pengecekan otomatis setiap kali ada perubahan input agenda
-    $("#tempat, #tanggal, #jam_mulai, #jam_selesai").on("change", cekBooking);
+    // Gunakan selector yang tepat sesuai id elemen input di form registrasi surat masuk Anda
+    // Pastikan element select tempat memiliki id="tempat" atau sesuaikan targetnya di bawah ini:
+    $("#tempat, #tanggal_kegiatan, #jam_mulai, #jam_selesai").on("change", cekBooking);
 });
 </script>
 @endsection
