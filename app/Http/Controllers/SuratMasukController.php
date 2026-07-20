@@ -158,18 +158,20 @@ class SuratMasukController extends Controller
             if ($request->jenis_surat === 'Internal') {
                 Agenda::create([
                     'surat_masuk_id'   => $surat->id,
+                    'user_id'          => Auth::id(),
+                
                     'tempat'           => $request->tempat,
-                    'tanggal_kegiatan' => $request->tanggal_kegiatan,
                     'jam_mulai'        => $request->jam_mulai,
                     'jam_selesai'      => $request->jam_selesai,
-                    'materi'           => $request->materi ?? $request->judul,
-                    'jumlah_peserta'   => $request->jumlah_peserta ?? 0,
-                    'kursi'            => $request->kursi ?? 0,
-                    'meja'             => $request->meja ?? 0,
-                    'proyektor'        => $request->proyektor ?? 0,
-                    'mic'              => $request->mic ?? 0,
-                    'sound_system'     => $request->sound_system ?? 0,
-                    'kabel_roll'       => $request->kabel_roll ?? 0,
+                    'materi'           => $request->materi,
+                
+                    'jumlah_peserta'   => $request->jumlah_peserta,
+                    'kursi'            => $request->kursi,
+                    'meja'             => $request->meja,
+                    'proyektor'        => $request->proyektor,
+                    'mic'              => $request->mic,
+                    'sound_system'     => $request->sound_system,
+                    'kabel_roll'       => $request->kabel_roll,
                     'lainnya'          => $request->lainnya,
                 ]);
             }
