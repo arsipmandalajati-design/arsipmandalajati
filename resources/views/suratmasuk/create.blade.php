@@ -301,13 +301,11 @@ $(document).ready(function() {
         var kodeArsipId = $(this).val();
         
         if (kodeArsipId) {
-            // Lakukan hit ke rute yang sudah kita buat di web.php
             $.ajax({
                 url: '/suratmasuk/get-nomor-registrasi/' + kodeArsipId,
                 type: "GET",
                 dataType: "json",
                 success: function(data) {
-                    // Masukkan hasilnya ke dalam input nomor_registrasi
                     $('#nomor_registrasi').val(data.nomor_registrasi);
                 },
                 error: function(xhr) {
@@ -316,7 +314,6 @@ $(document).ready(function() {
                 }
             });
         } else {
-            // Kosongkan kembali jika user tidak memilih kode arsip apapun
             $('#nomor_registrasi').val('');
         }
     });
@@ -350,7 +347,6 @@ document.addEventListener("DOMContentLoaded", function () {
             return; 
         }
 
-        // Kunci tombol untuk mencegah double submit data ke database
         btnSimpan.disabled = true;
         btnSimpan.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Menyimpan...';
 
@@ -367,65 +363,60 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // ======================================
-// 2. DYNAMIC TOGGLE BOOKING CARD
-// ======================================
-function toggleBooking(){
-    let booking = document.getElementById("bookingCard");
-    if(!booking) return;
+    // 2. DYNAMIC TOGGLE BOOKING CARD
+    // ======================================
+    function toggleBooking(){
+        let booking = document.getElementById("bookingCard");
+        if(!booking) return;
 
-    if(jenisSurat.value === "Internal"){
-        booking.style.display = "block";
-        // Set required untuk field utama booking jika jenis internal
-        document.getElementById("tempat").setAttribute("required", "true");
-        document.getElementById("tanggal_kegiatan").setAttribute("required", "true");
-        document.getElementById("jam_mulai").setAttribute("required", "true");
-        document.getElementById("jam_selesai").setAttribute("required", "true");
-    } else {
-        booking.style.display = "none";
-        // Hapus required attribute (TYPO SUDAH DIPERBAIKI DI SINI)
-        document.getElementById("tempat").removeAttribute("required");
-        document.getElementById("tanggal_kegiatan").removeAttribute("required");
-        document.getElementById("jam_mulai").removeAttribute("required");
-        document.getElementById("jam_selesai").removeAttribute("required");
-        
-        // Bersihkan value inputan di dalam card booking agar tidak ikut terkirim kotor
-        $("#bookingCard").find('input[type="text"], input[type="date"], input[type="time"], select').val('');
-        $("#bookingCard").find('input[type="number"]').val(0);
-        $("#bookingAlertContainer").html('');
-        btnSimpan.disabled = false;
-    }
-}
-
-// ======================================
-// 3. GENERATE NOMOR REGISTRASI VIA FETCH API
-// ======================================
-function ambilNomorRegistrasi(){
-    let id = kodeArsip.value;
-
-    if(id === ""){
-        document.getElementById("nomor_registrasi").value = "";
-        return;
-    }
-
-    // Mengambil data real-time dari controller
-    fetch("/suratmasuk/get-nomor-registrasi/" + id)
-    .then(function(response){
-        if(!response.ok){
-            throw new Error("Route gagal diakses");
+        if(jenisSurat.value === "Internal"){
+            booking.style.display = "block";
+            document.getElementById("tempat").setAttribute("required", "true");
+            document.getElementById("tanggal_kegiatan").setAttribute("required", "true");
+            document.getElementById("jam_mulai").setAttribute("required", "true");
+            document.getElementById("jam_selesai").setAttribute("required", "true");
+        } else {
+            booking.style.display = "none";
+            document.getElementById("tempat").removeAttribute("required");
+            document.getElementById("tanggal_kegiatan").removeAttribute("required");
+            document.getElementById("jam_mulai").removeAttribute("required");
+            document.getElementById("jam_selesai").removeAttribute("required");
+            
+            $("#bookingCard").find('input[type="text"], input[type="date"], input[type="time"], select').val('');
+            $("#bookingCard").find('input[type="number"]').val(0);
+            $("#bookingAlertContainer").html('');
+            btnSimpan.disabled = false;
         }
-        return response.json();
-    })
-    .then(function(data){
-        // Cukup set nilai ke satu input utama yang memiliki atribut name
-        document.getElementById("nomor_registrasi").value = data.nomor_registrasi;
-    })
-    .catch(function(error){
-        console.error("Gagal mengambil nomor registrasi:", error);
-    });
-}
+    }
 
     // ======================================
-    // 4. CEK BENTROK JADWAL RUANGAN (AJAX JQUERY)
+    // 3. GENERATE NOMOR REGISTRASI VIA FETCH API
+    // ======================================
+    function ambilNomorRegistrasi(){
+        let id = kodeArsip.value;
+
+        if(id === ""){
+            document.getElementById("nomor_registrasi").value = "";
+            return;
+        }
+
+        fetch("/suratmasuk/get-nomor-registrasi/" + id)
+        .then(function(response){
+            if(!response.ok){
+                throw new Error("Route gagal diakses");
+            }
+            return response.json();
+        })
+        .then(function(data){
+            document.getElementById("nomor_registrasi").value = data.nomor_registrasi;
+        })
+        .catch(function(error){
+            console.error("Gagal mengambil nomor registrasi:", error);
+        });
+    }
+
+    // ======================================
+    // 4. CEK BENTROK JADWAL RUANGAN (AJAX JQUERY OPTIMIZED)
     // ======================================
     $("#tempat, #tanggal_kegiatan, #jam_mulai, #jam_selesai").on("change", function(){
         let tempat = $("#tempat").val();
@@ -435,6 +426,16 @@ function ambilNomorRegistrasi(){
         let alertContainer = $("#bookingAlertContainer");
 
         if(tempat === "" || tanggal === "" || mulai === "" || selesai === ""){
+            return;
+        }
+
+        if(selesai <= mulai) {
+            alertContainer.html(`
+                <div class="alert alert-warning rounded-3 py-2 border-0 shadow-sm animate__animated animate__shakeX">
+                    <i class="bi bi-clock-fill me-2"></i>
+                    <strong>Format Waktu Salah!</strong> Jam Selesai harus lebih lambat daripada Jam Mulai.
+                </div>`);
+            btnSimpan.disabled = true;
             return;
         }
 
@@ -456,22 +457,24 @@ function ambilNomorRegistrasi(){
                             <i class="bi bi-exclamation-triangle-fill me-2"></i>
                             <strong>Peringatan Jadwal Bentrok!</strong> Ruangan tersebut sudah dipesan di tanggal dan jam yang sama.
                         </div>`);
-                    btnSimpan.disabled = true; // Kunci tombol simpan
+                    btnSimpan.disabled = true;
                 } else {
                     alertContainer.html(`
                         <div class="alert alert-success rounded-3 py-2 border-0 shadow-sm">
                             <i class="bi bi-check-circle-fill me-2"></i> Ruangan tersedia dan siap digunakan!
                         </div>`);
-                    btnSimpan.disabled = false; // Buka kunci tombol simpan
+                    btnSimpan.disabled = false;
                 }
             },
             error: function(){
-                console.log("Gagal melakukan verifikasi ketersediaan jadwal.");
-                alertContainer.html('');
+                console.error("Gagal melakukan verifikasi ketersediaan jadwal.");
+                alertContainer.html(`
+                    <div class="alert alert-warning rounded-3 py-2 border-0 shadow-sm">
+                        <i class="bi bi-exclamation-circle-fill me-2"></i> Gagal memverifikasi jadwal. Silakan coba lagi.
+                    </div>`);
+                btnSimpan.disabled = false;
             }
         });
-    });
+    }); // Kode PHP lama di dalam sini sudah dihapus bersih
 });
 </script>
-
-@endsection

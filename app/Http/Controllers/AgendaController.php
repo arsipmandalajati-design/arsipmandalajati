@@ -827,33 +827,21 @@ public function whatsapp(Agenda $agenda)
 
 public function cekBooking(Request $request)
 {
-    $bentrok = Agenda::where('tempat',$request->tempat)
-        ->where('tanggal',$request->tanggal)
-        ->where(function($q) use($request){
+    // Logika pengecekan bentrok yang sesungguhnya di sisi server
+    $bentrok = Agenda::where('tempat', $request->tempat)
+        ->where('tanggal_kegiatan', $request->tanggal)
+        ->where(function($query) use ($request) {
+            $query->whereBetween('jam_mulai', [$request->jam_mulai, $request->jam_selesai])
+                  ->orWhereBetween('jam_selesai', [$request->jam_mulai, $request->jam_selesai])
+                  ->orWhere(function($q) use ($request) {
+                      $q->where('jam_mulai', '<=', $request->jam_mulai)
+                        ->where('jam_selesai', '>=', $request->jam_selesai);
+                  });
+        })->exists();
 
-            $q->whereBetween('jam_mulai',[
-                $request->jam_mulai,
-                $request->jam_selesai
-            ])
-
-            ->orWhereBetween('jam_selesai',[
-                $request->jam_mulai,
-                $request->jam_selesai
-            ])
-
-            ->orWhere(function($qq) use($request){
-
-                $qq->where('jam_mulai','<=',$request->jam_mulai)
-                   ->where('jam_selesai','>=',$request->jam_selesai);
-
-            });
-
-        })
-
-        ->exists();
-
+    // Mengembalikan response dalam bentuk JSON agar bisa dibaca AJAX
     return response()->json([
-        'bentrok'=>$bentrok
+        'bentrok' => $bentrok
     ]);
 }
 

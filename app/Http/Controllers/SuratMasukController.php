@@ -63,7 +63,10 @@ class SuratMasukController extends Controller
     public function create()
     {
         $kodearsip = KodeArsip::all();
-        return view('suratmasuk.create', compact('kodearsip'));
+        // Mengambil data surat keluar untuk opsi "Nomor Surat Jadi"
+        $suratKeluarJadi = SuratKeluar::orderBy('created_at', 'desc')->get();
+
+        return view('suratmasuk.create', compact('kodearsip', 'suratKeluarJadi'));
     }
 
     /*
@@ -79,9 +82,8 @@ class SuratMasukController extends Controller
 
         $request->validate([
             'kode_arsip_id'    => 'required|exists:kode_arsips,id',
-            'nomor_surat'      => 'required|unique:surat_masuks,nomor_surat',
+            'nomor_surat'      => 'required', // Aturan unique dihapus agar nomor surat fisik / surat keluar yang ditarik balik tidak bentrok
             'jenis_surat'      => 'required',
-            'sumber_arsip'     => 'required',
             'judul'            => 'required',
             'pengirim'         => 'required',
             'tanggal_surat'    => 'required|date',
@@ -118,10 +120,9 @@ class SuratMasukController extends Controller
             'user_id'           => Auth::id(),
             'kode_arsip_id'     => $request->kode_arsip_id,
             'nomor_urut'        => $nomorUrut,
-            'nomor_registrasi'  => $nomorRegistrasi, // Diaktifkan kembali agar tersimpan ke database
+            'nomor_registrasi'  => $nomorRegistrasi,
             'nomor_surat'       => $request->nomor_surat,
             'jenis_surat'       => $request->jenis_surat,
-            'sumber_arsip'      => $request->sumber_arsip,
             'judul'             => $request->judul,
             'pengirim'          => $request->pengirim,
             'tanggal_surat'     => $request->tanggal_surat,
@@ -177,8 +178,10 @@ class SuratMasukController extends Controller
     {
         $surat = SuratMasuk::findOrFail($id);
         $kodearsip = KodeArsip::all();
+        // Mengambil data surat keluar untuk pilihan edit jika jenisnya diubah ke Internal
+        $suratKeluarJadi = SuratKeluar::orderBy('created_at', 'desc')->get();
 
-        return view('suratmasuk.edit', compact('surat', 'kodearsip'));
+        return view('suratmasuk.edit', compact('surat', 'kodearsip', 'suratKeluarJadi'));
     }
 
     /*
@@ -194,9 +197,8 @@ class SuratMasukController extends Controller
 
         $request->validate([
             'kode_arsip_id' => 'required|exists:kode_arsips,id',
-            'nomor_surat'   => 'required|unique:surat_masuks,nomor_surat,' . $id,
+            'nomor_surat'   => 'required', // Aturan unique juga dihapus di sini
             'jenis_surat'   => 'required',
-            'sumber_arsip'  => 'required',
             'judul'         => 'required',
             'pengirim'      => 'required',
             'tanggal_surat' => 'required|date',
@@ -233,7 +235,6 @@ class SuratMasukController extends Controller
             'nomor_registrasi' => $nomorRegistrasi,
             'nomor_surat'      => $request->nomor_surat,
             'jenis_surat'      => $request->jenis_surat,
-            'sumber_arsip'     => $request->sumber_arsip,
             'judul'            => $request->judul,
             'pengirim'         => $request->pengirim,
             'tanggal_surat'    => $request->tanggal_surat,
