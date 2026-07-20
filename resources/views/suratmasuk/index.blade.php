@@ -522,7 +522,7 @@ $(document).ready(function() {
     });
 
     // Reset iframe saat modal ditutup agar ringkas memory browser
-    $('#previewModalSurstMasuk').on('hidden.bs.modal', function () {
+    $('#previewModalSuratMasuk').on('hidden.bs.modal', function () {
         $('#md-pdf-viewer').attr('src', '');
     });
 
