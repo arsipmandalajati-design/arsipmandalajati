@@ -116,7 +116,7 @@ class SuratMasukController extends Controller
             'user_id'           => Auth::id(),
             'kode_arsip_id'     => $request->kode_arsip_id,
             'nomor_urut'        => $nomorUrut,
-            'nomor_registrasi'  => $nomorRegistrasi,
+           // 'nomor_registrasi'  => $nomorRegistrasi,//
             'nomor_surat'       => $request->nomor_surat,
             'jenis_surat'       => $request->jenis_surat,
             'sumber_arsip'      => $request->sumber_arsip,
