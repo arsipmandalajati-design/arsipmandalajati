@@ -9,12 +9,17 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
-        Schema::table('surat_masuks', function (Blueprint $table) {
-            // Taruh setelah kolom kode_arsip_id
-            $table->integer('nomor_urut')->after('kode_arsip_id')->nullable(); 
-        });
+        if (Schema::hasTable('surat_masuks')) {
+            // Cek dulu, kalau kolom 'nomor_urut' BELUM ADA, baru ditambahkan
+            if (!Schema::hasColumn('surat_masuks', 'nomor_urut')) {
+                Schema::table('surat_masuks', function (Blueprint $table) {
+                    // Ditempatkan setelah kode_arsip_id sesuai kebutuhanmu
+                    $table->integer('nomor_urut')->nullable()->after('kode_arsip_id'); 
+                });
+            }
+        }
     }
 
     /**
@@ -22,8 +27,13 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('surat_masuks', function (Blueprint $table) {
-            //
-        });
+        if (Schema::hasTable('surat_masuks')) {
+            Schema::table('surat_masuks', function (Blueprint $table) {
+                // Hapus kolom hanya jika kolom tersebut benar-benar ada
+                if (Schema::hasColumn('surat_masuks', 'nomor_urut')) {
+                    $table->dropColumn('nomor_urut');
+                }
+            });
+        }
     }
 };

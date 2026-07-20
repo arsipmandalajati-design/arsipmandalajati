@@ -288,4 +288,98 @@ iframe{
     </div>
 </div>
 
+<!-- JAVASCRIPT LOGIC INTEGRATION -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    // ==========================================
+    // 1. HANDLER MODAL PREVIEW (SURAT MASUK)
+    // ==========================================
+    $('.btn-preview').on('click', function() {
+        const kode = $(this).data('kode');
+        const nomor = $(this).data('nomor');
+        const judul = $(this).data('judul');
+        const pengirim = $(this).data('pengirim');
+        const tanggal = $(this).data('tanggal');
+        const status = $(this).data('status');
+        const perihal = $(this).data('perihal');
+        const fileUrl = $(this).data('file');
+
+        // Injeksikan data ke elemen modal
+        $('#md-kode').text(kode);
+        $('#md-nomor').text(nomor);
+        $('#md-judul').text(judul);
+        $('#md-pengirim').text(pengirim);
+        $('#md-tanggal').text(tanggal);
+        $('#md-perihal').text(perihal);
+        $('#md-status').text(status);
+
+        // Styling dinamis badge status di dalam modal
+        $('#md-status').removeClass('bg-secondary bg-warning text-dark bg-success bg-primary');
+        if(status === 'Sudah Disposisi') {
+            $('#md-status').addClass('bg-success text-white');
+        } else if(status === 'Diproses' || status === 'Menunggu Verifikasi') {
+            $('#md-status').addClass('bg-warning text-dark');
+        } else if(status === 'Sudah Dijadikan Agenda') {
+            $('#md-status').addClass('bg-primary text-white');
+        } else {
+            $('#md-status').addClass('bg-secondary text-white');
+        }
+
+        // Kontrol tampilan preview berkas
+        if (fileUrl && (fileUrl.toLowerCase().endsWith('.pdf') || fileUrl.match(/\.(jpeg|jpg|gif|png)$/i) != null)) {
+            $('#md-pdf-viewer').removeClass('d-none').attr('src', fileUrl);
+            $('#md-file-fallback').addClass('d-none');
+        } else {
+            $('#md-pdf-viewer').addClass('d-none').attr('src', '');
+            $('#md-file-fallback').removeClass('d-none');
+            $('#md-download-btn').attr('href', fileUrl || '#');
+        }
+    });
+
+    // Reset iframe saat modal ditutup agar ringkas memory browser
+    $('#previewModalSuratMasuk').on('hidden.bs.modal', function () {
+        $('#md-pdf-viewer').attr('src', '');
+    });
+
+    // ==========================================
+    // 2. FUNGSI CEK BOOKING JADWAL (AGENDA)
+    // ==========================================
+    function cekBooking(){
+        let tempat = $("#tempat").val();
+        let tanggal = $("#tanggal").val();
+        let mulai = $("#jam_mulai").val();
+        let selesai = $("#jam_selesai").val();
+    
+        // Jika form belum terisi semua, jangan kirim request dulu
+        if(tempat == '' || tanggal == '' || mulai == '' || selesai == ''){
+            return;
+        }
+    
+        // Ajax request ke route pengecekan agenda
+        $.get("{{ route('agenda.cekBooking') }}", {
+            tempat: tempat,
+            tanggal: tanggal,
+            jam_mulai: mulai,
+            jam_selesai: selesai
+        }, function(res){
+            if(res.bentrok){
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Jadwal Bentrok',
+                    text: 'Ruangan sudah dipakai pada jam tersebut.',
+                    confirmButtonColor: '#dc3545'
+                });
+                $(".btn-save").prop("disabled", true);
+            } else {
+                $(".btn-save").prop("disabled", false);
+            }
+        });
+    }
+    
+    // Trigger pengecekan otomatis setiap kali ada perubahan input agenda
+    $("#tempat, #tanggal, #jam_mulai, #jam_selesai").on("change", cekBooking);
+});
+</script>
+
 @endsection

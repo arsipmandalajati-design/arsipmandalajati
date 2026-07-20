@@ -11,19 +11,25 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Cek apakah kolom 'status_disposisi' belum ada di tabel 'surat_masuks'
-        if (!Schema::hasColumn('surat_masuks', 'status_disposisi')) {
+        // Cek apakah tabel ada dan kolom 'status_disposisi' BELUM ada
+        if (Schema::hasTable('surat_masuks') && !Schema::hasColumn('surat_masuks', 'status_disposisi')) {
             Schema::table('surat_masuks', function (Blueprint $table) {
-                // Sesuaikan isi di bawah ini dengan tipe data asli bawaan file kamu
-                $table->string('status_disposisi')->nullable(); 
+                // Diposisikan setelah kolom file_surat agar struktur DB tetap rapi
+                $table->string('status_disposisi')->nullable()->after('file_surat'); 
             });
         }
     }
 
-public function down(): void
-{
-    Schema::table('surat_masuks', function (Blueprint $table) {
-        $table->dropColumn('disposisi');
-    });
-}
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        // Cek dulu apakah tabel dan kolom 'status_disposisi' benar-benar ada sebelum di-drop
+        if (Schema::hasTable('surat_masuks') && Schema::hasColumn('surat_masuks', 'status_disposisi')) {
+            Schema::table('surat_masuks', function (Blueprint $table) {
+                $table->dropColumn('status_disposisi'); // Nama kolom disamakan dengan fungsi up()
+            });
+        }
+    }
 };

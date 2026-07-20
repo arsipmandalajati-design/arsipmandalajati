@@ -489,7 +489,9 @@ document.addEventListener('DOMContentLoaded',function(){
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 $(document).ready(function() {
-    // Handler Modal data transfer
+    // ==========================================
+    // 1. HANDLER MODAL PREVIEW (SURAT MASUK)
+    // ==========================================
     $('.btn-preview').on('click', function() {
         const kode = $(this).data('kode');
         const nomor = $(this).data('nomor');
@@ -500,6 +502,7 @@ $(document).ready(function() {
         const perihal = $(this).data('perihal');
         const fileUrl = $(this).data('file');
 
+        // Injeksikan data ke elemen modal
         $('#md-kode').text(kode);
         $('#md-nomor').text(nomor);
         $('#md-judul').text(judul);
@@ -536,38 +539,43 @@ $(document).ready(function() {
         $('#md-pdf-viewer').attr('src', '');
     });
 
-    // Fungsi cek booking bawaan agenda
+    // ==========================================
+    // 2. FUNGSI CEK BOOKING JADWAL (AGENDA)
+    // ==========================================
     function cekBooking(){
-        let tempat=$("#tempat").val();
-        let tanggal=$("#tanggal").val();
-        let mulai=$("#jam_mulai").val();
-        let selesai=$("#jam_selesai").val();
+        let tempat = $("#tempat").val();
+        let tanggal = $("#tanggal").val();
+        let mulai = $("#jam_mulai").val();
+        let selesai = $("#jam_selesai").val();
     
-        if(tempat=='' || tanggal=='' || mulai=='' || selesai==''){
+        // Jika form belum terisi semua, jangan kirim request dulu
+        if(tempat == '' || tanggal == '' || mulai == '' || selesai == ''){
             return;
         }
     
-        $.get("{{ route('agenda.cekBooking') }}",{
-            tempat:tempat,
-            tanggal:tanggal,
-            jam_mulai:mulai,
-            jam_selesai:selesai
-        },function(res){
+        // Ajax request ke route pengecekan agenda
+        $.get("{{ route('agenda.cekBooking') }}", {
+            tempat: tempat,
+            tanggal: tanggal,
+            jam_mulai: mulai,
+            jam_selesai: selesai
+        }, function(res){
             if(res.bentrok){
                 Swal.fire({
-                    icon:'warning',
-                    title:'Jadwal Bentrok',
-                    text:'Ruangan sudah dipakai pada jam tersebut.',
-                    confirmButtonColor:'#dc3545'
+                    icon: 'warning',
+                    title: 'Jadwal Bentrok',
+                    text: 'Ruangan sudah dipakai pada jam tersebut.',
+                    confirmButtonColor: '#dc3545'
                 });
-                $(".btn-save").prop("disabled",true);
-            }else{
-                $(".btn-save").prop("disabled",false);
+                $(".btn-save").prop("disabled", true);
+            } else {
+                $(".btn-save").prop("disabled", false);
             }
         });
     }
     
-    $("#tempat,#tanggal,#jam_mulai,#jam_selesai").on("change",cekBooking);
+    // Trigger pengecekan otomatis setiap kali ada perubahan input agenda
+    $("#tempat, #tanggal, #jam_mulai, #jam_selesai").on("change", cekBooking);
 });
 </script>
 @endsection

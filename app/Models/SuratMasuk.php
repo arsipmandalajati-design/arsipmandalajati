@@ -13,7 +13,7 @@ class SuratMasuk extends Model
     protected $fillable = [
         'user_id',
         'kode_arsip_id',
-        'pejabat_id', // Tambahkan ini jika tabel surat_masuk memiliki kolom pejabat_id
+        'pejabat_id', 
         'nomor_surat',
         'jenis_surat',
         'sumber_arsip',
@@ -24,19 +24,6 @@ class SuratMasuk extends Model
         'tanggal_surat',
         'perihal',
         'file_surat',
-        'tempat',
-        'tanggal_kegiatan',
-        'jam_mulai',
-        'jam_selesai',
-        'materi',
-        'jumlah_peserta',
-        'kursi',
-        'meja',
-        'proyektor',
-        'mic',
-        'sound_system',
-        'kabel_roll',
-        'lainnya',
         'status',
         'user_disposisi_id',
         'catatan_admin',
@@ -64,7 +51,7 @@ class SuratMasuk extends Model
 
     /*
     |--------------------------------------------------------------------------
-    | Pegawai Pembuat Surat
+    | Pegawai Pembuat/Penginput Surat
     |--------------------------------------------------------------------------
     */
     public function user()
@@ -84,7 +71,7 @@ class SuratMasuk extends Model
 
     /*
     |--------------------------------------------------------------------------
-    | Agenda
+    | Relasi Agenda (Logistik Internal)
     |--------------------------------------------------------------------------
     */
     public function agenda()

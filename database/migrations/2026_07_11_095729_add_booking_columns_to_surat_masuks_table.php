@@ -6,40 +6,79 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
-        Schema::table('surat_masuks', function (Blueprint $table) {
+        if (Schema::hasTable('surat_masuks')) {
+            Schema::table('surat_masuks', function (Blueprint $table) {
 
-            // Kebutuhan
-            $table->integer('jumlah_peserta')->default(0);
+                // Mengelompokkan logistik tepat di bawah kolom materi (dari migrasi sebelumnya)
+                if (!Schema::hasColumn('surat_masuks', 'jumlah_peserta')) {
+                    $table->integer('jumlah_peserta')->default(0)->after('materi');
+                }
 
-            $table->integer('kursi')->default(0);
-            $table->integer('meja')->default(0);
-            $table->integer('proyektor')->default(0);
-            $table->integer('mic')->default(0);
-            $table->integer('sound_system')->default(0);
-            $table->integer('kabel_roll')->default(0);
+                if (!Schema::hasColumn('surat_masuks', 'kursi')) {
+                    $table->integer('kursi')->default(0)->after('jumlah_peserta');
+                }
 
-            $table->string('lainnya')->nullable();
+                if (!Schema::hasColumn('surat_masuks', 'meja')) {
+                    $table->integer('meja')->default(0)->after('kursi');
+                }
 
-        });
+                if (!Schema::hasColumn('surat_masuks', 'proyektor')) {
+                    $table->integer('proyektor')->default(0)->after('meja');
+                }
+
+                if (!Schema::hasColumn('surat_masuks', 'mic')) {
+                    $table->integer('mic')->default(0)->after('proyektor');
+                }
+
+                if (!Schema::hasColumn('surat_masuks', 'sound_system')) {
+                    $table->integer('sound_system')->default(0)->after('mic');
+                }
+
+                if (!Schema::hasColumn('surat_masuks', 'kabel_roll')) {
+                    $table->integer('kabel_roll')->default(0)->after('sound_system');
+                }
+
+                if (!Schema::hasColumn('surat_masuks', 'lainnya')) {
+                    $table->string('lainnya')->nullable()->after('kabel_roll');
+                }
+
+            });
+        }
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
-        Schema::table('surat_masuks', function (Blueprint $table) {
+        if (Schema::hasTable('surat_masuks')) {
+            Schema::table('surat_masuks', function (Blueprint $table) {
 
-            $table->dropColumn([
-                'jumlah_peserta',
-                'kursi',
-                'meja',
-                'proyektor',
-                'mic',
-                'sound_system',
-                'kabel_roll',
-                'lainnya'
-            ]);
+                // List kolom logistik yang ingin diperiksa keberadaannya
+                $logistikColumns = [
+                    'jumlah_peserta', 'kursi', 'meja', 'proyektor', 
+                    'mic', 'sound_system', 'kabel_roll', 'lainnya'
+                ];
 
-        });
+                // Hanya kumpulkan kolom yang benar-benar ada di database untuk di-drop
+                $columnsToDrop = [];
+                foreach ($logistikColumns as $col) {
+                    if (Schema::hasColumn('surat_masuks', $col)) {
+                        $columnsToDrop[] = $col;
+                    }
+                }
+
+                // Jalankan perintah drop jika array tidak kosong
+                if (!empty($columnsToDrop)) {
+                    $table->dropColumn($columnsToDrop);
+                }
+
+            });
+        }
     }
 };

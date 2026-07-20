@@ -43,10 +43,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/notifications/read/{id}', [NotificationController::class, 'read'])->name('notifications.read');
 
     /* --- SURAT MASUK --- */
-    // Catatan: Rute custom HARUS di atas Route::resource agar tidak terbaca sebagai {suratmasuk} ID
+    // Catatan: Rute kustom HARUS di atas Route::resource agar tidak terbaca sebagai {suratmasuk} ID
     Route::get('/suratmasuk/print', [SuratMasukController::class, 'print'])->name('suratmasuk.print');
-    Route::get('/suratmasuk/get-nomor-registrasi/{id}', [SuratMasukController::class, 'getNomorRegistrasi'])->name('suratmasuk.getNomorRegistrasi');
-    
+    Route::get('/suratmasuk/get-nomor-registrasi/{kode_arsip_id}', [SuratMasukController::class, 'getNomorRegistrasi'])->name('suratmasuk.getNomor');
+
     // Alur Disposisi & Agenda
     Route::get('/suratmasuk/{id}/disposisi', [SuratMasukController::class, 'disposisi'])->name('suratmasuk.disposisi');
     Route::post('/suratmasuk/{id}/disposisi', [SuratMasukController::class, 'kirimDisposisi'])->name('suratmasuk.kirimDisposisi');
@@ -60,12 +60,12 @@ Route::middleware('auth')->group(function () {
     Route::resource('suratkeluar', SuratKeluarController::class);
 
     /* --- AGENDA --- */
-    // Fitur Cek Ruangan via AJAX (Duplikasi dibersihkan menjadi satu rute yang jelas)
+    // Fitur Cek Ruangan via AJAX (Digunakan oleh komponen jQuery cekBooking)
     Route::get('/agenda/cek-booking', [AgendaController::class, 'cekBooking'])->name('agenda.cekBooking');
     
     // Pembuatan agenda khusus yang ditarik dari disposisi surat masuk
-    Route::get('/agenda/create/{id}', [AgendaController::class, 'create'])->name('agenda.create');
-    Route::post('/agenda/store/{id}', [AgendaController::class, 'store'])->name('agenda.store');
+    Route::get('/agenda/create-from-surat/{id}', [AgendaController::class, 'createFromSurat'])->name('agenda.createFromSurat');
+    Route::post('/agenda/store-from-surat/{id}', [AgendaController::class, 'storeFromSurat'])->name('agenda.storeFromSurat');
     
     // Fitur Tambahan Agenda
     Route::get('/agenda/print', [AgendaController::class, 'print'])->name('agenda.print');
@@ -73,7 +73,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/agenda/{agenda}/hasil', [AgendaController::class, 'hasil'])->name('agenda.hasil');
     Route::post('/agenda/{agenda}/hasil', [AgendaController::class, 'simpanHasil'])->name('agenda.simpanHasil');
     
-    Route::resource('agenda', AgendaController::class)->except(['create', 'store']);
+    // Resource penuh agar tombol tambah agenda mandiri/biasa tetap berfungsi normal
+    Route::resource('agenda', AgendaController::class);
 
     /* --- LOGOUT --- */
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
