@@ -94,9 +94,7 @@ Registrasikan surat fisik maupun dokumen digital yang diterima Kecamatan sebagai
         <form id="formRegistrasiSurat" action="{{ route('suratmasuk.store') }}" method="POST" enctype="multipart/form-data" novalidate>
             @csrf
 
-            {{-- ========================================= --}}
             {{-- INFORMASI ARSIP --}}
-            {{-- ========================================= --}}
             <div class="section-title">Informasi Arsip</div>
             <div class="row mb-3">
                 <div class="col-md-6 mb-3">
@@ -104,7 +102,7 @@ Registrasikan surat fisik maupun dokumen digital yang diterima Kecamatan sebagai
                     <select class="form-select" id="kode_arsip_id" name="kode_arsip_id" required>
                         <option value="">-- Pilih Kode Arsip --</option>
                         @foreach($kodearsip as $item)
-                            <option value="{{ $item->id }}">{{ $item->kode }} - {{ $item->nama_kategori }}</option>
+                            <option value="{{ $item->id }}" {{ old('kode_arsip_id') == $item->id ? 'selected' : '' }}>{{ $item->kode }} - {{ $item->nama_kategori }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -116,9 +114,7 @@ Registrasikan surat fisik maupun dokumen digital yang diterima Kecamatan sebagai
                 </div>
             </div>
 
-            {{-- ========================================= --}}
             {{-- INFORMASI SURAT --}}
-            {{-- ========================================= --}}
             <div class="section-title mt-2">Informasi Surat</div>
             <div class="row mb-3">
                 <div class="col-md-6 mb-3">
@@ -146,9 +142,7 @@ Registrasikan surat fisik maupun dokumen digital yang diterima Kecamatan sebagai
                 </div>
             </div>
 
-            {{-- ========================================= --}}
             {{-- DETAIL SURAT --}}
-            {{-- ========================================= --}}
             <div class="section-title mt-2">Detail Surat</div>
             <div class="row mb-3">
                 <div class="col-md-6 mb-3">
@@ -176,9 +170,7 @@ Registrasikan surat fisik maupun dokumen digital yang diterima Kecamatan sebagai
                 </div>
             </div>
 
-            {{-- ========================================= --}}
             {{-- DOKUMEN SURAT --}}
-            {{-- ========================================= --}}
             <div class="section-title mt-2">Dokumen Surat</div>
             <div class="row mb-4">
                 <div class="col-md-12">
@@ -189,9 +181,7 @@ Registrasikan surat fisik maupun dokumen digital yang diterima Kecamatan sebagai
                 </div>
             </div>
 
-            {{-- ========================================= --}}
             {{-- DYNAMIC CARD: INTEGRASI BOOKING TEMPAT --}}
-            {{-- ========================================= --}}
             <div id="bookingCard" class="card border border-teal-subtle bg-light bg-opacity-25 shadow-sm mb-4 rounded-4 overflow-hidden animate__animated animate__fadeIn" style="display:none;">
                 <div class="card-body p-4">
                     <div class="booking-title">Booking Tempat & Fasilitas Kegiatan</div>
@@ -291,62 +281,131 @@ Registrasikan surat fisik maupun dokumen digital yang diterima Kecamatan sebagai
     </div>
 </div>
 
-{{-- ========================================= --}}
 {{-- JAVASCRIPT LOGIC --}}
-{{-- ========================================= --}}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 $(document).ready(function() {
-    $('#kode_arsip_id').on('change', function() {
-        var kodeArsipId = $(this).val();
-        
-        if (kodeArsipId) {
-            $.ajax({
-                url: '/suratmasuk/get-nomor-registrasi/' + kodeArsipId,
-                type: "GET",
-                dataType: "json",
-                success: function(data) {
-                    $('#nomor_registrasi').val(data.nomor_registrasi);
-                },
-                error: function(xhr) {
-                    console.error("Gagal mengambil nomor registrasi:", xhr.responseText);
-                    alert("Gagal memuat nomor registrasi otomatis.");
-                }
-            });
-        } else {
-            $('#nomor_registrasi').val('');
-        }
-    });
-});
-</script>
+    const $jenisSurat = $('#jenis_surat');
+    const $kodeArsip = $('#kode_arsip_id');
+    const $form = $('#formRegistrasiSurat');
+    const $btnSimpan = $('#btnSimpan');
+    const $nomorRegistrasi = $('#nomor_registrasi');
 
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const jenisSurat = document.getElementById("jenis_surat");
-    const kodeArsip = document.getElementById("kode_arsip_id");
-    const form = document.getElementById("formRegistrasiSurat");
-    const btnSimpan = document.getElementById("btnSimpan");
-
+    // Jalankan pengecekan awal saat halaman dimuat (untuk handle old values)
     toggleBooking();
-    if(kodeArsip.value !== ""){
+    if ($kodeArsip.val() !== "") {
         ambilNomorRegistrasi();
     }
 
-    jenisSurat.addEventListener("change", toggleBooking);
-    kodeArsip.addEventListener("change", ambilNomorRegistrasi);
+    // Event Listeners
+    $jenisSurat.on('change', toggleBooking);
+    $kodeArsip.on('change', ambilNomorRegistrasi);
 
-    // 1. SUBMIT FORM
-    form.addEventListener("submit", function(e){
-        if(!form.checkValidity()){
-            e.preventDefault();
-            e.stopPropagation();
-            form.classList.add('was-validated');
-            return; 
+    // 1. FUNGSI AMBIL NOMOR REGISTRASI (Unified via jQuery AJAX)
+    function ambilNomorRegistrasi() {
+        let id = $kodeArsip.val();
+        if (id === "") {
+            $nomorRegistrasi.val('');
+            return;
         }
 
-        btnSimpan.disabled = true;
-        btnSimpan.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Menyimpan...';
+        $.ajax({
+            url: '/suratmasuk/get-nomor-registrasi/' + id,
+            type: "GET",
+            dataType: "json",
+            success: function(data) {
+                $nomorRegistrasi.val(data.nomor_registrasi);
+            },
+            error: function(xhr) {
+                console.error("Gagal mengambil nomor registrasi:", xhr.responseText);
+            }
+        });
+    }
+
+    // 2. FUNGSI TOGGLE BOOKING CARD
+    function toggleBooking() {
+        let $booking = $("#bookingCard");
+        if (!$booking.length) return;
+
+        if ($jenisSurat.val() === "Internal") {
+            $booking.show();
+            $("#tempat, #tanggal_kegiatan, #jam_mulai, #jam_selesai").attr("required", true);
+        } else {
+            $booking.hide();
+            $("#tempat, #tanggal_kegiatan, #jam_mulai, #jam_selesai").removeAttr("required");
+            
+            $booking.find('input[type="text"], input[type="date"], input[type="time"], select').val('');
+            $booking.find('input[type="number"]').val(0);
+            $("#bookingAlertContainer").html('');
+            $btnSimpan.prop('disabled', false);
+        }
+    }
+
+    // 3. CEK BENTROK JADWAL
+    $("#tempat, #tanggal_kegiatan, #jam_mulai, #jam_selesai").on("change", function() {
+        let tempat = $("#tempat").val();
+        let tanggal = $("#tanggal_kegiatan").val();
+        let mulai = $("#jam_mulai").val();
+        let selesai = $("#jam_selesai").val();
+        let $alertContainer = $("#bookingAlertContainer");
+
+        if (tempat === "" || tanggal === "" || mulai === "" || selesai === "") {
+            return;
+        }
+
+        if (selesai <= mulai) {
+            $alertContainer.html(`
+                <div class="alert alert-warning rounded-3 py-2 border-0 shadow-sm animate__animated animate__shakeX">
+                    <i class="bi bi-clock-fill me-2"></i>
+                    <strong>Format Waktu Salah!</strong> Jam Selesai harus lebih lambat daripada Jam Mulai.
+                </div>`);
+            $btnSimpan.prop('disabled', true);
+            return;
+        }
+
+        $alertContainer.html('<div class="alert alert-info py-2 rounded-3 border-0"><span class="spinner-border spinner-border-sm me-2"></span>Memeriksa agenda ruangan...</div>');
+
+        $.ajax({
+            url: "{{ route('agenda.cekBooking') }}",
+            type: "GET",
+            data: { tempat, tanggal, jam_mulai: mulai, jam_selesai: selesai },
+            success: function(res) {
+                if (res.bentrok) {
+                    $alertContainer.html(`
+                        <div class="alert alert-danger rounded-3 py-2 border-0 shadow-sm animate__animated animate__shakeX">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <strong>Peringatan Jadwal Bentrok!</strong> Ruangan tersebut sudah dipesan di tanggal dan jam yang sama.
+                        </div>`);
+                    $btnSimpan.prop('disabled', true);
+                } else {
+                    $alertContainer.html(`
+                        <div class="alert alert-success rounded-3 py-2 border-0 shadow-sm">
+                            <i class="bi bi-check-circle-fill me-2"></i> Ruangan tersedia dan siap digunakan!
+                        </div>`);
+                    $btnSimpan.prop('disabled', false);
+                }
+            },
+            error: function() {
+                $alertContainer.html(`
+                    <div class="alert alert-warning rounded-3 py-2 border-0 shadow-sm">
+                        <i class="bi bi-exclamation-circle-fill me-2"></i> Gagal memverifikasi jadwal. Silakan coba lagi.
+                    </div>`);
+                $btnSimpan.prop('disabled', false);
+            }
+        });
+    });
+
+    // 4. SUBMIT FORM VALIDATION
+    $form.on('submit', function(e) {
+        if (!this.checkValidity()) {
+            e.preventDefault();
+            e.stopPropagation();
+            $form.addClass('was-validated');
+            return;
+        }
+
+        $btnSimpan.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Menyimpan...');
 
         Swal.fire({
             title: "Menyimpan Data Surat...",
@@ -356,115 +415,6 @@ document.addEventListener("DOMContentLoaded", function () {
             showConfirmButton: false,
             didOpen: () => {
                 Swal.showLoading();
-            }
-        });
-    });
-
-    // 2. TOGGLE BOOKING CARD
-    function toggleBooking(){
-        let booking = document.getElementById("bookingCard");
-        if(!booking) return;
-
-        if(jenisSurat.value === "Internal"){
-            booking.style.display = "block";
-            document.getElementById("tempat").setAttribute("required", "true");
-            document.getElementById("tanggal_kegiatan").setAttribute("required", "true");
-            document.getElementById("jam_mulai").setAttribute("required", "true");
-            document.getElementById("jam_selesai").setAttribute("required", "true");
-        } else {
-            booking.style.display = "none";
-            document.getElementById("tempat").removeAttribute("required");
-            document.getElementById("tanggal_kegiatan").removeAttribute("required");
-            document.getElementById("jam_mulai").removeAttribute("required");
-            document.getElementById("jam_selesai").removeAttribute("required");
-            
-            $("#bookingCard").find('input[type="text"], input[type="date"], input[type="time"], select').val('');
-            $("#bookingCard").find('input[type="number"]').val(0);
-            $("#bookingAlertContainer").html('');
-            btnSimpan.disabled = false;
-        }
-    }
-
-    // 3. FETCH NOMOR REGISTRASI
-    function ambilNomorRegistrasi(){
-        let id = kodeArsip.value;
-
-        if(id === ""){
-            document.getElementById("nomor_registrasi").value = "";
-            return;
-        }
-
-        fetch("/suratmasuk/get-nomor-registrasi/" + id)
-        .then(function(response){
-            if(!response.ok){
-                throw new Error("Route gagal diakses");
-            }
-            return response.json();
-        })
-        .then(function(data){
-            document.getElementById("nomor_registrasi").value = data.nomor_registrasi;
-        })
-        .catch(function(error){
-            console.error("Gagal mengambil nomor registrasi:", error);
-        });
-    }
-
-    // 4. CEK BENTROK JADWAL
-    $("#tempat, #tanggal_kegiatan, #jam_mulai, #jam_selesai").on("change", function(){
-        let tempat = $("#tempat").val();
-        let tanggal = $("#tanggal_kegiatan").val();
-        let mulai = $("#jam_mulai").val();
-        let selesai = $("#jam_selesai").val();
-        let alertContainer = $("#bookingAlertContainer");
-
-        if(tempat === "" || tanggal === "" || mulai === "" || selesai === ""){
-            return;
-        }
-
-        if(selesai <= mulai) {
-            alertContainer.html(`
-                <div class="alert alert-warning rounded-3 py-2 border-0 shadow-sm animate__animated animate__shakeX">
-                    <i class="bi bi-clock-fill me-2"></i>
-                    <strong>Format Waktu Salah!</strong> Jam Selesai harus lebih lambat daripada Jam Mulai.
-                </div>`);
-            btnSimpan.disabled = true;
-            return;
-        }
-
-        alertContainer.html('<div class="alert alert-info py-2 rounded-3 border-0"><span class="spinner-border spinner-border-sm me-2"></span>Memeriksa agenda ruangan...</div>');
-
-        $.ajax({
-            url: "{{ route('agenda.cekBooking') }}",
-            type: "GET",
-            data: {
-                tempat: tempat,
-                tanggal: tanggal,
-                jam_mulai: mulai,
-                jam_selesai: selesai
-            },
-            success: function(res){
-                if(res.bentrok){
-                    alertContainer.html(`
-                        <div class="alert alert-danger rounded-3 py-2 border-0 shadow-sm animate__animated animate__shakeX">
-                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                            <strong>Peringatan Jadwal Bentrok!</strong> Ruangan tersebut sudah dipesan di tanggal dan jam yang sama.
-                        </div>`);
-                    btnSimpan.disabled = true;
-                } else {
-                    alertContainer.html(`
-                        <div class="alert alert-success rounded-3 py-2 border-0 shadow-sm">
-                            <i class="bi bi-check-circle-fill me-2"></i> Ruangan tersedia dan siap digunakan!
-                        </div>`);
-                    btnSimpan.disabled = false;
-                }
-            },
-            error: function(){
-                console.error("Gagal melakukan verifikasi ketersediaan jadwal.");
-                alertContainer.html(`
-                    <div class="alert alert-warning rounded-3 py-2 border-0 shadow-sm">
-                        <i class="bi bi-exclamation-circle-fill me-2"></i> Gagal memverifikasi jadwal. Silakan coba lagi.
-                    </div>`);
-                btnSimpan.disabled = false;
             }
         });
     });
