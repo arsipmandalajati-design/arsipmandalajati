@@ -25,88 +25,40 @@ class SuratMasukController extends Controller
     */
 
     public function index(Request $request)
-{
-    $suratmasuk = SuratMasuk::with('kodearsip');
+    {
+        $suratmasuk = SuratMasuk::with('kodearsip');
 
-    /*
-    |--------------------------------------------------------------------------
-    | FILTER TANGGAL
-    |--------------------------------------------------------------------------
-    */
+        if ($request->filled('tanggal_awal')) {
+            $suratmasuk->whereDate('tanggal_surat', '>=', $request->tanggal_awal);
+        }
 
-    if ($request->filled('tanggal_awal')) {
-        $suratmasuk->whereDate(
-            'tanggal_surat',
-            '>=',
-            $request->tanggal_awal
-        );
-    }
+        if ($request->filled('tanggal_akhir')) {
+            $suratmasuk->whereDate('tanggal_surat', '<=', $request->tanggal_akhir);
+        }
 
-    if ($request->filled('tanggal_akhir')) {
-        $suratmasuk->whereDate(
-            'tanggal_surat',
-            '<=',
-            $request->tanggal_akhir
-        );
-    }
+        if ($request->filled('kode_arsip')) {
+            $suratmasuk->whereHas('kodearsip', function ($q) use ($request) {
+                $q->where('kode', 'LIKE', '%' . $request->kode_arsip . '%');
+            });
+        }
 
-    /*
-    |--------------------------------------------------------------------------
-    | FILTER KODE ARSIP
-    |--------------------------------------------------------------------------
-    */
+        if ($request->filled('perihal')) {
+            $suratmasuk->where('perihal', 'LIKE', '%' . $request->perihal . '%');
+        }
 
-    if ($request->filled('kode_arsip')) {
-        $suratmasuk->whereHas('kodearsip', function ($q) use ($request) {
-            $q->where(
-                'kode',
-                'LIKE',
-                '%' . $request->kode_arsip . '%'
-            );
-        });
-    }
+        if ($request->filled('status')) {
+            $suratmasuk->where('status', $request->status);
+        }
 
-    /*
-    |--------------------------------------------------------------------------
-    | FILTER PERIHAL
-    |--------------------------------------------------------------------------
-    */
+        $suratmasuk = $suratmasuk->latest()->get();
 
-    if ($request->filled('perihal')) {
-        $suratmasuk->where(
-            'perihal',
-            'LIKE',
-            '%' . $request->perihal . '%'
-        );
-    }
+        $kodearsip = KodeArsip::all();
 
-    /*
-    |--------------------------------------------------------------------------
-    | FILTER STATUS
-    |--------------------------------------------------------------------------
-    */
-
-    if ($request->filled('status')) {
-        $suratmasuk->where(
-            'status',
-            $request->status
-        );
-    }
-
-    $suratmasuk = $suratmasuk
-        ->latest()
-        ->get();
-
-    $kodearsip = KodeArsip::all();
-
-    return view(
-        'suratmasuk.index',
-        compact(
+        return view('suratmasuk.index', compact(
             'suratmasuk',
             'kodearsip'
-        )
-    );
-}  
+        ));
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -123,351 +75,388 @@ class SuratMasukController extends Controller
             compact('kodearsip')
         );
     }
-    /*
-|--------------------------------------------------------------------------
-| SIMPAN SURAT MASUK
-|--------------------------------------------------------------------------
-*/
-
-public function store(Request $request)
-{
-    // Hilangkan spasi di nomor surat
-    $request->merge([
-        'nomor_surat' => trim($request->nomor_surat)
-    ]);
-
-    $request->validate([
-
-        'kode_arsip_id'    => 'nullable|exists:kode_arsips,id',
-
-        'nomor_surat'      => 'required|unique:surat_masuks,nomor_surat',
-
-        'jenis_surat'      => 'required',
-
-        'sumber_arsip'     => 'required',
-
-        'judul'            => 'required',
-
-        'pengirim'         => 'required',
-
-        'tanggal_surat'    => 'required|date',
-
-        'perihal'          => 'required',
-
-        'file_surat'       => 'required|mimes:pdf,jpg,jpeg,png|max:2048',
-
-        'tempat'           => 'nullable',
-
-        'tanggal_kegiatan' => 'nullable|date',
-
-        'jam_mulai'        => 'nullable',
-
-        'jam_selesai'      => 'nullable',
-
-        'status' => 'Menunggu Verifikasi',
-
-        'materi'           => 'nullable',
-
-        'jumlah_peserta'   => 'nullable|integer',
-
-        'kursi'            => 'nullable|integer',
-
-        'meja'             => 'nullable|integer',
-
-        'proyektor'        => 'nullable|integer',
-
-        'mic'              => 'nullable|integer',
-
-        'sound_system'     => 'nullable|integer',
-
-        'kabel_roll'       => 'nullable|integer',
-
-        'lainnya'          => 'nullable',
-
-    ]);
 
     /*
     |--------------------------------------------------------------------------
-    | Upload File
+    | SIMPAN SURAT MASUK
     |--------------------------------------------------------------------------
     */
 
-    $file = null;
-
-    if ($request->hasFile('file_surat')) {
-
-        $file = $request->file('file_surat')
-            ->store('surat_masuk', 'public');
-
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Simpan Surat Masuk
-    |--------------------------------------------------------------------------
-    */
-
-    $surat = SuratMasuk::create([
-
-        'user_id'            => Auth::id(),
-
-        'kode_arsip_id'      => $request->kode_arsip_id,
-
-        'nomor_surat'        => $request->nomor_surat,
-
-        'jenis_surat'        => $request->jenis_surat,
-
-        'sumber_arsip'       => $request->sumber_arsip,
-
-        'judul'              => $request->judul,
-
-        'pengirim'           => $request->pengirim,
-
-        'tanggal_surat'      => $request->tanggal_surat,
-
-        'perihal'            => $request->perihal,
-
-        'file_surat'         => $file,
-
-        'tempat'             => $request->tempat,
-
-        'tanggal_kegiatan'   => $request->tanggal_kegiatan,
-
-        'jam_mulai'          => $request->jam_mulai,
-
-        'jam_selesai'        => $request->jam_selesai,
-
-        'materi'             => $request->materi,
-
-        'jumlah_peserta'     => $request->jumlah_peserta ?? 0,
-
-        'kursi'              => $request->kursi ?? 0,
-
-        'meja'               => $request->meja ?? 0,
-
-        'proyektor'          => $request->proyektor ?? 0,
-
-        'mic'                => $request->mic ?? 0,
-
-        'sound_system'       => $request->sound_system ?? 0,
-
-        'kabel_roll'         => $request->kabel_roll ?? 0,
-
-        'lainnya'            => $request->lainnya,
-
-        'status' => 'Menunggu Verifikasi',
-
-    ]);
-
-    /*
-    |--------------------------------------------------------------------------
-    | Simpan Arsip
-    |--------------------------------------------------------------------------
-    */
-
-    Arsip::create([
-
-        'kode_arsip'   => optional($surat->kodearsip)->kode ?? '-',
-
-        'nama_arsip'   => $surat->judul,
-
-        'tanggal_arsip'=> $surat->tanggal_surat,
-
-        'kategori'     => 'Surat Masuk',
-
-        'file_arsip'   => $surat->file_surat,
-
-    ]);
-        /*
-    |--------------------------------------------------------------------------
-    | NOTIFIKASI KE ADMIN
-    |--------------------------------------------------------------------------
-    */
-
-    $admins = User::where('role', 'admin')->get();
-
-    foreach ($admins as $admin) {
-
-        Notification::create([
-
-            'user_id'      => $admin->id,
-
-            'judul'        => 'Surat Masuk Baru',
-
-            'pesan'        => Auth::user()->name .
-                              ' menambahkan surat "' .
-                              $surat->judul .
-                              '".',
-
-            'jenis'        => 'surat',
-
-            'reference_id' => $surat->id,
-
-            'is_read'      => 0,
-
+    public function store(Request $request)
+    {
+        $request->merge([
+            'nomor_surat' => trim($request->nomor_surat)
         ]);
 
-    }
+        $request->validate([
+            'kode_arsip_id'    => 'required|exists:kode_arsips,id',
+            'nomor_surat'      => 'required|unique:surat_masuks,nomor_surat',
+            'jenis_surat'      => 'required',
+            'sumber_arsip'     => 'required',
+            'judul'            => 'required',
+            'pengirim'         => 'required',
+            'tanggal_surat'    => 'required|date',
+            'perihal'          => 'required',
+            'file_surat'       => 'required|mimes:pdf,jpg,jpeg,png|max:2048',
 
-    /*
-    |--------------------------------------------------------------------------
-    | REDIRECT
-    |--------------------------------------------------------------------------
-    */
+            'tempat'           => 'nullable',
+            'tanggal_kegiatan' => 'nullable|date',
+            'jam_mulai'        => 'nullable',
+            'jam_selesai'      => 'nullable',
+            'materi'           => 'nullable',
 
-    return redirect()
-        ->route('suratmasuk.index')
-        ->with(
-            'success',
-            'Surat masuk berhasil disimpan.'
-        );
-}
+            'jumlah_peserta'   => 'nullable|integer',
+            'kursi'            => 'nullable|integer',
+            'meja'             => 'nullable|integer',
+            'proyektor'        => 'nullable|integer',
+            'mic'              => 'nullable|integer',
+            'sound_system'     => 'nullable|integer',
+            'kabel_roll'       => 'nullable|integer',
+            'lainnya'          => 'nullable',
+        ]);
 
-/*
-|--------------------------------------------------------------------------
-| FORM EDIT SURAT
-|--------------------------------------------------------------------------
-*/
+        /*
+        |--------------------------------------------------------------------------
+        | GENERATE NOMOR REGISTRASI
+        |--------------------------------------------------------------------------
+        */
 
-public function edit($id)
-{
-    $surat = SuratMasuk::findOrFail($id);
+        $kode = KodeArsip::findOrFail($request->kode_arsip_id);
 
-    $kodearsip = KodeArsip::all();
+        $last = SuratMasuk::where(
+            'kode_arsip_id',
+            $request->kode_arsip_id
+        )->latest()->first();
 
-    return view(
-        'suratmasuk.edit',
-        compact(
-            'surat',
-            'kodearsip'
-        )
-    );
-}
-/*
-|--------------------------------------------------------------------------
-| UPDATE SURAT MASUK
-|--------------------------------------------------------------------------
-*/
+        $nomorUrut = $last
+            ? $last->nomor_urut + 1
+            : 1;
 
-public function update(Request $request, $id)
-{
-    $request->merge([
-        'nomor_surat' => trim($request->nomor_surat)
-    ]);
+        $nomorRegistrasi =
+            $kode->kode .
+            '/' .
+            str_pad($nomorUrut, 3, '0', STR_PAD_LEFT);
 
-    $request->validate([
+        /*
+        |--------------------------------------------------------------------------
+        | UPLOAD FILE
+        |--------------------------------------------------------------------------
+        */
 
-        'kode_arsip_id' => 'required|exists:kode_arsips,id',
+        $file = null;
 
-        'nomor_surat' => 'required|unique:surat_masuks,nomor_surat,' . $id,
+        if ($request->hasFile('file_surat')) {
 
-        'jenis_surat' => 'required',
-
-        'sumber_arsip' => 'required',
-
-        'judul' => 'required',
-
-        'pengirim' => 'required',
-
-        'tanggal_surat' => 'required|date',
-
-        'perihal' => 'required',
-
-        'file_surat' => 'nullable|mimes:pdf,jpg,jpeg,png|max:2048',
-
-    ]);
-
-    $surat = SuratMasuk::findOrFail($id);
-
-    /*
-    |--------------------------------------------------------------------------
-    | UPLOAD FILE BARU
-    |--------------------------------------------------------------------------
-    */
-
-    $file = $surat->file_surat;
-
-    if ($request->hasFile('file_surat')) {
-
-        if (
-            $surat->file_surat &&
-            Storage::disk('public')->exists($surat->file_surat)
-        ) {
-
-            Storage::disk('public')->delete($surat->file_surat);
+            $file = $request->file('file_surat')
+                ->store('surat_masuk', 'public');
 
         }
 
-        $file = $request
-            ->file('file_surat')
-            ->store('surat_masuk', 'public');
+        /*
+        |--------------------------------------------------------------------------
+        | SIMPAN SURAT
+        |--------------------------------------------------------------------------
+        */
 
+        $surat = SuratMasuk::create([
+
+            'user_id'           => Auth::id(),
+
+            'kode_arsip_id'     => $request->kode_arsip_id,
+
+            'nomor_urut'        => $nomorUrut,
+
+            'nomor_registrasi'  => $nomorRegistrasi,
+
+            'nomor_surat'       => $request->nomor_surat,
+
+            'jenis_surat'       => $request->jenis_surat,
+
+            'sumber_arsip'      => $request->sumber_arsip,
+
+            'judul'             => $request->judul,
+
+            'pengirim'          => $request->pengirim,
+
+            'tanggal_surat'     => $request->tanggal_surat,
+
+            'perihal'           => $request->perihal,
+
+            'file_surat'        => $file,
+
+            'tempat'            => $request->tempat,
+
+            'tanggal_kegiatan'  => $request->tanggal_kegiatan,
+
+            'jam_mulai'         => $request->jam_mulai,
+
+            'jam_selesai'       => $request->jam_selesai,
+
+            'materi'            => $request->materi,
+
+            'jumlah_peserta'    => $request->jumlah_peserta ?? 0,
+
+            'kursi'             => $request->kursi ?? 0,
+
+            'meja'              => $request->meja ?? 0,
+
+            'proyektor'         => $request->proyektor ?? 0,
+
+            'mic'               => $request->mic ?? 0,
+
+            'sound_system'      => $request->sound_system ?? 0,
+
+            'kabel_roll'        => $request->kabel_roll ?? 0,
+
+            'lainnya'           => $request->lainnya,
+
+            'status'            => 'Belum Disposisi',
+
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | SIMPAN KE TABEL ARSIP
+        |--------------------------------------------------------------------------
+        */
+
+        Arsip::create([
+
+            'kode_arsip'    => $nomorRegistrasi,
+
+            'nama_arsip'    => $surat->judul,
+
+            'tanggal_arsip' => $surat->tanggal_surat,
+
+            'kategori'      => 'Surat Masuk',
+
+            'file_arsip'    => $surat->file_surat,
+
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | KIRIM NOTIFIKASI KE ADMIN
+        |--------------------------------------------------------------------------
+        */
+
+        $admins = User::where('role', 'admin')->get();
+
+        foreach ($admins as $admin) {
+
+            Notification::create([
+
+                'user_id'      => $admin->id,
+
+                'judul'        => 'Surat Masuk Baru',
+
+                'pesan'        => Auth::user()->name .
+                                  ' menambahkan surat "' .
+                                  $surat->judul .
+                                  '".',
+
+                'jenis'        => 'surat',
+
+                'reference_id' => $surat->id,
+
+                'is_read'      => 0,
+
+            ]);
+
+        }
+
+        return redirect()
+            ->route('suratmasuk.index')
+            ->with(
+                'success',
+                'Surat masuk berhasil disimpan.'
+            );
+    }
+
+        /*
+    |--------------------------------------------------------------------------
+    | FORM EDIT SURAT
+    |--------------------------------------------------------------------------
+    */
+
+    public function edit($id)
+    {
+        $surat = SuratMasuk::findOrFail($id);
+
+        $kodearsip = KodeArsip::all();
+
+        return view(
+            'suratmasuk.edit',
+            compact(
+                'surat',
+                'kodearsip'
+            )
+        );
     }
 
     /*
     |--------------------------------------------------------------------------
-    | UPDATE SURAT
+    | UPDATE SURAT MASUK
     |--------------------------------------------------------------------------
     */
 
-    $surat->update([
+    public function update(Request $request, $id)
+    {
+        $request->merge([
+            'nomor_surat' => trim($request->nomor_surat)
+        ]);
 
-        'kode_arsip_id' => $request->kode_arsip_id,
+        $request->validate([
 
-        'nomor_surat' => $request->nomor_surat,
+            'kode_arsip_id' => 'required|exists:kode_arsips,id',
 
-        'jenis_surat' => $request->jenis_surat,
+            'nomor_surat' => 'required|unique:surat_masuks,nomor_surat,' . $id,
 
-        'sumber_arsip' => $request->sumber_arsip,
+            'jenis_surat' => 'required',
 
-        'judul' => $request->judul,
+            'sumber_arsip' => 'required',
 
-        'pengirim' => $request->pengirim,
+            'judul' => 'required',
 
-        'tanggal_surat' => $request->tanggal_surat,
+            'pengirim' => 'required',
 
-        'perihal' => $request->perihal,
+            'tanggal_surat' => 'required|date',
 
-        'file_surat' => $file,
+            'perihal' => 'required',
 
-        'tempat' => $request->tempat,
+            'file_surat' => 'nullable|mimes:pdf,jpg,jpeg,png|max:2048',
 
-        'tanggal_kegiatan' => $request->tanggal_kegiatan,
+        ]);
 
-        'jam_mulai' => $request->jam_mulai,
+        $surat = SuratMasuk::findOrFail($id);
 
-        'jam_selesai' => $request->jam_selesai,
+        /*
+        |--------------------------------------------------------------------------
+        | JIKA KODE ARSIP BERUBAH
+        |--------------------------------------------------------------------------
+        */
 
-        'materi' => $request->materi,
+        if ($surat->kode_arsip_id != $request->kode_arsip_id) {
 
-        'jumlah_peserta' => $request->jumlah_peserta ?? 0,
+            $kode = KodeArsip::findOrFail($request->kode_arsip_id);
 
-        'kursi' => $request->kursi ?? 0,
+            $last = SuratMasuk::where(
+                'kode_arsip_id',
+                $request->kode_arsip_id
+            )->latest()->first();
 
-        'meja' => $request->meja ?? 0,
+            $nomorUrut = $last
+                ? $last->nomor_urut + 1
+                : 1;
 
-        'proyektor' => $request->proyektor ?? 0,
+            $nomorRegistrasi =
+                $kode->kode .
+                '/' .
+                str_pad($nomorUrut, 3, '0', STR_PAD_LEFT);
 
-        'mic' => $request->mic ?? 0,
+        } else {
 
-        'sound_system' => $request->sound_system ?? 0,
+            $nomorUrut = $surat->nomor_urut;
 
-        'kabel_roll' => $request->kabel_roll ?? 0,
+            $nomorRegistrasi = $surat->nomor_registrasi;
 
-        'lainnya' => $request->lainnya,
+        }
 
-    ]);
+        /*
+        |--------------------------------------------------------------------------
+        | UPLOAD FILE BARU
+        |--------------------------------------------------------------------------
+        */
 
-    /*
-    |--------------------------------------------------------------------------
-    | UPDATE DATA ARSIP
-    |--------------------------------------------------------------------------
-    */
+        $file = $surat->file_surat;
 
-    Arsip::where('nama_arsip', $surat->judul)
-        ->update([
+        if ($request->hasFile('file_surat')) {
 
-            'kode_arsip' => optional($surat->kodearsip)->kode ?? '-',
+            if (
+                $surat->file_surat &&
+                Storage::disk('public')->exists($surat->file_surat)
+            ) {
+
+                Storage::disk('public')->delete($surat->file_surat);
+
+            }
+
+            $file = $request
+                ->file('file_surat')
+                ->store('surat_masuk', 'public');
+
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | UPDATE SURAT
+        |--------------------------------------------------------------------------
+        */
+
+        $surat->update([
+
+            'kode_arsip_id' => $request->kode_arsip_id,
+
+            'nomor_urut' => $nomorUrut,
+
+            'nomor_registrasi' => $nomorRegistrasi,
+
+            'nomor_surat' => $request->nomor_surat,
+
+            'jenis_surat' => $request->jenis_surat,
+
+            'sumber_arsip' => $request->sumber_arsip,
+
+            'judul' => $request->judul,
+
+            'pengirim' => $request->pengirim,
+
+            'tanggal_surat' => $request->tanggal_surat,
+
+            'perihal' => $request->perihal,
+
+            'file_surat' => $file,
+
+            'tempat' => $request->tempat,
+
+            'tanggal_kegiatan' => $request->tanggal_kegiatan,
+
+            'jam_mulai' => $request->jam_mulai,
+
+            'jam_selesai' => $request->jam_selesai,
+
+            'materi' => $request->materi,
+
+            'jumlah_peserta' => $request->jumlah_peserta ?? 0,
+
+            'kursi' => $request->kursi ?? 0,
+
+            'meja' => $request->meja ?? 0,
+
+            'proyektor' => $request->proyektor ?? 0,
+
+            'mic' => $request->mic ?? 0,
+
+            'sound_system' => $request->sound_system ?? 0,
+
+            'kabel_roll' => $request->kabel_roll ?? 0,
+
+            'lainnya' => $request->lainnya,
+
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | UPDATE DATA ARSIP
+        |--------------------------------------------------------------------------
+        */
+
+        Arsip::where(
+            'nama_arsip',
+            $surat->getOriginal('judul')
+        )->update([
+
+            'kode_arsip' => $nomorRegistrasi,
 
             'nama_arsip' => $request->judul,
 
@@ -479,231 +468,208 @@ public function update(Request $request, $id)
 
         ]);
 
-    return redirect()
-        ->route('suratmasuk.index')
-        ->with(
-            'success',
-            'Surat masuk berhasil diperbarui.'
-        );
-}
-/*
-|--------------------------------------------------------------------------
-| HAPUS SURAT
-|--------------------------------------------------------------------------
-*/
-
-public function destroy($id)
-{
-    $surat = SuratMasuk::findOrFail($id);
-
-    /*
-    |--------------------------------------------------------------------------
-    | Hapus File
-    |--------------------------------------------------------------------------
-    */
-
-    if (
-        $surat->file_surat &&
-        Storage::disk('public')->exists($surat->file_surat)
-    ) {
-        Storage::disk('public')->delete($surat->file_surat);
+        return redirect()
+            ->route('suratmasuk.index')
+            ->with(
+                'success',
+                'Surat masuk berhasil diperbarui.'
+            );
     }
 
     /*
     |--------------------------------------------------------------------------
-    | Hapus Arsip
+    | HAPUS SURAT
     |--------------------------------------------------------------------------
     */
 
-    Arsip::where('nama_arsip', $surat->judul)->delete();
+    public function destroy($id)
+    {
+        $surat = SuratMasuk::findOrFail($id);
+
+        if (
+            $surat->file_surat &&
+            Storage::disk('public')->exists($surat->file_surat)
+        ) {
+
+            Storage::disk('public')->delete($surat->file_surat);
+
+        }
+
+        Arsip::where(
+            'nama_arsip',
+            $surat->judul
+        )->delete();
+
+        Agenda::where(
+            'surat_masuk_id',
+            $surat->id
+        )->delete();
+
+        $surat->delete();
+
+        return redirect()
+            ->route('suratmasuk.index')
+            ->with(
+                'success',
+                'Surat berhasil dihapus.'
+            );
+    }
+
+        /*
+    |--------------------------------------------------------------------------
+    | VERIFIKASI SURAT
+    |--------------------------------------------------------------------------
+    */
+
+    public function verifikasi($id)
+    {
+        $surat = SuratMasuk::findOrFail($id);
+
+        $surat->update([
+            'status' => 'Belum Disposisi'
+        ]);
+
+        Notification::create([
+            'user_id'      => $surat->user_id,
+            'judul'        => 'Surat Diverifikasi',
+            'pesan'        => 'Surat "' . $surat->judul . '" berhasil diverifikasi Admin.',
+            'jenis'        => 'surat',
+            'reference_id' => $surat->id,
+            'is_read'      => 0,
+        ]);
+
+        return redirect()
+            ->route('suratmasuk.index')
+            ->with('success','Surat berhasil diverifikasi.');
+    }
 
     /*
     |--------------------------------------------------------------------------
-    | Hapus Agenda Jika Ada
+    | PRINT
     |--------------------------------------------------------------------------
     */
 
-    Agenda::where('surat_masuk_id', $surat->id)->delete();
+    public function print()
+    {
+        $suratmasuk = SuratMasuk::with([
+            'kodearsip',
+            'user',
+            'userDisposisi'
+        ])->latest()->get();
 
-    /*
-    |--------------------------------------------------------------------------
-    | Hapus Surat
-    |--------------------------------------------------------------------------
-    */
-
-    $surat->delete();
-
-    return redirect()
-        ->route('suratmasuk.index')
-        ->with(
-            'success',
-            'Surat berhasil dihapus.'
+        return view(
+            'suratmasuk.print',
+            compact('suratmasuk')
         );
-}
-
-/*
-|--------------------------------------------------------------------------
-| VERIFIKASI SURAT
-|--------------------------------------------------------------------------
-*/
-
-public function verifikasi($id)
-{
-    $surat = SuratMasuk::findOrFail($id);
-
-    $surat->update([
-
-        'status' => 'Sudah Diverifikasi'
-
-    ]);
-
-    Notification::create([
-
-        'user_id' => $surat->user_id,
-
-        'judul' => 'Surat Diverifikasi',
-
-        'pesan' => 'Surat "' .
-                    $surat->judul .
-                    '" telah diverifikasi.',
-
-        'jenis' => 'surat',
-
-        'reference_id' => $surat->id,
-
-        'is_read' => 0,
-
-    ]);
-
-    return redirect()
-        ->route('suratmasuk.index')
-        ->with(
-            'success',
-            'Surat berhasil diverifikasi.'
-        );
-}
-
-/*
-|--------------------------------------------------------------------------
-| PRINT
-|--------------------------------------------------------------------------
-*/
-
-public function print()
-{
-    $suratmasuk = SuratMasuk::with([
-        'kodearsip',
-        'user',
-        'userDisposisi'
-    ])->latest()->get();
-
-    return view(
-        'suratmasuk.print',
-        compact('suratmasuk')
-    );
-}
-
-/*
-|--------------------------------------------------------------------------
-| DETAIL SURAT
-|--------------------------------------------------------------------------
-*/
-
-public function show($id)
-{
-    $suratmasuk = SuratMasuk::with([
-
-        'kodearsip',
-
-        'user',
-
-        'userDisposisi',
-
-        'agenda'
-
-    ])->findOrFail($id);
-
-    return view(
-        'suratmasuk.show',
-        compact('suratmasuk')
-    );
-}
-/*
-|--------------------------------------------------------------------------
-| HALAMAN DISPOSISI
-|--------------------------------------------------------------------------
-*/
-
-public function disposisi($id)
-{
-    $surat = SuratMasuk::with([
-        'kodearsip',
-        'user',
-        'userDisposisi'
-    ])->findOrFail($id);
-
-    $users = User::where('role', 'pegawai')
-                ->orderBy('name')
-                ->get();
-
-    return view(
-        'suratmasuk.disposisi',
-        compact(
-            'surat',
-            'users'
-        )
-    );
-}
-
-/*
-|--------------------------------------------------------------------------
-| KIRIM DISPOSISI
-|--------------------------------------------------------------------------
-*/
-
-public function kirimDisposisi(Request $request, $id)
-{
-    $request->validate([
-        'user_disposisi_id' => 'required',
-        'catatan_admin'     => 'required'
-    ]);
-
-    $surat = SuratMasuk::findOrFail($id);
-
-    $surat->update([
-        'user_disposisi_id' => $request->user_disposisi_id,
-        'catatan_admin'     => $request->catatan_admin,
-        'status'            => 'Sudah Disposisi'
-    ]);
+    }
 
     /*
     |--------------------------------------------------------------------------
-    | NOTIFIKASI PEGAWAI
+    | DETAIL SURAT
     |--------------------------------------------------------------------------
     */
 
-    Notification::create([
+    public function show($id)
+    {
+        $suratmasuk = SuratMasuk::with([
+            'kodearsip',
+            'user',
+            'userDisposisi',
+            'agenda'
+        ])->findOrFail($id);
 
-        'user_id' => $request->user_disposisi_id,
+        return view(
+            'suratmasuk.show',
+            compact('suratmasuk')
+        );
+    }
 
-        'judul' => 'Disposisi Baru',
+    /*
+    |--------------------------------------------------------------------------
+    | HALAMAN DISPOSISI
+    |--------------------------------------------------------------------------
+    */
 
-        'pesan' => 'Anda menerima disposisi surat "' .
-                    $surat->judul .
-                    '".',
+    public function disposisi($id)
+    {
+        $surat = SuratMasuk::with([
+            'kodearsip',
+            'user',
+            'userDisposisi'
+        ])->findOrFail($id);
 
-        'jenis' => 'surat',
+        $users = User::where('role','pegawai')
+                    ->orderBy('name')
+                    ->get();
 
-        'reference_id' => $surat->id,
+        return view(
+            'suratmasuk.disposisi',
+            compact(
+                'surat',
+                'users'
+            )
+        );
+    }
 
-        'is_read' => 0
+    /*
+    |--------------------------------------------------------------------------
+    | KIRIM DISPOSISI
+    |--------------------------------------------------------------------------
+    */
 
-    ]);
+    public function kirimDisposisi(Request $request,$id)
+    {
+        $request->validate([
 
-    return redirect()
-    ->route('suratmasuk.index')
-    ->with('success','Disposisi berhasil dikirim.');
-}
+            'user_disposisi_id'=>'required',
+
+            'catatan_admin'=>'required'
+
+        ]);
+
+        $surat = SuratMasuk::findOrFail($id);
+
+        $surat->update([
+
+            'user_disposisi_id'=>$request->user_disposisi_id,
+
+            'catatan_admin'=>$request->catatan_admin,
+
+            'status'=>'Sudah Disposisi'
+
+        ]);
+
+        Notification::create([
+
+            'user_id'=>$request->user_disposisi_id,
+
+            'judul'=>'Disposisi Baru',
+
+            'pesan'=>'Anda menerima disposisi surat "'.
+                        $surat->judul.
+                        '".',
+
+            'jenis'=>'surat',
+
+            'reference_id'=>$surat->id,
+
+            'is_read'=>0
+
+        ]);
+
+        return redirect()
+            ->route('suratmasuk.index')
+            ->with(
+                'success',
+                'Disposisi berhasil dikirim.'
+            );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | KIRIM KE AGENDA
+    |--------------------------------------------------------------------------
+    */
 
     public function pilihAgenda($id)
     {
@@ -714,13 +680,45 @@ public function kirimDisposisi(Request $request, $id)
         }
 
         $surat->update([
-
-            'status'=>'Siap Dijadikan Agenda'
-
+            'status'=>'Sudah Dijadikan Agenda'
         ]);
 
         return redirect()
-            ->route('agenda.index')
-            ->with('success','Surat berhasil dikirim ke menu Agenda.');
+            ->route('agenda.create',$surat->id)
+            ->with(
+                'success',
+                'Silakan lengkapi data Agenda.'
+            );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | AJAX NOMOR REGISTRASI
+    |--------------------------------------------------------------------------
+    */
+
+    public function getNomorRegistrasi($id)
+    {
+        $kode = KodeArsip::findOrFail($id);
+
+        $last = SuratMasuk::where(
+            'kode_arsip_id',
+            $id
+        )->latest()->first();
+
+        $nomor = $last
+            ? $last->nomor_urut + 1
+            : 1;
+
+        return response()->json([
+
+            'nomor_urut'=>$nomor,
+
+            'nomor_registrasi'=>
+                $kode->kode .
+                '/' .
+                str_pad($nomor,3,'0',STR_PAD_LEFT)
+
+        ]);
     }
 }

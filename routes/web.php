@@ -126,6 +126,10 @@ Route::middleware('auth')->group(function () {
     )->name('suratmasuk.verifikasi');
 
 
+    Route::get(
+        '/kodearsip/{id}/nomor-registrasi',
+        [SuratMasukController::class, 'getNomorRegistrasi']
+    )->name('kodearsip.nomor');
 
     /*
     |--------------------------------------------------------------------------

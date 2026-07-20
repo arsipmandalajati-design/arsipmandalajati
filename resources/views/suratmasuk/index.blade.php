@@ -117,31 +117,21 @@ document.addEventListener('DOMContentLoaded',function(){
 @endif
 
 <div class="running-box">
-
-        <div class="d-flex align-items-center">
-    
-            <div class="icon">
-                <i class="bi bi-megaphone-fill"></i>
-            </div>
-    
-            <div class="running-text">
-    
-                <span>
-    
-                    📥 Kelola Surat Masuk dengan mudah • Pastikan seluruh surat telah diverifikasi dan didisposisikan kepada pegawai yang bersangkutan.
-    
-                </span>
-    
-            </div>
-    
+    <div class="d-flex align-items-center">
+        <div class="icon">
+            <i class="bi bi-megaphone-fill"></i>
         </div>
-    
+        <div class="running-text">
+            <span>
+                📥 Kelola Surat Masuk dengan mudah • Pastikan seluruh surat telah diverifikasi dan didisposisikan kepada pegawai yang bersangkutan.
+            </span>
+        </div>
     </div>
+</div>
 
 <div class="card border-0 shadow-sm">
     <div class="card-body">
         <form action="{{ route('suratmasuk.index') }}" method="GET">
-            {{-- Tetap pertahankan parameter type saat filter pencarian disubmit --}}
             @if(request('type'))
                 <input type="hidden" name="type" value="{{ request('type') }}">
             @endif
@@ -254,13 +244,11 @@ document.addEventListener('DOMContentLoaded',function(){
                             
                             {{-- KOLOM CONDITIONAL (SURAT VS AGENDA) --}}
                             @if(request('type') == 'agenda')
-                                {{-- TEMPAT --}}
                                 <td>
                                     <span class="badge bg-info text-dark">
                                         <i class="bi bi-geo-alt-fill me-1"></i> {{ $item->tempat ?? '-' }}
                                     </span>
                                 </td>
-                                {{-- JADWAL --}}
                                 <td>
                                     <small class="fw-bold d-block text-dark">
                                         <i class="bi bi-calendar-event me-1"></i> {{ $item->tanggal_kegiatan ? \Carbon\Carbon::parse($item->tanggal_kegiatan)->format('d M Y') : '-' }}
@@ -270,11 +258,9 @@ document.addEventListener('DOMContentLoaded',function(){
                                     </small>
                                 </td>
                             @else
-                                {{-- PENGIRIM --}}
                                 <td>
                                     <i class="bi bi-building"></i> {{ $item->pengirim }}
                                 </td>
-                                {{-- TANGGAL --}}
                                 <td>
                                     {{ \Carbon\Carbon::parse($item->tanggal_surat)->format('d M Y') }}
                                 </td>
@@ -282,39 +268,17 @@ document.addEventListener('DOMContentLoaded',function(){
                             
                             {{-- STATUS --}}
                             <td>
-
                                 @if($item->status == 'Belum Disposisi')
-                            
-                                    <span class="badge bg-secondary">
-                                        Belum Disposisi
-                                    </span>
-                            
+                                    <span class="badge bg-secondary">Belum Disposisi</span>
                                 @elseif($item->status == 'Diproses')
-                            
-                                    <span class="badge bg-warning text-dark">
-                                        Diproses
-                                    </span>
-                            
+                                    <span class="badge bg-warning text-dark">Diproses</span>
                                 @elseif($item->status == 'Sudah Disposisi')
-                            
-                                    <span class="badge bg-success">
-                                        Sudah Disposisi
-                                    </span>
-                            
+                                    <span class="badge bg-success">Sudah Disposisi</span>
                                 @elseif($item->status == 'Sudah Dijadikan Agenda')
-                            
-                                    <span class="badge bg-primary">
-                                        Sudah Dijadikan Agenda
-                                    </span>
-                            
+                                    <span class="badge bg-primary">Sudah Dijadikan Agenda</span>
                                 @else
-                            
-                                    <span class="badge bg-secondary">
-                                        {{ $item->status }}
-                                    </span>
-                            
+                                    <span class="badge bg-secondary">{{ $item->status }}</span>
                                 @endif
-                            
                             </td>
                             
                             {{-- TUJUAN DISPOSISI --}}
@@ -329,7 +293,7 @@ document.addEventListener('DOMContentLoaded',function(){
                             {{-- FILE --}}
                             <td>
                                 @if($item->file_surat)
-                                    <a href="{{ asset('storage/'.$item->file_surat) }}" target="_blank" class="btn btn-info btn-sm" title="Lihat File">
+                                    <a href="{{ asset('storage/'.$item->file_surat) }}" target="_blank" class="btn btn-info btn-sm text-white" title="Lihat File">
                                         <i class="bi bi-file-earmark-pdf-fill"></i>
                                     </a>
                                 @else
@@ -337,161 +301,243 @@ document.addEventListener('DOMContentLoaded',function(){
                                 @endif
                             </td>
                             
-                            
+                            {{-- AKSI --}}
+                            <td class="text-center">
+                                <div class="d-flex gap-1 justify-content-center">
+                                    {{-- ================= ADMIN ================= --}}
+                                    @if(Auth::user()->role == 'admin')
+                                        {{-- Tombol Detail memicu Modal --}}
+                                        <button type="button" 
+                                                class="btn btn-info btn-sm text-white btn-preview" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#previewModalSuratMasuk"
+                                                data-kode="{{ $item->kodearsip->kode ?? '-' }}"
+                                                data-nomor="{{ $item->nomor_surat }}"
+                                                data-judul="{{ $item->judul }}"
+                                                data-pengirim="{{ $item->pengirim }}"
+                                                data-tanggal="{{ \Carbon\Carbon::parse($item->tanggal_surat)->format('d M Y') }}"
+                                                data-status="{{ $item->status }}"
+                                                data-perihal="{{ $item->perihal }}"
+                                                data-file="{{ $item->file_surat ? asset('storage/' . $item->file_surat) : '' }}"
+                                                title="Detail & Preview Surat">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
 
-                           {{-- AKSI --}}
-<td class="text-center">
-    {{-- ================= ADMIN ================= --}}
-    @if(Auth::user()->role == 'admin')
-        {{-- Detail Surat --}}
-        <a href="{{ route('suratmasuk.show', $item->id) }}" class="btn btn-info btn-sm text-white" title="Detail Surat">
-            <i class="bi bi-eye"></i>
-        </a>
+                                        <a href="{{ route('suratmasuk.disposisi', $item->id) }}" class="btn btn-primary btn-sm" title="Kirim Disposisi">
+                                            <i class="bi bi-send-fill"></i>
+                                        </a>
+                                        
+                                        @if($item->status == 'Menunggu Verifikasi')
+                                            <a href="{{ route('suratmasuk.edit', $item->id) }}" class="btn btn-warning btn-sm text-white" title="Edit Surat">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </a>
+                                            <form action="{{ route('suratmasuk.verifikasi', $item->id) }}" method="POST" style="display:inline;">
+                                                @csrf
+                                                <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Verifikasi surat ini?')" title="Verifikasi Surat">
+                                                    <i class="bi bi-patch-check-fill"></i>
+                                                </button>
+                                            </form>
+                                        @endif
+                                    
+                                        <form action="{{ route('suratmasuk.destroy', $item->id) }}" method="POST" style="display:inline;">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus data ini?')" title="Hapus">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
 
-    <a href="{{ route('suratmasuk.disposisi', $item->id) }}"
-       class="btn btn-primary btn-sm">
-        <i class="bi bi-send-fill"></i>
-    </a>
-    
-        {{-- Edit Surat --}}
-        @if($item->status == 'Menunggu Verifikasi')
-            <a href="{{ route('suratmasuk.edit', $item->id) }}" class="btn btn-warning btn-sm text-white" title="Edit Surat">
-                <i class="bi bi-pencil-square"></i>
-            </a>
-        @endif
-    
-        {{-- Verifikasi Surat (POST Method) --}}
-        @if($item->status == 'Menunggu Verifikasi')
-            <form action="{{ route('suratmasuk.verifikasi', $item->id) }}" method="POST" style="display:inline;">
-                @csrf
-                <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Verifikasi surat ini?')" title="Verifikasi Surat">
-                    <i class="bi bi-patch-check-fill"></i>
-                </button>
-            </form>
-        @endif
-    
-        {{-- Disposisi --}}
-        @if($item->status == 'Sudah Diverifikasi')
-            <a href="{{ route('suratmasuk.disposisi', $item->id) }}" class="btn btn-primary btn-sm" title="Kirim Disposisi">
-                <i class="bi bi-send-fill"></i>
-            </a>
-        @endif
-    
-        {{-- Hapus --}}
-        <form action="{{ route('suratmasuk.destroy', $item->id) }}" method="POST" style="display:inline;">
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus data ini?')" title="Hapus">
-                <i class="bi bi-trash"></i>
-            </button>
-        </form>
+                                    {{-- ================= PEGAWAI ================= --}}
+                                    @elseif(Auth::user()->role == 'pegawai')
+                                        {{-- Tombol Detail memicu Modal --}}
+                                        <button type="button" 
+                                                class="btn btn-info btn-sm text-white btn-preview" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#previewModalSuratMasuk"
+                                                data-kode="{{ $item->kodearsip->kode ?? '-' }}"
+                                                data-nomor="{{ $item->nomor_surat }}"
+                                                data-judul="{{ $item->judul }}"
+                                                data-pengirim="{{ $item->pengirim }}"
+                                                data-tanggal="{{ \Carbon\Carbon::parse($item->tanggal_surat)->format('d M Y') }}"
+                                                data-status="{{ $item->status }}"
+                                                data-perihal="{{ $item->perihal }}"
+                                                data-file="{{ $item->file_surat ? asset('storage/' . $item->file_surat) : '' }}"
+                                                title="Detail & Preview Surat">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
 
-    {{-- ================= PEGAWAI ================= --}}
+                                        @if(in_array($item->status, ['Sudah Diverifikasi','Sudah Disposisi']))
+                                            <a href="{{ route('agenda.create',$item->id) }}" class="btn btn-success btn-sm" title="Tambah Agenda">
+                                                <i class="bi bi-calendar-plus-fill"></i>
+                                            </a>
+                                        @endif
 
-@elseif(Auth::user()->role == 'pegawai')
+                                        @if($item->status == 'Sudah Dijadikan Agenda')
+                                            <span class="badge bg-success">
+                                                <i class="bi bi-check-circle-fill"></i> Agenda Dibuat
+                                            </span>
+                                        @endif
 
-{{-- Detail Surat --}}
-<a href="{{ route('suratmasuk.show',$item->id) }}"
-   class="btn btn-info btn-sm text-white"
-   title="Detail Surat">
-
-    <i class="bi bi-eye"></i>
-
-</a>
-
-{{-- Tambah Agenda --}}
-@if(in_array($item->status, ['Sudah Diverifikasi','Sudah Disposisi']))
-
-    <a href="{{ route('agenda.create',$item->id) }}"
-       class="btn btn-success btn-sm"
-       title="Tambah Agenda">
-
-        <i class="bi bi-calendar-plus-fill"></i>
-
-    </a>
-
-@endif
-
-{{-- Sudah Dijadikan Agenda --}}
-@if($item->status == 'Sudah Dijadikan Agenda')
-
-    <span class="badge bg-success">
-        <i class="bi bi-check-circle-fill"></i>
-        Agenda Dibuat
-    </span>
-
-@endif
-
-{{-- Edit Surat --}}
-@if(
-    $item->user_id == Auth::id() &&
-    $item->status == 'Menunggu Verifikasi'
-)
-
-    <a href="{{ route('suratmasuk.edit',$item->id) }}"
-       class="btn btn-warning btn-sm text-white">
-
-        <i class="bi bi-pencil-square"></i>
-
-    </a>
-
-@endif
-
-{{-- Hapus --}}
-@if(
-    $item->user_id == Auth::id() &&
-    $item->status == 'Menunggu Verifikasi'
-)
-
-    <form action="{{ route('suratmasuk.destroy',$item->id) }}"
-          method="POST"
-          style="display:inline;">
-
-        @csrf
-        @method('DELETE')
-
-        <button type="submit"
-                class="btn btn-danger btn-sm"
-                onclick="return confirm('Yakin ingin menghapus surat ini?')">
-
-            <i class="bi bi-trash"></i>
-
-        </button>
-
-    </form>
-
-@endif
-@endif
-</td>
-
-</tr>
-@empty
-
-<tr>
-    <td colspan="11" class="text-center py-5">
-        <i class="bi bi-inbox fs-1 text-secondary"></i>
-        <br><br>
-        <strong>
-            {{ request('type') == 'agenda' ? 'Belum ada agenda kegiatan terdaftar.' : 'Belum ada data surat masuk.' }}
-        </strong>
-        <br>
-        <small class="text-muted">
-            {{ request('type') == 'agenda' ? 'Jadwal agenda akan muncul setelah surat internal dimasukkan.' : 'Silakan tambahkan surat masuk terlebih dahulu.' }}
-        </small>
-    </td>
-</tr>
-
-@endforelse
+                                        @if($item->user_id == Auth::id() && $item->status == 'Menunggu Verifikasi')
+                                            <a href="{{ route('suratmasuk.edit',$item->id) }}" class="btn btn-warning btn-sm text-white">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </a>
+                                            <form action="{{ route('suratmasuk.destroy',$item->id) }}" method="POST" style="display:inline;">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus surat ini?')">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        @endif
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="11" class="text-center py-5">
+                                <i class="bi bi-inbox fs-1 text-secondary"></i>
+                                <br><br>
+                                <strong>
+                                    {{ request('type') == 'agenda' ? 'Belum ada agenda kegiatan terdaftar.' : 'Belum ada data surat masuk.' }}
+                                </strong>
+                                <br>
+                                <small class="text-muted">
+                                    {{ request('type') == 'agenda' ? 'Jadwal agenda akan muncul setelah surat internal dimasukkan.' : 'Silakan tambahkan surat masuk terlebih dahulu.' }}
+                                </small>
+                            </td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
     </div>
 </div>
 
-<script>
+<!-- MODAL DETAIL SEJAJAR & PREVIEW DOKUMEN -->
+<div class="modal fade" id="previewModalSuratMasuk" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered" style="max-width: 90%;">
+        <div class="modal-content" style="border-radius: 20px; overflow: hidden;">
+            <div class="modal-header bg-primary text-white py-3">
+                <h5 class="modal-title fw-bold" id="previewModalLabel">
+                    <i class="bi bi-envelope-open-fill me-2"></i> Detail & Preview Surat Masuk
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="row">
+                    <!-- SISI KIRI: Detail Informasi Sejajar -->
+                    <div class="col-lg-5">
+                        <h5 class="fw-bold text-dark mb-3"><i class="bi bi-info-circle-fill text-primary"></i> Informasi Surat</h5>
+                        <div class="card shadow-sm border-0 bg-light p-3" style="border-radius: 15px;">
+                            <div class="row mb-2">
+                                <div class="col-sm-4 fw-bold text-muted">Kode Arsip</div>
+                                <div class="col-sm-8">: <span id="md-kode" class="badge bg-dark"></span></div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-4 fw-bold text-muted">No. Surat</div>
+                                <div class="col-sm-8">: <span id="md-nomor" class="text-primary fw-bold"></span></div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-4 fw-bold text-muted">Judul Surat</div>
+                                <div class="col-sm-8">: <span id="md-judul" class="fw-bold"></span></div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-4 fw-bold text-muted">Asal Surat</div>
+                                <div class="col-sm-8">: <span id="md-pengirim"></span></div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-4 fw-bold text-muted">Tanggal Surat</div>
+                                <div class="col-sm-8">: <span id="md-tanggal"></span></div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-4 fw-bold text-muted">Status</div>
+                                <div class="col-sm-8">: <span id="md-status" class="badge"></span></div>
+                            </div>
+                            <hr>
+                            <div class="form-group mb-0">
+                                <label class="fw-bold text-muted mb-1">Perihal / Ringkasan:</label>
+                                <div class="p-2 border rounded bg-white" id="md-perihal" style="min-height: 100px; max-height: 200px; overflow-y: auto;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- SISI KANAN: Preview Dokumen PDF / Gambar -->
+                    <div class="col-lg-7 mt-4 mt-lg-0">
+                        <h5 class="fw-bold text-dark mb-3"><i class="bi bi-file-earmark-pdf-fill text-danger"></i> Preview Lampiran</h5>
+                        <div class="card shadow-sm border-0 bg-dark rounded-3" style="height: 520px; overflow: hidden;">
+                            <iframe id="md-pdf-viewer" src="" width="100%" height="100%" style="border: none;"></iframe>
+                            <div id="md-file-fallback" class="text-center my-auto d-none p-4 text-white">
+                                <i class="bi bi-file-earmark-x fs-1 text-danger"></i>
+                                <p class="mt-2">Format tidak didukung preview instan atau berkas tidak tersedia.</p>
+                                <a id="md-download-btn" href="#" target="_blank" class="btn btn-light btn-sm fw-bold mt-2">
+                                    <i class="bi bi-download"></i> Unduh File
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer bg-light border-0">
+                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal" style="border-radius:10px;">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Handler Modal data transfer
+    $('.btn-preview').on('click', function() {
+        const kode = $(this).data('kode');
+        const nomor = $(this).data('nomor');
+        const judul = $(this).data('judul');
+        const pengirim = $(this).data('pengirim');
+        const tanggal = $(this).data('tanggal');
+        const status = $(this).data('status');
+        const perihal = $(this).data('perihal');
+        const fileUrl = $(this).data('file');
+
+        $('#md-kode').text(kode);
+        $('#md-nomor').text(nomor);
+        $('#md-judul').text(judul);
+        $('#md-pengirim').text(pengirim);
+        $('#md-tanggal').text(tanggal);
+        $('#md-perihal').text(perihal);
+        $('#md-status').text(status);
+
+        // Styling dinamis badge status di dalam modal
+        $('#md-status').removeClass('bg-secondary bg-warning text-dark bg-success bg-primary');
+        if(status === 'Sudah Disposisi') {
+            $('#md-status').addClass('bg-success text-white');
+        } else if(status === 'Diproses' || status === 'Menunggu Verifikasi') {
+            $('#md-status').addClass('bg-warning text-dark');
+        } else if(status === 'Sudah Dijadikan Agenda') {
+            $('#md-status').addClass('bg-primary text-white');
+        } else {
+            $('#md-status').addClass('bg-secondary text-white');
+        }
+
+        // Kontrol tampilan preview berkas
+        if (fileUrl && (fileUrl.toLowerCase().endsWith('.pdf') || fileUrl.match(/\.(jpeg|jpg|gif|png)$/i) != null)) {
+            $('#md-pdf-viewer').removeClass('d-none').attr('src', fileUrl);
+            $('#md-file-fallback').addClass('d-none');
+        } else {
+            $('#md-pdf-viewer').addClass('d-none').attr('src', '');
+            $('#md-file-fallback').removeClass('d-none');
+            $('#md-download-btn').attr('href', fileUrl || '#');
+        }
+    });
+
+    // Reset iframe saat modal ditutup agar ringkas memory browser
+    $('#previewModalSuratMasuk').on('hidden.bs.modal', function () {
+        $('#md-pdf-viewer').attr('src', '');
+    });
+
+    // Fungsi cek booking bawaan agenda
     function cekBooking(){
-    
         let tempat=$("#tempat").val();
         let tanggal=$("#tanggal").val();
         let mulai=$("#jam_mulai").val();
@@ -502,40 +548,26 @@ document.addEventListener('DOMContentLoaded',function(){
         }
     
         $.get("{{ route('agenda.cekBooking') }}",{
-    
             tempat:tempat,
             tanggal:tanggal,
             jam_mulai:mulai,
             jam_selesai:selesai
-    
         },function(res){
-    
             if(res.bentrok){
-    
                 Swal.fire({
-    
                     icon:'warning',
                     title:'Jadwal Bentrok',
-    
                     text:'Ruangan sudah dipakai pada jam tersebut.',
-    
                     confirmButtonColor:'#dc3545'
-    
                 });
-    
                 $(".btn-save").prop("disabled",true);
-    
             }else{
-    
                 $(".btn-save").prop("disabled",false);
-    
             }
-    
         });
-    
     }
     
     $("#tempat,#tanggal,#jam_mulai,#jam_selesai").on("change",cekBooking);
-    
-    </script>
+});
+</script>
 @endsection

@@ -18,6 +18,9 @@ class SuratMasuk extends Model
         'jenis_surat',
         'sumber_arsip',
     
+'nomor_urut',
+'nomor_registrasi',
+
         'judul',
         'pengirim',
         'tanggal_surat',

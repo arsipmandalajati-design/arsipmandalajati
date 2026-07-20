@@ -14,19 +14,9 @@ Registrasikan surat fisik maupun dokumen digital yang diterima Kecamatan sebagai
 
 @section('content')
 
-<link rel="stylesheet"
-href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
 <style>
-
-.page-header{
-    background:linear-gradient(135deg,#667eea,#4f46e5);
-    border-radius:20px;
-    padding:30px;
-    color:#fff;
-    margin-bottom:25px;
-}
-
 .form-card{
     border:none;
     border-radius:20px;
@@ -59,10 +49,12 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.m
     border:none;
     border-radius:12px;
     padding:10px 25px;
+    color:#fff;
 }
 
 .btn-save:hover{
     background:#4338ca;
+    color:#fff;
 }
 
 .btn-back{
@@ -74,9 +66,11 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.m
     font-weight:600;
 }
 
+.required{
+    color:red;
+}
 </style>
 
-{{-- ALERT VALIDASI --}}
 @if ($errors->any())
 <div class="alert alert-danger">
     <ul class="mb-0">
@@ -87,763 +81,338 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.m
 </div>
 @endif
 
-{{-- ========================================================= --}}
-{{-- INFORMASI ARSIP --}}
-{{-- ========================================================= --}}
-
-<div class="section-title">
-    Informasi Arsip
-</div>
-
-<div class="row">
-
-    <div class="col-md-6 mb-3">
-
-        <label class="form-label fw-semibold">
-            Pilih Kode Arsip
-        </label>
-
-        <select
-            name="kode_arsip_id"
-            id="kode_arsip_id"
-            class="form-select"
-            required>
-
-            <option value="">Pilih Kode Arsip...</option>
-
-            @foreach($kodearsip as $item)
-
-            <option
-                value="{{ $item->id }}"
-                data-kode="{{ $item->kode }}">
-
-                {{ $item->kode }}
-                -
-                {{ $item->nama_arsip }}
-
-            </option>
-
-            @endforeach
-
-        </select>
-
-    </div>
-
-    <div class="col-md-6 mb-3">
-
-        <label class="form-label fw-semibold">
-            Ketik Kode Arsip (Opsional)
-        </label>
-
-        <input
-            type="text"
-            id="kode_manual"
-            class="form-control"
-            placeholder="Contoh : HM.01">
-
-        <small class="text-muted">
-            Kosongkan jika menggunakan kode arsip dari daftar.
-        </small>
-
-    </div>
-
-</div>
-{{-- ========================================================= --}}
-{{-- INFORMASI SURAT --}}
-{{-- ========================================================= --}}
-
-<div class="section-title mt-4">
-    Informasi Surat
-</div>
-
-<div class="row">
-
-    {{-- JENIS SURAT --}}
-    <div class="col-md-6 mb-3">
-
-        <label class="form-label fw-semibold">
-            Jenis Surat
-        </label>
-
-        <select
-            name="jenis_surat"
-            id="jenis_surat"
-            class="form-select"
-            required>
-
-            <option value="">-- Pilih Jenis Surat --</option>
-
-            <option value="Internal">
-                Internal Kecamatan
-            </option>
-
-            <option value="Eksternal">
-                Eksternal
-            </option>
-
-        </select>
-
-        <small class="text-muted">
-            Internal = kegiatan Kecamatan.<br>
-            Eksternal = surat dari luar instansi.
-        </small>
-
-    </div>
-
-    {{-- SUMBER ARSIP --}}
-    <div class="col-md-6 mb-3">
-
-        <label class="form-label fw-semibold">
-            Sumber Arsip
-        </label>
-
-        <select
-            name="sumber_arsip"
-            class="form-select"
-            required>
-
-            <option value="Dokumen Digital">
-                Dokumen Digital
-            </option>
-
-            <option value="Hasil Scan Dokumen Fisik">
-                Hasil Scan Dokumen Fisik
-            </option>
-
-        </select>
-
-    </div>
-
-    {{-- NOMOR REGISTRASI --}}
-    <div class="col-md-6 mb-3">
-
-        <label class="form-label fw-semibold">
-            Nomor Registrasi
-        </label>
-
-        <input
-            type="text"
-            id="nomor_manual"
-            class="form-control"
-            placeholder="Contoh : 058-Pel.PDH">
-
-    </div>
-
-    {{-- NOMOR SURAT OTOMATIS --}}
-    <div class="col-md-6 mb-3">
-
-        <label class="form-label fw-semibold">
-
-            <i class="bi bi-file-earmark-lock me-1"></i>
-
-            Nomor Surat Otomatis
-
-        </label>
-
-        <input
-            type="text"
-            id="nomor_surat"
-            name="nomor_surat"
-            class="form-control bg-light"
-            readonly>
-
-        <small class="text-muted">
-            Nomor surat dibuat otomatis berdasarkan kode arsip.
-        </small>
-
-    </div>
-
-</div>
-
-{{-- ========================================================= --}}
-{{-- DETAIL SURAT --}}
-{{-- ========================================================= --}}
-
-<div class="section-title mt-4">
-    Detail Surat
-</div>
-
-<div class="row">
-
-    {{-- JUDUL --}}
-    <div class="col-md-6 mb-3">
-
-        <label class="form-label fw-semibold">
-            Judul Surat
-        </label>
-
-        <input
-            type="text"
-            name="judul"
-            class="form-control"
-            placeholder="Masukkan judul surat"
-            required>
-
-    </div>
-
-    {{-- PENGIRIM --}}
-    <div class="col-md-6 mb-3">
-
-        <label class="form-label fw-semibold">
-            Asal Surat / Instansi
-        </label>
-
-        <input
-            type="text"
-            name="pengirim"
-            class="form-control"
-            placeholder="Contoh : Kelurahan, Universitas, Instansi"
-            required>
-
-        <small class="text-muted">
-            Isi nama instansi atau pihak yang mengirim surat.
-        </small>
-
-    </div>
-
-    {{-- TANGGAL SURAT --}}
-    <div class="col-md-6 mb-3">
-
-        <label class="form-label fw-semibold">
-            Tanggal Surat
-        </label>
-
-        <input
-            type="date"
-            name="tanggal_surat"
-            class="form-control"
-            required>
-
-    </div>
-
-    {{-- PERIHAL --}}
-    <div class="col-md-12 mb-3">
-
-        <label class="form-label fw-semibold">
-            Perihal
-        </label>
-
-        <textarea
-            name="perihal"
-            rows="4"
-            class="form-control"
-            placeholder="Masukkan perihal surat"
-            required></textarea>
-
-    </div>
-
-</div>
-
-{{-- ========================================================= --}}
-{{-- DOKUMEN SURAT --}}
-{{-- ========================================================= --}}
-
-<div class="section-title mt-4">
-    Dokumen Surat
-</div>
-
-<div class="row">
-
-    <div class="col-md-12 mb-3">
-
-        <label class="form-label fw-semibold">
-
-            <i class="bi bi-file-earmark-arrow-up"></i>
-
-            Upload File Surat
-
-        </label>
-
-        <input
-            type="file"
-            name="file_surat"
-            class="form-control"
-            accept=".pdf,.jpg,.jpeg,.png"
-            required>
-
-        <small class="text-muted">
-            Format PDF, JPG, JPEG, PNG.
-            Maksimal ukuran 2 MB.
-        </small>
-
-    </div>
-
-</div>
-
-<hr class="my-4">
-{{-- ========================================================= --}}
-{{-- BOOKING TEMPAT --}}
-{{-- ========================================================= --}}
-
-<div id="bookingCard" class="card border-0 shadow-sm" style="display:none;">
-
-    <div class="card-header bg-primary text-white">
-        <i class="bi bi-calendar-event"></i>
-        Booking Tempat (Opsional)
-    </div>
-
-    <div class="card-body">
-
-        <div class="alert alert-info">
-            <i class="bi bi-info-circle"></i>
-            Booking tempat digunakan apabila surat merupakan kegiatan internal Kecamatan yang membutuhkan ruangan.
-        </div>
-
-        <div class="row">
-
-            {{-- TEMPAT --}}
-            <div class="col-md-12 mb-3">
-
-                <label class="form-label fw-semibold">
-                    Tempat
-                </label>
-
-                <select id="tempat"
-                    name="tempat"
-                    class="form-select">
-
-                    <option value="">
-                        -- Pilih Tempat --
-                    </option>
-
-                    <option value="Aula Kecamatan">
-                        Aula Kecamatan
-                    </option>
-
-                    <option value="Ruang Camat">
-                        Ruang Camat
-                    </option>
-
-                    <option value="Ruang Sekretaris">
-                        Ruang Sekretaris
-                    </option>
-
-                    <option value="Ruang Rapat">
-                        Ruang Rapat
-                    </option>
-
-                    <option value="Halaman Kecamatan">
-                        Halaman Kecamatan
-                    </option>
-
-                </select>
-
+<div class="card form-card">
+    <div class="card-body p-4">
+        <form id="formRegistrasiSurat" action="{{ route('suratmasuk.store') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+
+            {{-- ========================================= --}}
+            {{-- INFORMASI ARSIP --}}
+            {{-- ========================================= --}}
+            <div class="section-title">Informasi Arsip</div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-semibold">Kode Arsip <span class="required">*</span></label>
+                    <select name="kode_arsip_id" id="kode_arsip_id" class="form-select" required>
+                        <option value="">-- Pilih Kode Arsip --</option>
+                        @foreach($kodearsip as $item)
+                            <option value="{{ $item->id }}" data-kode="{{ $item->kode }}" {{ old('kode_arsip_id')==$item->id ? 'selected' : '' }}>
+                                {{ $item->kode }} - {{ $item->nama_kode }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <small class="text-muted">Pilih klasifikasi arsip.</small>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-semibold">Nomor Registrasi</label>
+                    <input type="text" id="nomor_registrasi" class="form-control bg-light" readonly>
+                    <input type="hidden" name="nomor_registrasi" id="nomor_registrasi_hidden">
+                    <small class="text-muted">Nomor registrasi dibuat otomatis.</small>
+                </div>
             </div>
 
-            {{-- TANGGAL --}}
-            <div class="col-md-6 mb-3">
+            {{-- ========================================= --}}
+            {{-- INFORMASI SURAT --}}
+            {{-- ========================================= --}}
+            <div class="section-title mt-4">Informasi Surat</div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-semibold">Jenis Surat <span class="required">*</span></label>
+                    <select name="jenis_surat" id="jenis_surat" class="form-select" required>
+                        <option value="">-- Pilih Jenis Surat --</option>
+                        <option value="Internal" {{ old('jenis_surat')=='Internal' ? 'selected' : '' }}>Internal Kecamatan</option>
+                        <option value="Eksternal" {{ old('jenis_surat')=='Eksternal' ? 'selected' : '' }}>Eksternal</option>
+                    </select>
+                    <small class="text-muted">Internal = kegiatan Kecamatan.<br>Eksternal = surat dari luar instansi.</small>
+                </div>
 
-                <label class="form-label fw-semibold">
-                    Tanggal Kegiatan
-                </label>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-semibold">Sumber Arsip <span class="required">*</span></label>
+                    <select name="sumber_arsip" class="form-select" required>
+                        <option value="Dokumen Digital" {{ old('sumber_arsip')=='Dokumen Digital' ? 'selected' : '' }}>Dokumen Digital</option>
+                        <option value="Hasil Scan Dokumen Fisik" {{ old('sumber_arsip')=='Hasil Scan Dokumen Fisik' ? 'selected' : '' }}>Hasil Scan Dokumen Fisik</option>
+                    </select>
+                </div>
 
-                <input type="date"
-                    id="tanggal_kegiatan"
-                    name="tanggal_kegiatan"
-                    class="form-control">
-
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-semibold">Nomor Surat <span class="required">*</span></label>
+                    <input type="text" name="nomor_surat" id="nomor_surat" class="form-control" value="{{ old('nomor_surat') }}" placeholder="Masukkan nomor surat" required>
+                    <small class="text-muted">Isi sesuai nomor surat yang diterima.</small>
+                </div>
             </div>
 
-            {{-- JAM MULAI --}}
-            <div class="col-md-3 mb-3">
+            {{-- ========================================= --}}
+            {{-- DETAIL SURAT --}}
+            {{-- ========================================= --}}
+            <div class="section-title mt-4">Detail Surat</div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-semibold">Judul Surat <span class="required">*</span></label>
+                    <input type="text" name="judul" class="form-control" value="{{ old('judul') }}" placeholder="Masukkan judul surat" required>
+                </div>
 
-                <label class="form-label fw-semibold">
-                    Jam Mulai
-                </label>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-semibold">Asal Surat / Instansi <span class="required">*</span></label>
+                    <input type="text" name="pengirim" class="form-control" value="{{ old('pengirim') }}" placeholder="Contoh : Kecamatan Mandalajati" required>
+                </div>
 
-                <input type="time"
-                id="jam_mulai"
-                name="jam_mulai"
-                class="form-control"
-                    value="{{ old('jam_mulai') }}">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-semibold">Tanggal Surat <span class="required">*</span></label>
+                    <input type="date" name="tanggal_surat" class="form-control" value="{{ old('tanggal_surat') }}" required>
+                </div>
 
+                <div class="col-md-12 mb-3">
+                    <label class="form-label fw-semibold">Perihal <span class="required">*</span></label>
+                    <textarea name="perihal" rows="4" class="form-control" placeholder="Masukkan perihal surat" required>{{ old('perihal') }}</textarea>
+                </div>
             </div>
 
-            {{-- JAM SELESAI --}}
-            <div class="col-md-3 mb-3">
-
-                <label class="form-label fw-semibold">
-                    Jam Selesai
-                </label>
-
-                <input
-                    type="time"
-                    id="jam_selesai"
-                    name="jam_selesai"
-                    class="form-control"
-                    value="{{ old('jam_selesai') }}">
-
+            {{-- ========================================= --}}
+            {{-- DOKUMEN SURAT --}}
+            {{-- ========================================= --}}
+            <div class="section-title mt-4">Dokumen Surat</div>
+            <div class="row">
+                <div class="col-md-12 mb-4">
+                    <label class="form-label fw-semibold"><i class="bi bi-file-earmark-arrow-up me-1"></i>Upload File Surat <span class="required">*</span></label>
+                    <input type="file" name="file_surat" class="form-control" accept=".pdf,.jpg,.jpeg,.png" required>
+                    <small class="text-muted">Format PDF, JPG, JPEG, PNG. Maksimal 2 MB.</small>
+                </div>
             </div>
 
-            <div id="bookingAlert"
-     class="alert alert-danger mt-3 d-none">
+            <hr class="my-4">
 
-    <i class="bi bi-exclamation-triangle-fill"></i>
+            {{-- ========================================= --}}
+            {{-- BOOKING KEGIATAN --}}
+            {{-- ========================================= --}}
+            <div id="bookingCard" class="card border-0 shadow-sm mb-4" style="display:none; border-radius:15px; overflow:hidden;">
+                <div class="card-header bg-primary text-white">
+                    <i class="bi bi-calendar-event me-2"></i>Booking Tempat Kegiatan
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        Booking hanya digunakan apabila surat merupakan kegiatan internal yang membutuhkan ruangan.
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label fw-semibold">Tempat</label>
+                            <select id="tempat" name="tempat" class="form-select">
+                                <option value="">-- Pilih Tempat --</option>
+                                <option value="Aula Kecamatan">Aula Kecamatan</option>
+                                <option value="Ruang Camat">Ruang Camat</option>
+                                <option value="Ruang Sekretaris">Ruang Sekretaris</option>
+                                <option value="Ruang Rapat">Ruang Rapat</option>
+                                <option value="Halaman Kecamatan">Halaman Kecamatan</option>
+                            </select>
+                        </div>
 
-    Jadwal sudah dibooking.
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Tanggal Kegiatan</label>
+                            <input type="date" id="tanggal_kegiatan" name="tanggal_kegiatan" class="form-control" value="{{ old('tanggal_kegiatan') }}">
+                        </div>
 
-</div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label fw-semibold">Jam Mulai</label>
+                            <input type="time" id="jam_mulai" name="jam_mulai" class="form-control" value="{{ old('jam_mulai') }}">
+                        </div>
 
-            {{-- MATERI --}}
-            <div class="col-md-12 mb-3">
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label fw-semibold">Jam Selesai</label>
+                            <input type="time" id="jam_selesai" name="jam_selesai" class="form-control" value="{{ old('jam_selesai') }}">
+                        </div>
 
-                <label class="form-label fw-semibold">
-                    Materi Kegiatan
-                </label>
+                        <div class="col-md-12">
+                            <div id="bookingAlert" class="alert alert-danger d-none">
+                                <i class="bi bi-exclamation-triangle-fill me-1"></i>Ruangan sudah dibooking pada jadwal tersebut.
+                            </div>
+                        </div>
 
-                <input
-                    type="text"
-                    name="materi"
-                    class="form-control"
-                    placeholder="Contoh : Rapat Evaluasi Bulanan"
-                    value="{{ old('materi') }}">
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label fw-semibold">Materi Kegiatan</label>
+                            <input type="text" name="materi" class="form-control" value="{{ old('materi') }}" placeholder="Contoh : Rapat Evaluasi Bulanan">
+                        </div>
+                    </div>
 
+                    <hr>
+                    <h5 class="fw-bold text-primary mb-3"><i class="bi bi-box-seam me-2"></i>Kebutuhan Kegiatan</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Jumlah Peserta</label>
+                            <input type="number" name="jumlah_peserta" class="form-control" value="{{ old('jumlah_peserta',0) }}">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label fw-semibold">Kursi</label>
+                            <input type="number" name="kursi" class="form-control" value="{{ old('kursi',0) }}">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label fw-semibold">Meja</label>
+                            <input type="number" name="meja" class="form-control" value="{{ old('meja',0) }}">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label fw-semibold">Proyektor</label>
+                            <input type="number" name="proyektor" class="form-control" value="{{ old('proyektor',0) }}">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label fw-semibold">Mic</label>
+                            <input type="number" name="mic" class="form-control" value="{{ old('mic',0) }}">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-semibold">Sound System</label>
+                            <input type="number" name="sound_system" class="form-control" value="{{ old('sound_system',0) }}">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-semibold">Kabel Roll</label>
+                            <input type="number" name="kabel_roll" class="form-control" value="{{ old('kabel_roll',0) }}">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-semibold">Lainnya</label>
+                            <input type="text" name="lainnya" class="form-control" value="{{ old('lainnya') }}" placeholder="Contoh : Whiteboard, Flipchart">
+                        </div>
+                    </div>
+                </div>
             </div>
 
-        </div>
-
-        <hr>
-
-        <h5 class="fw-bold text-primary">
-            <i class="bi bi-box-seam"></i>
-            Kebutuhan Kegiatan
-        </h5>
-
-        <div class="row">
-
-            {{-- JUMLAH PESERTA --}}
-            <div class="col-md-6 mb-3">
-
-                <label class="form-label fw-semibold">
-                    Jumlah Peserta
-                </label>
-
-                <input
-                    type="number"
-                    name="jumlah_peserta"
-                    class="form-control"
-                    value="{{ old('jumlah_peserta',0) }}">
-
+            {{-- ========================================= --}}
+            {{-- BUTTON --}}
+            {{-- ========================================= --}}
+            <div class="d-flex justify-content-end gap-2 mt-4">
+                <a href="{{ route('suratmasuk.index') }}" class="btn btn-secondary btn-back">
+                    <i class="bi bi-arrow-left"></i> Kembali
+                </a>
+                <button type="submit" id="btnSimpan" class="btn btn-save">
+                    <i class="bi bi-save"></i> Simpan Surat
+                </button>
             </div>
-
-        </div>
-
-        <div class="row">
-
-            <div class="col-md-3 mb-3">
-
-                <label>Kursi</label>
-
-                <input
-                    type="number"
-                    name="kursi"
-                    class="form-control"
-                    value="{{ old('kursi',0) }}">
-
-            </div>
-
-            <div class="col-md-3 mb-3">
-
-                <label>Meja</label>
-
-                <input
-                    type="number"
-                    name="meja"
-                    class="form-control"
-                    value="{{ old('meja',0) }}">
-
-            </div>
-
-            <div class="col-md-3 mb-3">
-
-                <label>Proyektor</label>
-
-                <input
-                    type="number"
-                    name="proyektor"
-                    class="form-control"
-                    value="{{ old('proyektor',0) }}">
-
-            </div>
-
-            <div class="col-md-3 mb-3">
-
-                <label>Mic</label>
-
-                <input
-                    type="number"
-                    name="mic"
-                    class="form-control"
-                    value="{{ old('mic',0) }}">
-
-            </div>
-
-        </div>
-
-        <div class="row">
-
-            <div class="col-md-4 mb-3">
-
-                <label>Sound System</label>
-
-                <input
-                    type="number"
-                    name="sound_system"
-                    class="form-control"
-                    value="{{ old('sound_system',0) }}">
-
-            </div>
-
-            <div class="col-md-4 mb-3">
-
-                <label>Kabel Roll</label>
-
-                <input
-                    type="number"
-                    name="kabel_roll"
-                    class="form-control"
-                    value="{{ old('kabel_roll',0) }}">
-
-            </div>
-
-            <div class="col-md-4 mb-3">
-
-                <label>Lainnya</label>
-
-                <input
-                    type="text"
-                    name="lainnya"
-                    class="form-control"
-                    placeholder="Contoh : Whiteboard, Flipchart"
-                    value="{{ old('lainnya') }}">
-
-            </div>
-
-        </div>
-
+        </form>
     </div>
-
-</div>
-{{-- ========================================================= --}}
-{{-- BUTTON --}}
-{{-- ========================================================= --}}
-
-<div class="d-flex justify-content-end gap-2 mt-4">
-
-    <a href="{{ route('suratmasuk.index') }}"
-        class="btn btn-secondary btn-back">
-
-        <i class="bi bi-arrow-left"></i>
-        Kembali
-
-    </a>
-
-    <button type="submit"
-        class="btn btn-primary btn-save">
-
-        <i class="bi bi-save"></i>
-        Simpan Surat
-
-    </button>
-
 </div>
 
-</form>
-
-</div>
-</div>
-
-{{-- ========================================================= --}}
+{{-- ========================================= --}}
 {{-- JAVASCRIPT --}}
-{{-- ========================================================= --}}
-
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+{{-- ========================================= --}}
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+document.addEventListener("DOMContentLoaded", function () {
+    const jenisSurat = document.getElementById("jenis_surat");
+    const kodeArsip = document.getElementById("kode_arsip_id");
+    const form = document.getElementById("formRegistrasiSurat");
 
-document.addEventListener('DOMContentLoaded', function () {
-
+    // tampilkan / sembunyikan booking
     toggleBooking();
-    generateNomor();
 
-    document.getElementById('jenis_surat')
-        .addEventListener('change', toggleBooking);
+    // kalau edit / old value
+    if(kodeArsip.value !== ""){
+        ambilNomorRegistrasi();
+    }
 
-    document.getElementById('kode_arsip_id')
-        .addEventListener('change', generateNomor);
+    jenisSurat.addEventListener("change", toggleBooking);
+    kodeArsip.addEventListener("change", ambilNomorRegistrasi);
 
-    document.getElementById('kode_manual')
-        .addEventListener('keyup', generateNomor);
+    // ======================================
+    // SUBMIT FORM DENGAN VALIDASI & SWAL SAFE
+    // ======================================
+    form.addEventListener("submit", function(e){
+        // Biarkan HTML5 memeriksa required input terlebih dahulu
+        if(!form.checkValidity()){
+            return; 
+        }
 
-    document.getElementById('nomor_manual')
-        .addEventListener('keyup', generateNomor);
+        // Jalankan SweetAlert loading jika form valid
+        document.getElementById("btnSimpan").disabled = true;
 
+        Swal.fire({
+            title: "Menyimpan Surat...",
+            text: "Mohon tunggu sebentar",
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            showConfirmButton: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+    });
 });
 
-
-// ==========================
-// TAMPILKAN BOOKING
-// ==========================
-
+// ======================================
+// BOOKING CARD
+// ======================================
 function toggleBooking(){
+    let booking = document.getElementById("bookingCard");
+    if(!booking) return;
 
-    let jenis = document.getElementById("jenis_surat").value;
-
-    if(jenis=="Internal"){
-
-        document.getElementById("bookingCard").style.display="block";
-
-    }else{
-
-        document.getElementById("bookingCard").style.display="none";
-
+    if(document.getElementById("jenis_surat").value === "Internal"){
+        booking.style.display = "block";
+    } else {
+        booking.style.display = "none";
+        // Reset input fields booking ketika disembunyikan agar required/input tak sengaja tidak terkirim
+        $("#bookingCard find('input, select')").val('');
     }
-
 }
 
+// ======================================
+// NOMOR REGISTRASI
+// ======================================
+function ambilNomorRegistrasi(){
+    let id = document.getElementById("kode_arsip_id").value;
 
-
-// ==========================
-// NOMOR OTOMATIS
-// ==========================
-
-function generateNomor(){
-
-    let dropdown=document.getElementById("kode_arsip_id");
-
-    let selected=dropdown.options[dropdown.selectedIndex];
-
-    let kodeDropdown=selected ? selected.getAttribute("data-kode") : "";
-
-    let kodeManual=document.getElementById("kode_manual").value.trim();
-
-    let kode=kodeManual!="" ? kodeManual : kodeDropdown;
-
-    let nomor=document.getElementById("nomor_manual").value.trim();
-
-    let tahun=new Date().getFullYear();
-
-    let bulan=new Date().getMonth()+1;
-
-    let romawi=[
-        "",
-        "I",
-        "II",
-        "III",
-        "IV",
-        "V",
-        "VI",
-        "VII",
-        "VIII",
-        "IX",
-        "X",
-        "XI",
-        "XII"
-    ];
-
-    if(kode!="" && nomor!=""){
-
-        document.getElementById("nomor_surat").value=
-
-            "No."+kode+
-            "/"+nomor+
-            "-Kec.MDLJ/T/"+
-            romawi[bulan]+
-            "/"+
-            tahun;
-
-    }else{
-
-        document.getElementById("nomor_surat").value="";
-
+    if(id === ""){
+        document.getElementById("nomor_registrasi").value = "";
+        document.getElementById("nomor_registrasi_hidden").value = "";
+        return;
     }
 
+    fetch("/kodearsip/" + id + "/nomor-registrasi")
+    .then(function(response){
+        if(!response.ok){
+            throw new Error("Route gagal");
+        }
+        return response.json();
+    })
+    .then(function(data){
+        document.getElementById("nomor_registrasi").value = data.nomor_registrasi;
+        document.getElementById("nomor_registrasi_hidden").value = data.nomor_registrasi;
+    })
+    .catch(function(error){
+        console.error(error);
+    });
 }
 
+// ======================================
+// CEK BOOKING (AJAX JQUERY)
+// ======================================
+$("#tempat, #tanggal_kegiatan, #jam_mulai, #jam_selesai").on("change", function(){
+    let tempat = $("#tempat").val();
+    let tanggal = $("#tanggal_kegiatan").val();
+    let mulai = $("#jam_mulai").val();
+    let selesai = $("#jam_selesai").val();
 
-
-// ==========================
-// CEK BOOKING
-// ==========================
-
-function cekBooking(){
-
-    let tanggal=$("#tanggal_kegiatan").val();
-
-    let tempat=$("#tempat").val();
-
-    let mulai=$("#jam_mulai").val();
-
-    let selesai=$("#jam_selesai").val();
-
-    if(
-        tanggal=="" ||
-        tempat=="" ||
-        mulai=="" ||
-        selesai==""
-    ){
+    if(tempat === "" || tanggal === "" || mulai === "" || selesai === ""){
         return;
     }
 
     $.ajax({
-
-        url:"{{ route('agenda.cekBooking') }}",
-
-        type:"GET",
-
-        data:{
-
-            tanggal:tanggal,
-
-            tempat:tempat,
-
-            jam_mulai:mulai,
-
-            jam_selesai:selesai
-
+        url: "{{ route('agenda.cekBooking') }}",
+        type: "GET",
+        data: {
+            tempat: tempat,
+            tanggal: tanggal,
+            jam_mulai: mulai,
+            jam_selesai: selesai
         },
-
-        success:function(res){
-
+        success: function(res){
             if(res.bentrok){
-
-                $("#bookingAlert")
-                    .removeClass("d-none");
-
-                Swal.fire({
-
-                    icon:"warning",
-
-                    title:"Jadwal Bentrok",
-
-                    text:"Tempat sudah digunakan pada jam tersebut.",
-
-                    timer:2000,
-
-                    showConfirmButton:false
-
-                });
-
-                $(".btn-save").prop("disabled",true);
-
-            }else{
-
-                $("#bookingAlert")
-                    .addClass("d-none");
-
-                $(".btn-save").prop("disabled",false);
-
+                $("#bookingAlert").removeClass("d-none");
+            } else {
+                $("#bookingAlert").addClass("d-none");
             }
-
+        },
+        error: function(){
+            console.log("Gagal cek booking");
         }
-
     });
-
-}
-
-$("#tanggal_kegiatan,#tempat,#jam_mulai,#jam_selesai")
-.on("change keyup",cekBooking);
-
+});
 </script>
+
 @endsection
