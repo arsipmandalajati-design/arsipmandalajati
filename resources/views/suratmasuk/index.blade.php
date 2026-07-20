@@ -386,9 +386,9 @@ document.addEventListener('DOMContentLoaded',function(){
     </div>
 </div>
 
-<!-- MODAL DETAIL SEJAJAR & PREVIEW DOKUMEN -->
+<!-- MODAL DETAIL & PREVIEW DOKUMEN (STACKED VERTICAL) -->
 <div class="modal fade" id="previewModalSuratMasuk" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered" style="max-width: 90%;">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content shadow-lg" style="border-radius: 20px; overflow: hidden;">
             <div class="modal-header bg-primary text-white py-3">
                 <h5 class="modal-title fw-bold" id="previewModalLabel">
@@ -398,175 +398,204 @@ document.addEventListener('DOMContentLoaded',function(){
             </div>
             <div class="modal-body p-4 bg-light">
                 <div class="row g-4">
-                    <!-- SISI KIRI: Informasi Surat Terstruktur & Sejajar -->
-                    <div class="col-lg-5">
-                        <div class="card shadow-sm border-0 h-100 p-4" style="border-radius: 15px;">
+                    
+                    <!-- BAGIAN ATAS: Informasi Detail Surat -->
+                    <div class="col-12">
+                        <div class="card shadow-sm border-0 p-4" style="border-radius: 15px;">
                             <h5 class="fw-bold text-dark mb-3 border-bottom pb-2">
                                 <i class="bi bi-info-circle-fill text-primary me-2"></i> Informasi Surat
                             </h5>
                             
-                            <table class="table table-borderless table-sm mb-3" style="font-size: 0.95rem;">
-                                <tr>
-                                    <td class="fw-bold text-muted" style="width: 35%;">Kode Arsip</td>
-                                    <td style="width: 5%;">:</td>
-                                    <td><span id="md-kode" class="badge bg-dark"></span></td>
-                                </tr>
-                                <tr>
-                                    <td class="fw-bold text-muted">No. Surat</td>
-                                    <td>:</td>
-                                    <td><span id="md-nomor" class="text-primary fw-bold"></span></td>
-                                </tr>
-                                <tr>
-                                    <td class="fw-bold text-muted">Judul Surat</td>
-                                    <td>:</td>
-                                    <td><span id="md-judul" class="fw-bold text-dark"></span></td>
-                                </tr>
-                                <tr>
-                                    <td class="fw-bold text-muted">Asal Surat</td>
-                                    <td>:</td>
-                                    <td><span id="md-pengirim" class="text-dark"></span></td>
-                                </tr>
-                                <tr>
-                                    <td class="fw-bold text-muted">Tgl. Surat</td>
-                                    <td>:</td>
-                                    <td><span id="md-tanggal" class="text-dark"></span></td>
-                                </tr>
-                                <tr>
-                                    <td class="fw-bold text-muted">Status</td>
-                                    <td>:</td>
-                                    <td><span id="md-status" class="badge"></span></td>
-                                </tr>
-                            </table>
+                            <div class="row g-2" style="font-size: 0.95rem;">
+                                <div class="col-md-6">
+                                    <table class="table table-borderless table-sm mb-0">
+                                        <tr>
+                                            <td class="fw-bold text-muted" style="width: 35%;">Kode Arsip</td>
+                                            <td style="width: 5%;">:</td>
+                                            <td><span id="md-kode" class="badge bg-dark"></span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-bold text-muted">No. Surat</td>
+                                            <td>:</td>
+                                            <td><span id="md-nomor" class="text-primary fw-bold"></span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-bold text-muted">Judul Surat</td>
+                                            <td>:</td>
+                                            <td><span id="md-judul" class="fw-bold text-dark"></span></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <table class="table table-borderless table-sm mb-0">
+                                        <tr>
+                                            <td class="fw-bold text-muted" style="width: 35%;">Asal Surat</td>
+                                            <td style="width: 5%;">:</td>
+                                            <td><span id="md-pengirim" class="text-dark"></span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-bold text-muted">Tgl. Surat</td>
+                                            <td>:</td>
+                                            <td><span id="md-tanggal" class="text-dark"></span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-bold text-muted">Status</td>
+                                            <td>:</td>
+                                            <td><span id="md-status" class="badge"></span></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
 
-                            <div class="mt-auto">
+                            <div class="mt-3">
                                 <label class="fw-bold text-muted mb-1 small text-uppercase">Perihal / Ringkasan:</label>
-                                <div class="p-3 border rounded bg-white text-dark shadow-inner" id="md-perihal" style="min-height: 90px; max-height: 150px; overflow-y: auto; font-size: 0.9rem;"></div>
+                                <div class="p-3 border rounded bg-white text-dark shadow-inner" id="md-perihal" style="min-height: 70px; max-height: 120px; overflow-y: auto; font-size: 0.9rem;"></div>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- SISI KANAN: Preview Dokumen PDF / Gambar -->
-                    <div class="col-lg-7">
-                        <div class="card shadow-sm border-0 h-100 bg-dark rounded-3 overflow-hidden" style="min-height: 520px;">
-                            <div class="card-header bg-secondary bg-opacity-25 text-white py-2 px-3 d-flex justify-content-between align-items-center">
-                                <span class="small fw-bold"><i class="bi bi-file-earmark-pdf-fill text-danger me-1"></i> Preview Lampiran Berkas</span>
-                            </div>
-                            <div class="card-body p-0 position-relative" style="height: 480px;">
-                                <iframe id="md-pdf-viewer" src="" width="100%" height="100%" style="border: none; background: #fff;"></iframe>
-                                
-                                <div id="md-file-fallback" class="text-center position-absolute top-50 start-50 translate-middle d-none p-4 text-white w-100">
-                                    <i class="bi bi-file-earmark-x fs-1 text-danger"></i>
-                                    <p class="mt-2 text-light">Format file tidak didukung preview instan atau berkas tidak ditemukan di storage server.</p>
-                                    <a id="md-download-btn" href="#" target="_blank" class="btn btn-light btn-sm fw-bold mt-2 shadow">
-                                        <i class="bi bi-download me-1"></i> Unduh Berkas
-                                    </a>
-                                </div>
+                   <!-- BAGIAN BAWAH: Preview Dokumen PDF / Gambar / Office -->
+                   <div class="col-12">
+                    <div class="card shadow-sm border-0 bg-dark rounded-3 overflow-hidden">
+                        <div class="card-header bg-secondary bg-opacity-25 text-white py-2 px-3 d-flex justify-content-between align-items-center">
+                            <span class="small fw-bold">
+                                <i class="bi bi-file-earmark-pdf-fill text-danger me-1"></i> Preview Lampiran Berkas
+                            </span>
+                            <a id="md-direct-download" href="#" target="_blank" class="btn btn-sm btn-outline-light d-none" title="Buka / Download di tab baru">
+                                <i class="bi bi-box-arrow-up-right me-1"></i> Buka Tab Baru
+                            </a>
+                        </div>
+                        <div class="card-body p-0 position-relative" style="height: 550px;">
+                            {{-- Iframe untuk PDF, Gambar, & Google Docs Viewer --}}
+                            <iframe id="md-pdf-viewer" src="" width="100%" height="100%" style="border: none; background: #fff;"></iframe>
+                            
+                            {{-- Fallback jika file tidak ditemukan / tidak ada --}}
+                            <div id="md-file-fallback" class="text-center position-absolute top-50 start-50 translate-middle d-none p-4 text-white w-100">
+                                <i class="bi bi-file-earmark-x fs-1 text-danger"></i>
+                                <p class="mt-2 text-light mb-2">Berkas tidak dilampirkan atau format tidak mendukung preview langsung.</p>
+                                <a id="md-download-btn" href="#" target="_blank" class="btn btn-light btn-sm fw-bold shadow d-none">
+                                    <i class="bi bi-download me-1"></i> Unduh Berkas
+                                </a>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="modal-footer bg-white border-0 py-3 px-4">
-                <button type="button" class="btn btn-secondary px-4 shadow-sm" data-bs-dismiss="modal" style="border-radius:10px;">Tutup</button>
+
             </div>
         </div>
+        <div class="modal-footer bg-white border-0 py-3 px-4">
+            <button type="button" class="btn btn-secondary px-4 shadow-sm" data-bs-dismiss="modal" style="border-radius:10px;">Tutup</button>
+        </div>
     </div>
+</div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 $(document).ready(function() {
-    // ==========================================
-    // 1. HANDLER MODAL PREVIEW (SURAT MASUK)
-    // ==========================================
-    $('.btn-preview').on('click', function() {
-        const kode = $(this).data('kode');
-        const nomor = $(this).data('nomor');
-        const judul = $(this).data('judul');
-        const pengirim = $(this).data('pengirim');
-        const tanggal = $(this).data('tanggal');
-        const status = $(this).data('status');
-        const perihal = $(this).data('perihal');
-        const fileUrl = $(this).data('file');
+// ==========================================
+// 1. HANDLER MODAL PREVIEW (SURAT MASUK)
+// ==========================================
+$('.btn-preview').on('click', function() {
+    const kode = $(this).data('kode');
+    const nomor = $(this).data('nomor');
+    const judul = $(this).data('judul');
+    const pengirim = $(this).data('pengirim');
+    const tanggal = $(this).data('tanggal');
+    const status = $(this).data('status');
+    const perihal = $(this).data('perihal');
+    const fileUrl = $(this).data('file');
 
-        // Injeksikan data ke elemen modal
-        $('#md-kode').text(kode);
-        $('#md-nomor').text(nomor);
-        $('#md-judul').text(judul);
-        $('#md-pengirim').text(pengirim);
-        $('#md-tanggal').text(tanggal);
-        $('#md-perihal').text(perihal);
-        $('#md-status').text(status);
+    // Injeksikan data teks ke modal
+    $('#md-kode').text(kode);
+    $('#md-nomor').text(nomor);
+    $('#md-judul').text(judul);
+    $('#md-pengirim').text(pengirim);
+    $('#md-tanggal').text(tanggal);
+    $('#md-perihal').text(perihal);
+    $('#md-status').text(status);
 
-        // Styling dinamis badge status di dalam modal
-        $('#md-status').removeClass('bg-secondary bg-warning text-dark bg-success bg-primary');
-        if(status === 'Sudah Disposisi') {
-            $('#md-status').addClass('bg-success text-white');
-        } else if(status === 'Diproses' || status === 'Menunggu Verifikasi') {
-            $('#md-status').addClass('bg-warning text-dark');
-        } else if(status === 'Sudah Dijadikan Agenda') {
-            $('#md-status').addClass('bg-primary text-white');
-        } else {
-            $('#md-status').addClass('bg-secondary text-white');
-        }
-
-        // Kontrol tampilan preview berkas
-        if (fileUrl && fileUrl !== '') {
-            $('#md-pdf-viewer').removeClass('d-none').attr('src', fileUrl);
-            $('#md-file-fallback').addClass('d-none');
-        } else {
-            $('#md-pdf-viewer').addClass('d-none').attr('src', '');
-            $('#md-file-fallback').removeClass('d-none');
-            $('#md-download-btn').attr('href', '#');
-        }
-    });
-
-    // Reset iframe saat modal ditutup agar ringkas memory browser
-    $('#previewModalSuratMasuk').on('hidden.bs.modal', function () {
-        $('#md-pdf-viewer').attr('src', '');
-    });
-
-    // ==========================================
-    // 2. FUNGSI CEK BOOKING JADWAL (AGENDA)
-    // ==========================================
-    function cekBooking(){
-        let tempat = $("#tempat").val();
-        let tanggal = $("#tanggal").val();
-        let mulai = $("#jam_mulai").val();
-        let selesai = $("#jam_selesai").val();
-    
-        if(!tempat || !tanggal || !mulai || !selesai){
-            return;
-        }
-    
-        $.get("{{ route('agenda.cekBooking') }}", {
-            tempat: tempat,
-            tanggal: tanggal,
-            jam_mulai: mulai,
-            jam_selesai: selesai
-        })
-        .done(function(res){
-            $('.alert-verification-jadwal').remove(); 
-
-            if(res.bentrok){
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Jadwal Bentrok',
-                    text: 'Ruangan sudah dipakai pada jam tersebut.',
-                    confirmButtonColor: '#dc3545'
-                });
-                $(".btn-save").prop("disabled", true);
-            } else {
-                $(".btn-save").prop("disabled", false);
-            }
-        })
-        .fail(function(xhr, status, error){
-            console.error("Gagal memverifikasi jadwal otomatis:", error);
-            $(".btn-save").prop("disabled", false);
-        });
+    // Styling dinamis badge status di dalam modal
+    $('#md-status').removeClass('bg-secondary bg-warning text-dark bg-success bg-primary');
+    if(status === 'Sudah Disposisi') {
+        $('#md-status').addClass('bg-success text-white');
+    } else if(status === 'Diproses' || status === 'Menunggu Verifikasi') {
+        $('#md-status').addClass('bg-warning text-dark');
+    } else if(status === 'Sudah Dijadikan Agenda') {
+        $('#md-status').addClass('bg-primary text-white');
+    } else {
+        $('#md-status').addClass('bg-secondary text-white');
     }
-    
-    $("#tempat, #tanggal_kegiatan, #jam_mulai, #jam_selesai").on("change", cekBooking);
+
+    // Kontrol Tampilan & Preview Berkas
+    if (fileUrl && fileUrl !== '') {
+        let embedUrl = fileUrl;
+        const extension = fileUrl.split('.').pop().toLowerCase();
+
+        // Jika format dokumen Office (docx, doc, xlsx, pptx), gunakan Google Viewer
+        if (['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'].includes(extension)) {
+            embedUrl = `https://docs.google.com/gview?url=${encodeURIComponent(fileUrl)}&embedded=true`;
+        }
+
+        // Tampilkan Iframe & set tombol download
+        $('#md-pdf-viewer').removeClass('d-none').attr('src', embedUrl);
+        $('#md-direct-download').removeClass('d-none').attr('href', fileUrl);
+        $('#md-file-fallback').addClass('d-none');
+    } else {
+        // Jika file kosong / tidak ditemukan
+        $('#md-pdf-viewer').addClass('d-none').attr('src', '');
+        $('#md-direct-download').addClass('d-none').attr('href', '#');
+        $('#md-file-fallback').removeClass('d-none');
+        $('#md-download-btn').addClass('d-none').attr('href', '#');
+    }
+});
+
+// Reset iframe saat modal ditutup agar tidak membebankan memori browser
+$('#previewModalSuratMasuk').on('hidden.bs.modal', function () {
+    $('#md-pdf-viewer').attr('src', '');
+});
+
+// ==========================================
+// 2. FUNGSI CEK BOOKING JADWAL (AGENDA)
+// ==========================================
+function cekBooking(){
+    let tempat = $("#tempat").val();
+    let tanggal = $("#tanggal").val();
+    let mulai = $("#jam_mulai").val();
+    let selesai = $("#jam_selesai").val();
+
+    if(!tempat || !tanggal || !mulai || !selesai){
+        return;
+    }
+
+    $.get("{{ route('agenda.cekBooking') }}", {
+        tempat: tempat,
+        tanggal: tanggal,
+        jam_mulai: mulai,
+        jam_selesai: selesai
+    })
+    .done(function(res){
+        $('.alert-verification-jadwal').remove(); 
+
+        if(res.bentrok){
+            Swal.fire({
+                icon: 'warning',
+                title: 'Jadwal Bentrok',
+                text: 'Ruangan sudah dipakai pada jam tersebut.',
+                confirmButtonColor: '#dc3545'
+            });
+            $(".btn-save").prop("disabled", true);
+        } else {
+            $(".btn-save").prop("disabled", false);
+        }
+    })
+    .fail(function(xhr, status, error){
+        console.error("Gagal memverifikasi jadwal otomatis:", error);
+        $(".btn-save").prop("disabled", false);
+    });
+}
+
+$("#tempat, #tanggal_kegiatan, #jam_mulai, #jam_selesai").on("change", cekBooking);
 });
 </script>
 @endsection
