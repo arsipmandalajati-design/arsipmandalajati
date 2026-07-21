@@ -175,6 +175,8 @@ class SuratKeluarController extends Controller
 
             'perihal'       => 'required',
 
+            'disposisi'     => 'nullable|string', // Ditambahkan disposisi
+
             'file_surat'    => 'required|mimes:pdf|max:2048',
 
         ]);
@@ -194,7 +196,8 @@ class SuratKeluarController extends Controller
                 ->store('surat', 'public');
 
         }
-                /*
+
+        /*
         |--------------------------------------------------------------------------
         | SIMPAN DATA SURAT KELUAR
         |--------------------------------------------------------------------------
@@ -202,23 +205,25 @@ class SuratKeluarController extends Controller
 
         $surat = SuratKeluar::create([
 
-            'user_id'        => Auth::id(),
+            'user_id'       => Auth::id(),
 
-            'kode_arsip_id'  => $request->kode_arsip_id,
+            'kode_arsip_id' => $request->kode_arsip_id,
 
-            'nomor_surat'    => $request->nomor_surat,
+            'nomor_surat'   => $request->nomor_surat,
 
-            'judul'          => $request->judul,
+            'judul'         => $request->judul,
 
-            'pengirim'       => $request->pengirim,
+            'pengirim'      => $request->pengirim,
 
-            'tujuan'         => $request->tujuan,
+            'tujuan'        => $request->tujuan,
 
-            'tanggal_surat'  => $request->tanggal_surat,
+            'tanggal_surat' => $request->tanggal_surat,
 
-            'perihal'        => $request->perihal,
+            'perihal'       => $request->perihal,
 
-            'file_surat'     => $file,
+            'disposisi'     => $request->disposisi, // Disimpan ke database
+
+            'file_surat'    => $file,
 
         ]);
 
@@ -265,8 +270,8 @@ class SuratKeluarController extends Controller
         return view(
             'suratkeluar.edit',
             [
-                'surat'      => $suratkeluar,
-                'kodearsip'  => $kodearsip
+                'surat'     => $suratkeluar,
+                'kodearsip' => $kodearsip
             ]
         );
     }
@@ -295,6 +300,8 @@ class SuratKeluarController extends Controller
             'tanggal_surat' => 'required|date',
 
             'perihal'       => 'required',
+
+            'disposisi'     => 'nullable|string', // Validasi disposisi saat edit
 
             'file_surat'    => 'nullable|mimes:pdf|max:2048',
 
@@ -332,6 +339,8 @@ class SuratKeluarController extends Controller
 
         }
 
+        $oldFileSurat = $suratkeluar->file_surat;
+
         $suratkeluar->update([
 
             'kode_arsip_id' => $request->kode_arsip_id,
@@ -348,6 +357,8 @@ class SuratKeluarController extends Controller
 
             'perihal'       => $request->perihal,
 
+            'disposisi'     => $request->disposisi, // Diperbarui
+
             'file_surat'    => $file,
 
         ]);
@@ -360,7 +371,7 @@ class SuratKeluarController extends Controller
 
         Arsip::where(
             'file_arsip',
-            $suratkeluar->getOriginal('file_surat')
+            $oldFileSurat
         )->update([
 
             'kode_arsip'    => $suratkeluar->kodearsip->kode ?? '-',
@@ -383,8 +394,9 @@ class SuratKeluarController extends Controller
                 'success',
                 'Data surat keluar berhasil diperbarui.'
             );
-        }
-                /*
+    }
+
+    /*
     |--------------------------------------------------------------------------
     | HAPUS DATA
     |--------------------------------------------------------------------------
@@ -488,23 +500,6 @@ class SuratKeluarController extends Controller
             compact('suratkeluar')
 
         );
-
-        /*
-        |--------------------------------------------------------------------------
-        | Jika ingin menggunakan DomPDF
-        |--------------------------------------------------------------------------
-        |
-
-        $pdf = Pdf::loadView(
-            'suratkeluar.print',
-            compact('suratkeluar')
-        );
-
-        return $pdf->stream(
-            'laporan-surat-keluar.pdf'
-        );
-
-        */
 
     }
 

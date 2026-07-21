@@ -87,7 +87,7 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.m
 
 }
 
-.page-title{
+.page-title-text{
 
     font-size:34px;
 
@@ -132,48 +132,6 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.m
 .info-card:hover{
 
     transform:translateY(-5px);
-
-}
-
-.info-icon{
-
-    width:65px;
-
-    height:65px;
-
-    border-radius:18px;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    background:#dcfce7;
-
-    color:#0f766e;
-
-    font-size:28px;
-
-    margin-bottom:15px;
-
-}
-
-.info-title{
-
-    font-size:14px;
-
-    color:#6b7280;
-
-}
-
-.info-number{
-
-    font-size:32px;
-
-    font-weight:700;
-
-    color:#003844;
 
 }
 
@@ -236,15 +194,11 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.m
 @keyframes runningText{
 
     0%{
-
         transform:translateX(0);
-
     }
 
     100%{
-
         transform:translateX(-100%);
-
     }
 
 }
@@ -255,19 +209,19 @@ FILTER
 
 .filter-card{
 
-border:none;
+    border:none;
 
-border-radius:24px;
+    border-radius:24px;
 
-box-shadow:0 8px 25px rgba(0,0,0,.08);
+    box-shadow:0 8px 25px rgba(0,0,0,.08);
 
 }
 
 .filter-card .card-header{
 
-border-bottom:1px solid #eef2f7;
+    border-bottom:1px solid #eef2f7;
 
-background:#fff;
+    background:#fff;
 
 }
 
@@ -277,157 +231,113 @@ TABLE
 
 .table-card{
 
-border:none;
+    border:none;
 
-border-radius:24px;
+    border-radius:24px;
 
-box-shadow:0 8px 25px rgba(0,0,0,.08);
+    box-shadow:0 8px 25px rgba(0,0,0,.08);
 
 }
 
 .table-card .card-header{
 
-background:#fff;
+    background:#fff;
 
-border-bottom:1px solid #eef2f7;
+    border-bottom:1px solid #eef2f7;
 
-border-radius:24px 24px 0 0;
+    border-radius:24px 24px 0 0;
 
 }
 
 .table{
 
-margin-bottom:0;
+    margin-bottom:0;
 
 }
 
 .table thead th{
 
-background:#0f766e;
+    background:#0f766e;
 
-color:#fff;
+    color:#fff;
 
-font-weight:600;
+    font-weight:600;
 
-border:none;
+    border:none;
 
-text-align:center;
+    text-align:center;
 
-padding:16px;
+    padding:16px;
 
-white-space:nowrap;
+    white-space:nowrap;
 
 }
 
 .table tbody td{
 
-vertical-align:middle;
+    vertical-align:middle;
 
-text-align:center;
+    text-align:center;
 
-padding:15px;
+    padding:15px;
 
 }
 
 .table tbody tr{
 
-transition:.25s;
+    transition:.25s;
 
 }
 
 .table tbody tr:hover{
 
-background:#f8fffd;
+    background:#f8fffd;
 
-transform:translateY(-2px);
+    transform:translateY(-2px);
 
-box-shadow:0 5px 18px rgba(0,0,0,.08);
-
-}
-
-.badge-kode{
-
-background:#dcfce7;
-
-color:#166534;
-
-border-radius:30px;
-
-padding:8px 14px;
-
-font-weight:600;
-
-}
-
-.file-btn{
-
-border-radius:30px;
-
-padding:6px 15px;
-
-}
-
-.action-btn{
-
-width:38px;
-
-height:38px;
-
-border-radius:50%;
-
-display:flex;
-
-justify-content:center;
-
-align-items:center;
-
-}
-
-.empty-state{
-
-padding:60px 20px;
+    box-shadow:0 5px 18px rgba(0,0,0,.08);
 
 }
 
 .form-label{
 
-font-size:14px;
+    font-size:14px;
 
-margin-bottom:8px;
+    margin-bottom:8px;
 
-color:#003844;
+    color:#003844;
 
 }
 
 .form-control{
 
-min-height:48px;
+    min-height:48px;
 
-border-radius:14px;
+    border-radius:14px;
 
-border:1px solid #dbe5ef;
+    border:1px solid #dbe5ef;
 
-transition:.3s;
+    transition:.3s;
 
 }
 
 .form-control:focus{
 
-border-color:#0f766e;
+    border-color:#0f766e;
 
-box-shadow:0 0 0 .15rem rgba(15,118,110,.15);
+    box-shadow:0 0 0 .15rem rgba(15,118,110,.15);
 
 }
 
 .btn{
 
-transition:.25s;
+    transition:.25s;
 
 }
 
 .btn:hover{
 
-transform:translateY(-2px);
+    transform:translateY(-2px);
 
 }
 
@@ -458,23 +368,7 @@ transform:translateY(-2px);
 }
 
 /* ===========================
-   BUTTON
-=========================== */
-
-.btn{
-    transition:.25s;
-}
-
-.btn:hover{
-    transform:translateY(-2px);
-}
-
-.action-btn:hover{
-    transform:scale(1.08);
-}
-
-/* ===========================
-   CARD
+   CARD HOVER
 =========================== */
 
 .filter-card,
@@ -498,56 +392,50 @@ transform:translateY(-2px);
 
 @media(max-width:768px){
 
-.page-header{
+    .page-header{
+        padding:25px;
+    }
 
-padding:25px;
+    .page-title-text{
+        font-size:27px;
+    }
 
-}
+    .page-subtitle{
+        font-size:14px;
+    }
 
-.page-title{
+    .btn{
+        width:100%;
+    }
 
-font-size:27px;
+    .table th,
+    .table td{
+        font-size:13px;
+        white-space:nowrap;
+    }
 
-}
-
-.page-subtitle{
-
-font-size:14px;
-
-}
-
-.info-card{
-
-margin-bottom:15px;
-
-}
-
-.btn{
-
-width:100%;
-
-}
-
-.table th,
-.table td{
-
-font-size:13px;
-
-white-space:nowrap;
-
-}
-
-.running-text span{
-
-animation-duration:65s;
-
-}
+    .running-text span{
+        animation-duration:65s;
+    }
 
 }
 
 </style>
 
-
+{{-- ===========================
+PAGE HEADER COMPONENT
+=========================== --}}
+<div class="page-header">
+    <div class="d-flex align-items-center">
+        <div class="fs-1 me-3">
+            @yield('page-icon')
+        </div>
+        <div>
+            <div class="page-title-text">@yield('page-title')</div>
+            <div class="page-subtitle">@yield('page-description')</div>
+        </div>
+    </div>
+</div>
 
 @if(session('success'))
 
@@ -555,17 +443,12 @@ animation-duration:65s;
 
 document.addEventListener('DOMContentLoaded',function(){
 
-Swal.fire({
-
-icon:'success',
-
-title:'Berhasil',
-
-text:'{{ session("success") }}',
-
-confirmButtonColor:'#0f766e'
-
-});
+    Swal.fire({
+        icon:'success',
+        title:'Berhasil',
+        text:'{{ session("success") }}',
+        confirmButtonColor:'#0f766e'
+    });
 
 });
 
@@ -600,6 +483,7 @@ RUNNING TEXT
     </div>
 
 </div>
+
 {{-- ===========================
 FILTER
 =========================== --}}
@@ -770,7 +654,7 @@ FILTER
 
 </div>
 
-    <!-- ===========================
+<!-- ===========================
 TABEL SURAT KELUAR
 =========================== -->
 
@@ -915,9 +799,9 @@ TABEL SURAT KELUAR
 
                                 <a
                                     href="{{ route('suratkeluar.show',$item->id) }}"
-                                    class="btn btn-info btn-sm rounded-circle"
+                                    class="btn btn-info btn-sm rounded-circle text-white"
                                     title="Detail"
-                                    style="width:38px;height:38px;">
+                                    style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;">
 
                                     <i class="bi bi-eye-fill"></i>
 
@@ -927,9 +811,9 @@ TABEL SURAT KELUAR
 
                                 <a
                                     href="{{ route('suratkeluar.edit',$item->id) }}"
-                                    class="btn btn-warning btn-sm rounded-circle"
+                                    class="btn btn-warning btn-sm rounded-circle text-white"
                                     title="Edit"
-                                    style="width:38px;height:38px;">
+                                    style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;">
 
                                     <i class="bi bi-pencil-fill"></i>
 
@@ -940,7 +824,7 @@ TABEL SURAT KELUAR
                                 <form
                                     action="{{ route('suratkeluar.destroy',$item->id) }}"
                                     method="POST"
-                                    class="form-delete">
+                                    class="form-delete d-inline">
 
                                     @csrf
                                     @method('DELETE')
@@ -948,7 +832,7 @@ TABEL SURAT KELUAR
                                     <button
                                         type="submit"
                                         class="btn btn-danger btn-sm rounded-circle"
-                                        style="width:38px;height:38px;"
+                                        style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;"
                                         title="Hapus">
 
                                         <i class="bi bi-trash-fill"></i>
@@ -970,11 +854,8 @@ TABEL SURAT KELUAR
                         <td colspan="10" class="text-center py-5">
 
                             <img
-
                                 src="https://cdn-icons-png.flaticon.com/512/7486/7486740.png"
-
                                 width="110"
-
                                 class="mb-3">
 
                             <h5 class="fw-bold text-secondary">
@@ -990,9 +871,7 @@ TABEL SURAT KELUAR
                             </p>
 
                             <a
-
                                 href="{{ route('suratkeluar.create') }}"
-
                                 class="btn btn-success rounded-pill px-4">
 
                                 <i class="bi bi-plus-circle-fill me-2"></i>
@@ -1016,88 +895,79 @@ TABEL SURAT KELUAR
     </div>
 
 </div>
+
 {{-- ===========================
 SWEET ALERT DELETE
 =========================== --}}
 
 <script>
 
-    document.addEventListener('DOMContentLoaded', function () {
-    
-        document.querySelectorAll('.form-delete').forEach(function(form){
-    
-            form.addEventListener('submit', function(e){
-    
-                e.preventDefault();
-    
-                Swal.fire({
-    
-                    title:'Yakin ingin menghapus?',
-    
-                    text:'Data Surat Keluar yang dihapus tidak dapat dikembalikan.',
-    
-                    icon:'warning',
-    
-                    showCancelButton:true,
-    
-                    confirmButtonColor:'#dc3545',
-    
-                    cancelButtonColor:'#6c757d',
-    
-                    confirmButtonText:'Ya, Hapus',
-    
-                    cancelButtonText:'Batal',
-    
-                    reverseButtons:true
-    
-                }).then((result)=>{
-    
-                    if(result.isConfirmed){
-    
-                        form.submit();
-    
-                    }
-    
-                });
-    
+document.addEventListener('DOMContentLoaded', function () {
+
+    document.querySelectorAll('.form-delete').forEach(function(form){
+
+        form.addEventListener('submit', function(e){
+
+            e.preventDefault();
+
+            Swal.fire({
+                title:'Yakin ingin menghapus?',
+                text:'Data Surat Keluar yang dihapus tidak dapat dikembalikan.',
+                icon:'warning',
+                showCancelButton:true,
+                confirmButtonColor:'#dc3545',
+                cancelButtonColor:'#6c757d',
+                confirmButtonText:'Ya, Hapus',
+                cancelButtonText:'Batal',
+                reverseButtons:true
+            }).then((result)=>{
+
+                if(result.isConfirmed){
+
+                    form.submit();
+
+                }
+
             });
-    
+
         });
-    
+
     });
-    
-    </script>
-    
-    {{-- ===========================
-    ANIMASI CARD
-    =========================== --}}
-    
-    <script>
-    
-    document.addEventListener("DOMContentLoaded",function(){
-    
-        const cards=document.querySelectorAll('.info-card,.filter-card,.table-card');
-    
-        cards.forEach(function(card,index){
-    
-            card.style.opacity='0';
-    
-            card.style.transform='translateY(25px)';
-    
-            setTimeout(function(){
-    
-                card.style.transition='.45s ease';
-    
-                card.style.opacity='1';
-    
-                card.style.transform='translateY(0)';
-    
-            },150*index);
-    
-        });
-    
+
+});
+
+</script>
+
+{{-- ===========================
+ANIMASI CARD
+=========================== --}}
+
+<script>
+
+document.addEventListener("DOMContentLoaded",function(){
+
+    const cards=document.querySelectorAll('.info-card,.filter-card,.table-card');
+
+    cards.forEach(function(card,index){
+
+        card.style.opacity='0';
+
+        card.style.transform='translateY(25px)';
+
+        setTimeout(function(){
+
+            card.style.transition='.45s ease';
+
+            card.style.opacity='1';
+
+            card.style.transform='translateY(0)';
+
+        },150*index);
+
     });
-    
-    </script>
-    
-    @endsection
+
+});
+
+</script>
+
+@endsection

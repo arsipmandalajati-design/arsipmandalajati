@@ -17,14 +17,13 @@ return new class extends Migration
             $table->foreignId('kode_arsip_id')->nullable();
             $table->string('nomor_surat');
             $table->string('judul')->nullable();
+            $table->string('pengirim');
             $table->string('tujuan');
             $table->date('tanggal_surat');
             $table->text('perihal')->nullable();
+            $table->text('disposisi')->nullable(); // Ditambahkan agar sinkron dengan fitur disposisi surat masuk
             $table->string('file_surat')->nullable();
-            
-            // Tambahkan kolom status di bawah ini dengan nilai default
-            $table->string('status')->default('Menunggu ACC'); 
-            
+            $table->string('status')->default('Menunggu ACC');
             $table->timestamps();
         });
     }

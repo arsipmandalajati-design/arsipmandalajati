@@ -227,79 +227,22 @@ UPLOAD
 
 }
 
-/* ===========================
-RUNNING TEXT
-=========================== */
-
-.running-box{
-
-    background:#fff;
-
-    border-left:6px solid #0f766e;
-
-    border-radius:18px;
-
-    padding:15px 20px;
-
-    margin-bottom:25px;
-
-    box-shadow:0 5px 18px rgba(0,0,0,.08);
-
-    overflow:hidden;
-
-}
-
-.running-box .icon{
-
-    color:#0f766e;
-
-    font-size:22px;
-
-    margin-right:15px;
-
-}
-
-.running-text{
-
-    overflow:hidden;
-
-    white-space:nowrap;
-
-    width:100%;
-
-}
-
-.running-text span{
-
-    display:inline-block;
-
-    padding-left:100%;
-
-    animation:runningText 45s linear infinite;
-
-    color:#374151;
-
-    font-weight:500;
-
-}
-
-@keyframes runningText{
-
-0%{
-
-transform:translateX(0);
-
-}
-
-100%{
-
-transform:translateX(-100%);
-
-}
-
-}
-
 </style>
+
+{{-- ===========================
+PAGE HEADER COMPONENT
+=========================== --}}
+<div class="page-header">
+    <div class="d-flex align-items-center">
+        <div class="fs-1 me-3">
+            @yield('page-icon')
+        </div>
+        <div>
+            <div class="page-title-text">@yield('page-title')</div>
+            <div class="page-subtitle">@yield('page-description')</div>
+        </div>
+    </div>
+</div>
 
 @if(session('success'))
 
@@ -702,6 +645,35 @@ Informasi Surat
 
     </div>
 
+    {{-- DISPOSISI --}}
+    <div class="col-md-12 mb-4">
+
+        <label class="form-label fw-semibold">
+
+            <i class="bi bi-journal-text me-1 text-success"></i>
+
+            Disposisi (Opsional)
+
+        </label>
+
+        <textarea
+            name="disposisi"
+            rows="4"
+            class="form-control @error('disposisi') is-invalid @enderror"
+            placeholder="Tuliskan catatan disposisi surat...">{{ old('disposisi') }}</textarea>
+
+        <small class="text-muted">
+            Catatan instruksi atau disposisi pimpinan terhadap surat keluar.
+        </small>
+
+        @error('disposisi')
+        <div class="invalid-feedback">
+            {{ $message }}
+        </div>
+        @enderror
+
+    </div>
+
     {{-- FILE PDF --}}
     <div class="col-md-12 mb-4">
 
@@ -792,207 +764,208 @@ Informasi Surat
 </div>
 
 </div>
-        <script>
+        
+<script>
 
-            /*
-            |--------------------------------------------------------------------------
-            | GENERATE NOMOR SURAT OTOMATIS
-            |--------------------------------------------------------------------------
-            */
-            
-            function generateNomorSurat(){
-            
-                let select = document.getElementById('kode_arsip_id');
-            
-                let selected = select.options[select.selectedIndex];
-            
-                let kodeDropdown = '';
-            
-                if(selected){
-            
-                    kodeDropdown = selected.getAttribute('data-kode');
-            
-                }
-            
-                let kodeManual = document
-                    .getElementById('kode_manual')
-                    .value
-                    .trim();
-            
-                let nomorManual = document
-                    .getElementById('nomor_manual')
-                    .value
-                    .trim();
-            
-                let kode = kodeManual !== ''
-                    ? kodeManual
-                    : kodeDropdown;
-            
-                let tahun = new Date().getFullYear();
-            
-                let bulan = new Date().getMonth()+1;
-            
-                let romawi = [
-            
-                    '',
-            
-                    'I',
-            
-                    'II',
-            
-                    'III',
-            
-                    'IV',
-            
-                    'V',
-            
-                    'VI',
-            
-                    'VII',
-            
-                    'VIII',
-            
-                    'IX',
-            
-                    'X',
-            
-                    'XI',
-            
-                    'XII'
-            
-                ];
-            
-                if(kode && nomorManual){
-            
-                    document.getElementById('nomor_surat').value =
-            
-                        'No.' +
-            
-                        kode +
-            
-                        '/' +
-            
-                        nomorManual +
-            
-                        '-Kec.MDLJ/T/' +
-            
-                        romawi[bulan] +
-            
-                        '/' +
-            
-                        tahun;
-            
-                }else{
-            
-                    document.getElementById('nomor_surat').value='';
-            
-                }
-            
-            }
-            
-            
-            /*
-            |--------------------------------------------------------------------------
-            | EVENT
-            |--------------------------------------------------------------------------
-            */
-            
-            document.getElementById('kode_arsip_id')
-            
-            .addEventListener(
-            
-            'change',
-            
-            generateNomorSurat
-            
-            );
-            
-            document.getElementById('kode_manual')
-            
-            .addEventListener(
-            
-            'keyup',
-            
-            generateNomorSurat
-            
-            );
-            
-            document.getElementById('nomor_manual')
-            
-            .addEventListener(
-            
-            'keyup',
-            
-            generateNomorSurat
-            
-            );
-            
-            
-            /*
-            |--------------------------------------------------------------------------
-            | PREVIEW NAMA FILE PDF
-            |--------------------------------------------------------------------------
-            */
-            
-            document.getElementById('file_surat').addEventListener('change',function(){
+    /*
+    |--------------------------------------------------------------------------
+    | GENERATE NOMOR SURAT OTOMATIS
+    |--------------------------------------------------------------------------
+    */
+    
+    function generateNomorSurat(){
+    
+        let select = document.getElementById('kode_arsip_id');
+    
+        let selected = select.options[select.selectedIndex];
+    
+        let kodeDropdown = '';
+    
+        if(selected){
+    
+            kodeDropdown = selected.getAttribute('data-kode');
+    
+        }
+    
+        let kodeManual = document
+            .getElementById('kode_manual')
+            .value
+            .trim();
+    
+        let nomorManual = document
+            .getElementById('nomor_manual')
+            .value
+            .trim();
+    
+        let kode = kodeManual !== ''
+            ? kodeManual
+            : kodeDropdown;
+    
+        let tahun = new Date().getFullYear();
+    
+        let bulan = new Date().getMonth()+1;
+    
+        let romawi = [
+    
+            '',
+    
+            'I',
+    
+            'II',
+    
+            'III',
+    
+            'IV',
+    
+            'V',
+    
+            'VI',
+    
+            'VII',
+    
+            'VIII',
+    
+            'IX',
+    
+            'X',
+    
+            'XI',
+    
+            'XII'
+    
+        ];
+    
+        if(kode && nomorManual){
+    
+            document.getElementById('nomor_surat').value =
+    
+                'No.' +
+    
+                kode +
+    
+                '/' +
+    
+                nomorManual +
+    
+                '-Kec.MDLJ/T/' +
+    
+                romawi[bulan] +
+    
+                '/' +
+    
+                tahun;
+    
+        }else{
+    
+            document.getElementById('nomor_surat').value='';
+    
+        }
+    
+    }
+    
+    
+    /*
+    |--------------------------------------------------------------------------
+    | EVENT
+    |--------------------------------------------------------------------------
+    */
+    
+    document.getElementById('kode_arsip_id')
+    
+    .addEventListener(
+    
+    'change',
+    
+    generateNomorSurat
+    
+    );
+    
+    document.getElementById('kode_manual')
+    
+    .addEventListener(
+    
+    'keyup',
+    
+    generateNomorSurat
+    
+    );
+    
+    document.getElementById('nomor_manual')
+    
+    .addEventListener(
+    
+    'keyup',
+    
+    generateNomorSurat
+    
+    );
+    
+    
+    /*
+    |--------------------------------------------------------------------------
+    | PREVIEW NAMA FILE PDF
+    |--------------------------------------------------------------------------
+    */
+    
+    document.getElementById('file_surat').addEventListener('change',function(){
 
-                let file=this.files[0];
+        let file=this.files[0];
 
-                if(file){
+        if(file){
 
-                document.getElementById('namaFile').innerHTML=
+        document.getElementById('namaFile').innerHTML=
 
-                '<span class="badge bg-success rounded-pill px-3 py-2">'+
-                '<i class="bi bi-check-circle-fill me-2"></i>'+
-                file.name+
-                '</span>';
+        '<span class="badge bg-success rounded-pill px-3 py-2">'+
+        '<i class="bi bi-check-circle-fill me-2"></i>'+
+        file.name+
+        '</span>';
 
-                }else{
+        }else{
 
-                document.getElementById('namaFile').innerHTML=
+        document.getElementById('namaFile').innerHTML=
 
-                '<i class="bi bi-info-circle me-1"></i> Belum ada file dipilih.';
+        '<i class="bi bi-info-circle me-1"></i> Belum ada file dipilih.';
 
-                }
+        }
 
-                });
-            
-/*
-            |--------------------------------------------------------------------------
-            | Tambahkan animasi halaman
-            |--------------------------------------------------------------------------
-            */
-                document.addEventListener("DOMContentLoaded",function(){
+        });
+    
+    /*
+    |--------------------------------------------------------------------------
+    | Tambahkan animasi halaman
+    |--------------------------------------------------------------------------
+    */
+        document.addEventListener("DOMContentLoaded",function(){
 
-                const card=document.querySelector(".form-card");
+        const card=document.querySelector(".form-card");
 
-                card.style.opacity="0";
+        card.style.opacity="0";
 
-                card.style.transform="translateY(25px)";
+        card.style.transform="translateY(25px)";
 
-                setTimeout(function(){
+        setTimeout(function(){
 
-                card.style.transition=".45s";
+        card.style.transition=".45s";
 
-                card.style.opacity="1";
+        card.style.opacity="1";
 
-                card.style.transform="translateY(0)";
+        card.style.transform="translateY(0)";
 
-                },150);
+        },150);
 
-                });
-            /*
-            |--------------------------------------------------------------------------
-            | AUTO GENERATE SAAT LOAD
-            |--------------------------------------------------------------------------
-            */
-            
-            window.onload=function(){
-            
-            generateNomorSurat();
-            
-            };
-            
-            </script>
-            
-            @endsection
+        });
+    /*
+    |--------------------------------------------------------------------------
+    | AUTO GENERATE SAAT LOAD
+    |--------------------------------------------------------------------------
+    */
+    
+    window.onload=function(){
+    
+    generateNomorSurat();
+    
+    };
+    
+</script>
+        
+@endsection
