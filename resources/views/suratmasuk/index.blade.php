@@ -1,4 +1,5 @@
 @extends('layouts.app')
+
 @section('page-icon')
 <i class="bi bi-envelope-fill"></i>
 @endsection
@@ -116,7 +117,7 @@ document.addEventListener('DOMContentLoaded',function(){
 </script>
 @endif
 
-<div class="running-box">
+<div class="running-box mb-4">
     <div class="d-flex align-items-center">
         <div class="icon">
             <i class="bi bi-megaphone-fill"></i>
@@ -172,7 +173,7 @@ document.addEventListener('DOMContentLoaded',function(){
                         </div>
                         <div class="col-md-9">
                             <div class="d-flex gap-2 justify-content-end">
-                                <button class="btn btn-primary">
+                                <button type="submit" class="btn btn-primary">
                                     <i class="bi bi-search"></i> Cari
                                 </button>
                                 <a href="{{ route('suratmasuk.index', request('type') ? ['type' => request('type')] : []) }}" class="btn btn-secondary">
@@ -239,7 +240,7 @@ document.addEventListener('DOMContentLoaded',function(){
                             <td>
                                 <strong>{{ $item->judul }}</strong>
                                 <br>
-                                <small class="text-muted">{{ Str::limit($item->perihal,40) }}</small>
+                                <small class="text-muted">{{ Str::limit($item->perihal, 40) }}</small>
                             </td>
                             
                             {{-- KOLOM CONDITIONAL (SURAT VS AGENDA) --}}
@@ -262,7 +263,7 @@ document.addEventListener('DOMContentLoaded',function(){
                                     <i class="bi bi-building"></i> {{ $item->pengirim }}
                                 </td>
                                 <td>
-                                    {{ \Carbon\Carbon::parse($item->tanggal_surat)->format('d M Y') }}
+                                    {{ $item->tanggal_surat ? \Carbon\Carbon::parse($item->tanggal_surat)->format('d M Y') : '-' }}
                                 </td>
                             @endif
                             
@@ -297,16 +298,14 @@ document.addEventListener('DOMContentLoaded',function(){
                                         <i class="bi bi-file-earmark-pdf-fill"></i>
                                     </a>
                                 @else
-                                    <span class="text-danger">Belum Ada</span>
+                                    <span class="text-danger small">Belum Ada</span>
                                 @endif
                             </td>
                             
                             {{-- AKSI --}}
                             <td class="text-center">
                                 <div class="d-flex gap-1 justify-content-center">
-                                    {{-- ================= ADMIN (LIHAT, DISPOSISI, EDIT, & HAPUS) ================= --}}
                                     @if(Auth::user()->role == 'admin')
-                                        {{-- Tombol Detail memicu Modal --}}
                                         <button type="button" 
                                                 class="btn btn-info btn-sm text-white btn-preview" 
                                                 data-bs-toggle="modal" 
@@ -315,7 +314,7 @@ document.addEventListener('DOMContentLoaded',function(){
                                                 data-nomor="{{ $item->nomor_surat }}"
                                                 data-judul="{{ $item->judul }}"
                                                 data-pengirim="{{ $item->pengirim }}"
-                                                data-tanggal="{{ \Carbon\Carbon::parse($item->tanggal_surat)->format('d M Y') }}"
+                                                data-tanggal="{{ $item->tanggal_surat ? \Carbon\Carbon::parse($item->tanggal_surat)->format('d M Y') : '-' }}"
                                                 data-status="{{ $item->status }}"
                                                 data-perihal="{{ $item->perihal }}"
                                                 data-file="{{ $item->file_surat ? asset('storage/' . str_replace('public/', '', $item->file_surat)) : '' }}"
@@ -339,9 +338,7 @@ document.addEventListener('DOMContentLoaded',function(){
                                             </button>
                                         </form>
 
-                                    {{-- ================= PEGAWAI (HANYA LIHAT DAN EDIT) ================= --}}
                                     @elseif(Auth::user()->role == 'pegawai')
-                                        {{-- Tombol Detail memicu Modal --}}
                                         <button type="button" 
                                                 class="btn btn-info btn-sm text-white btn-preview" 
                                                 data-bs-toggle="modal" 
@@ -350,10 +347,10 @@ document.addEventListener('DOMContentLoaded',function(){
                                                 data-nomor="{{ $item->nomor_surat }}"
                                                 data-judul="{{ $item->judul }}"
                                                 data-pengirim="{{ $item->pengirim }}"
-                                                data-tanggal="{{ \Carbon\Carbon::parse($item->tanggal_surat)->format('d M Y') }}"
+                                                data-tanggal="{{ $item->tanggal_surat ? \Carbon\Carbon::parse($item->tanggal_surat)->format('d M Y') : '-' }}"
                                                 data-status="{{ $item->status }}"
                                                 data-perihal="{{ $item->perihal }}"
-                                                data-file="{{ $item->file_surat ? asset('storage/' . $item->file_surat) : '' }}"
+                                                data-file="{{ $item->file_surat ? asset('storage/' . str_replace('public/', '', $item->file_surat)) : '' }}"
                                                 title="Detail & Preview Surat">
                                             <i class="bi bi-eye"></i>
                                         </button>
@@ -367,7 +364,7 @@ document.addEventListener('DOMContentLoaded',function(){
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="11" class="text-center py-5">
+                            <td colspan="10" class="text-center py-5">
                                 <i class="bi bi-inbox fs-1 text-secondary"></i>
                                 <br><br>
                                 <strong>
@@ -386,7 +383,7 @@ document.addEventListener('DOMContentLoaded',function(){
     </div>
 </div>
 
-<!-- MODAL DETAIL & PREVIEW DOKUMEN (STACKED VERTICAL) -->
+<!-- MODAL DETAIL & PREVIEW DOKUMEN -->
 <div class="modal fade" id="previewModalSuratMasuk" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content shadow-lg" style="border-radius: 20px; overflow: hidden;">
@@ -398,8 +395,6 @@ document.addEventListener('DOMContentLoaded',function(){
             </div>
             <div class="modal-body p-4 bg-light">
                 <div class="row g-4">
-                    
-                    <!-- BAGIAN ATAS: Informasi Detail Surat -->
                     <div class="col-12">
                         <div class="card shadow-sm border-0 p-4" style="border-radius: 15px;">
                             <h5 class="fw-bold text-dark mb-3 border-bottom pb-2">
@@ -454,48 +449,41 @@ document.addEventListener('DOMContentLoaded',function(){
                         </div>
                     </div>
                     
-                   <!-- BAGIAN BAWAH: Preview Dokumen PDF / Gambar / Office -->
                    <div class="col-12">
-                    <div class="card shadow-sm border-0 bg-dark rounded-3 overflow-hidden">
-                        <div class="card-header bg-secondary bg-opacity-25 text-white py-2 px-3 d-flex justify-content-between align-items-center">
-                            <span class="small fw-bold">
-                                <i class="bi bi-file-earmark-pdf-fill text-danger me-1"></i> Preview Lampiran Berkas
-                            </span>
-                            <a id="md-direct-download" href="#" target="_blank" class="btn btn-sm btn-outline-light d-none" title="Buka / Download di tab baru">
-                                <i class="bi bi-box-arrow-up-right me-1"></i> Buka Tab Baru
-                            </a>
-                        </div>
-                        <div class="card-body p-0 position-relative" style="height: 550px;">
-                            {{-- Iframe untuk PDF, Gambar, & Google Docs Viewer --}}
-                            <iframe id="md-pdf-viewer" src="" width="100%" height="100%" style="border: none; background: #fff;"></iframe>
-                            
-                            {{-- Fallback jika file tidak ditemukan / tidak ada --}}
-                            <div id="md-file-fallback" class="text-center position-absolute top-50 start-50 translate-middle d-none p-4 text-white w-100">
-                                <i class="bi bi-file-earmark-x fs-1 text-danger"></i>
-                                <p class="mt-2 text-light mb-2">Berkas tidak dilampirkan atau format tidak mendukung preview langsung.</p>
-                                <a id="md-download-btn" href="#" target="_blank" class="btn btn-light btn-sm fw-bold shadow d-none">
-                                    <i class="bi bi-download me-1"></i> Unduh Berkas
+                        <div class="card shadow-sm border-0 bg-dark rounded-3 overflow-hidden">
+                            <div class="card-header bg-secondary bg-opacity-25 text-white py-2 px-3 d-flex justify-content-between align-items-center">
+                                <span class="small fw-bold">
+                                    <i class="bi bi-file-earmark-pdf-fill text-danger me-1"></i> Preview Lampiran Berkas
+                                </span>
+                                <a id="md-direct-download" href="#" target="_blank" class="btn btn-sm btn-outline-light d-none" title="Buka / Download di tab baru">
+                                    <i class="bi bi-box-arrow-up-right me-1"></i> Buka Tab Baru
                                 </a>
+                            </div>
+                            <div class="card-body p-0 position-relative" style="height: 550px;">
+                                <iframe id="md-pdf-viewer" src="" width="100%" height="100%" style="border: none; background: #fff;"></iframe>
+                                
+                                <div id="md-file-fallback" class="text-center position-absolute top-50 start-50 translate-middle d-none p-4 text-white w-100">
+                                    <i class="bi bi-file-earmark-x fs-1 text-danger"></i>
+                                    <p class="mt-2 text-light mb-2">Berkas tidak dilampirkan atau format tidak mendukung preview langsung.</p>
+                                    <a id="md-download-btn" href="#" target="_blank" class="btn btn-light btn-sm fw-bold shadow d-none">
+                                        <i class="bi bi-download me-1"></i> Unduh Berkas
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-
+            </div>
+            <div class="modal-footer bg-white border-0 py-3 px-4">
+                <button type="button" class="btn btn-secondary px-4 shadow-sm" data-bs-dismiss="modal" style="border-radius:10px;">Tutup</button>
             </div>
         </div>
-        <div class="modal-footer bg-white border-0 py-3 px-4">
-            <button type="button" class="btn btn-secondary px-4 shadow-sm" data-bs-dismiss="modal" style="border-radius:10px;">Tutup</button>
-        </div>
     </div>
-</div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 $(document).ready(function() {
-    // ==========================================
-    // 1. HANDLER MODAL PREVIEW (SURAT MASUK)
-    // ==========================================
     $('.btn-preview').on('click', function() {
         const kode = $(this).data('kode');
         const nomor = $(this).data('nomor');
@@ -506,7 +494,6 @@ $(document).ready(function() {
         const perihal = $(this).data('perihal');
         const fileUrl = $(this).data('file');
 
-        // Injeksikan data ke elemen modal
         $('#md-kode').text(kode);
         $('#md-nomor').text(nomor);
         $('#md-judul').text(judul);
@@ -515,7 +502,6 @@ $(document).ready(function() {
         $('#md-perihal').text(perihal);
         $('#md-status').text(status);
 
-        // Styling dinamis badge status
         $('#md-status').removeClass('bg-secondary bg-warning text-dark bg-success bg-primary');
         if(status === 'Sudah Disposisi') {
             $('#md-status').addClass('bg-success text-white');
@@ -527,26 +513,23 @@ $(document).ready(function() {
             $('#md-status').addClass('bg-secondary text-white');
         }
 
-        // Kontrol tampilan preview berkas (Direct PDF/Image Viewer)
         if (fileUrl && fileUrl !== '' && fileUrl !== '#') {
             $('#md-pdf-viewer').removeClass('d-none').attr('src', fileUrl);
             $('#md-file-fallback').addClass('d-none');
             $('#md-download-btn').attr('href', fileUrl);
+            $('#md-direct-download').attr('href', fileUrl).removeClass('d-none');
         } else {
             $('#md-pdf-viewer').addClass('d-none').attr('src', '');
             $('#md-file-fallback').removeClass('d-none');
             $('#md-download-btn').attr('href', '#');
+            $('#md-direct-download').addClass('d-none');
         }
     });
 
-    // Reset iframe saat modal ditutup
     $('#previewModalSuratMasuk').on('hidden.bs.modal', function () {
         $('#md-pdf-viewer').attr('src', '');
     });
 
-    // ==========================================
-    // 2. FUNGSI CEK BOOKING JADWAL (AGENDA)
-    // ==========================================
     function cekBooking(){
         let tempat = $("#tempat").val();
         let tanggal = $("#tanggal").val();
@@ -587,3 +570,4 @@ $(document).ready(function() {
     $("#tempat, #tanggal_kegiatan, #jam_mulai, #jam_selesai").on("change", cekBooking);
 });
 </script>
+@endsection
