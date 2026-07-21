@@ -423,40 +423,6 @@ TABLE
 </style>
 
 {{-- ===========================
-PAGE HEADER COMPONENT
-=========================== --}}
-<div class="page-header">
-    <div class="d-flex align-items-center">
-        <div class="fs-1 me-3">
-            @yield('page-icon')
-        </div>
-        <div>
-            <div class="page-title-text">@yield('page-title')</div>
-            <div class="page-subtitle">@yield('page-description')</div>
-        </div>
-    </div>
-</div>
-
-@if(session('success'))
-
-<script>
-
-document.addEventListener('DOMContentLoaded',function(){
-
-    Swal.fire({
-        icon:'success',
-        title:'Berhasil',
-        text:'{{ session("success") }}',
-        confirmButtonColor:'#0f766e'
-    });
-
-});
-
-</script>
-
-@endif
-
-{{-- ===========================
 RUNNING TEXT
 =========================== --}}
 
