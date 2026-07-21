@@ -13,9 +13,11 @@ return new class extends Migration
     {
         Schema::create('surat_keluars', function (Blueprint $table) {
             $table->id();
+            
+            // Relasi ke tabel users
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             
-            // Relasi ke tabel kode_arsips dengan foreign key constraint
+            // Relasi ke tabel kode_arsips
             $table->foreignId('kode_arsip_id')->nullable()->constrained('kode_arsips')->nullOnDelete();
             
             $table->string('nomor_surat');
@@ -24,7 +26,10 @@ return new class extends Migration
             $table->string('tujuan');
             $table->date('tanggal_surat');
             $table->text('perihal')->nullable();
-            $table->text('disposisi')->nullable(); // Ditambahkan untuk menyamakan fitur disposisi seperti pada surat masuk
+            
+            // Disposisi diberikan default value agar konsisten
+            $table->text('disposisi')->nullable()->default('Menunggu ACC'); 
+            
             $table->string('file_surat')->nullable();
             $table->string('status')->default('Menunggu ACC');
             $table->timestamps();

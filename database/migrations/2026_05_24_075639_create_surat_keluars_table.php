@@ -13,17 +13,29 @@ return new class extends Migration
     {
         Schema::create('surat_keluars', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id');
-            $table->foreignId('kode_arsip_id')->nullable();
+
+            // Foreign key ke tabel users & kode_arsips
+            $table->foreignId('user_id')
+                  ->constrained('users')
+                  ->onDelete('cascade');
+
+            $table->foreignId('kode_arsip_id')
+                  ->nullable()
+                  ->constrained('kode_arsip') // Sesuaikan nama tabel kode_arsip kamu di DB
+                  ->onDelete('set null');
+
             $table->string('nomor_surat');
             $table->string('judul')->nullable();
             $table->string('pengirim');
             $table->string('tujuan');
             $table->date('tanggal_surat');
             $table->text('perihal')->nullable();
-            $table->text('disposisi')->nullable(); // Ditambahkan agar sinkron dengan fitur disposisi surat masuk
-            $table->string('file_surat')->nullable();
+
+            // Fitur Disposisi & Status
+            $table->text('disposisi')->nullable()->default('Menunggu ACC'); 
             $table->string('status')->default('Menunggu ACC');
+
+            $table->string('file_surat')->nullable();
             $table->timestamps();
         });
     }
