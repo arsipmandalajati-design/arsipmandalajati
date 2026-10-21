@@ -4,41 +4,38 @@ use Illuminate\Http\Request;
 
 define('LARAVEL_START', microtime(true));
 
-// Tentukan folder temporary untuk serverless Vercel
-$storagePath = '/tmp/storage';
-$cachePath = '/tmp/bootstrap/cache';
+// 1. Buat struktur folder di /tmp untuk Vercel Serverless
+$storageFolders = [
+    '/tmp/storage/app/public',
+    '/tmp/storage/framework/cache/data',
+    '/tmp/storage/framework/sessions',
+    '/tmp/storage/framework/views',
+    '/tmp/storage/logs',
+    '/tmp/bootstrap/cache',
+];
 
-if (!file_exists($storagePath . '/framework/views')) {
-    mkdir($storagePath . '/framework/views', 0755, true);
-}
-if (!file_exists($storagePath . '/framework/cache')) {
-    mkdir($storagePath . '/framework/cache', 0755, true);
-}
-if (!file_exists($storagePath . '/framework/sessions')) {
-    mkdir($storagePath . '/framework/sessions', 0755, true);
-}
-if (!file_exists($storagePath . '/logs')) {
-    mkdir($storagePath . '/logs', 0755, true);
-}
-if (!file_exists($cachePath)) {
-    mkdir($cachePath, 0755, true);
+foreach ($storageFolders as $folder) {
+    if (!file_exists($folder)) {
+        @mkdir($folder, 0755, true);
+    }
 }
 
-// Maintenance Mode Check
+// 2. Check Maintenance Mode
 if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php')) {
     require $maintenance;
 }
 
-// Register Autoloader
+// 3. Register Autoloader
 require __DIR__.'/../vendor/autoload.php';
 
-// Bootstrap Laravel
+// 4. Bootstrap Laravel Instance
 $app = require_once __DIR__.'/../bootstrap/app.php';
 
-// Bind custom storage path
-$app->useStoragePath($storagePath);
+// 5. Timpa Storage Path & Cache Path ke /tmp sebelum penanganan Request
+$app->useStoragePath('/tmp/storage');
+$app->useBootstrapPath('/tmp/bootstrap');
 
-// Handle Request
+// 6. Jalankan Request
 $response = $app->handleRequest(Request::capture());
 
 $response->send();
