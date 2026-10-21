@@ -2,16 +2,25 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Pejabat extends Model
 {
-    protected $fillable = [
+    use HasFactory;
 
-        'nama_pejabat',
+    protected $table = 'pejabats'; // Sesuaikan jika nama tabel di DB kamu 'pejabats' (ganti jadi 'pejabats')
+
+    protected $fillable = [
+        'user_id',
         'nip',
         'jabatan',
-        'tanda_tangan'
-
+        'golongan',
+        'unit_kerja',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
 }

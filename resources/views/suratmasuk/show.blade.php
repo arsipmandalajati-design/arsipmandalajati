@@ -1,385 +1,137 @@
 @extends('layouts.app')
 
 @section('content')
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
-<style>
-.page-header{
-    background: linear-gradient(135deg, #0f766e, #14b8a6);
-    border-radius: 20px;
-    padding: 30px;
-    color: white;
-    margin-bottom: 25px;
-}
-
-.info-card, .preview-card{
-    border: none;
-    border-radius: 20px;
-    box-shadow: 0 4px 20px rgba(0,0,0,.08);
-}
-
-.section-title{
-    font-size: 18px;
-    font-weight: 700;
-    color: #0f766e;
-    border-left: 5px solid #0f766e;
-    padding-left: 12px;
-    margin-bottom: 20px;
-}
-
-.info-item{
-    margin-bottom: 18px;
-}
-
-.info-label{
-    display: block;
-    font-weight: 700;
-    color: #6b7280;
-    margin-bottom: 5px;
-}
-
-.info-value{
-    font-size: 15px;
-    color: #111827;
-}
-
-.badge-custom{
-    background: #d1fae5;
-    color: #065f46;
-    padding: 8px 15px;
-    border-radius: 30px;
-    font-size: 13px;
-    font-weight: 600;
-}
-
-.facility-badge {
-    background: #f3f4f6;
-    color: #374151;
-    border: 1px solid #e5e7eb;
-    padding: 6px 12px;
-    border-radius: 10px;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.btn-download{
-    background: #0f766e;
-    color: white;
-    border: none;
-    border-radius: 12px;
-    padding: 10px 20px;
-}
-
-.btn-download:hover{
-    background: #115e59;
-    color: white;
-}
-
-.btn-back{
-    border-radius: 12px;
-    padding: 10px 20px;
-}
-
-iframe{
-    border-radius: 15px;
-}
-</style>
-
-<div class="page-header">
-    <h2 class="fw-bold mb-2">
-        <i class="bi bi-envelope-open-fill"></i>
-        Detail Surat Masuk
-    </h2>
-    <p class="mb-0">
-        Informasi lengkap surat masuk beserta data kegiatan dan disposisi.
-    </p>
-</div>
-
-<div class="row">
-    <!-- Kolom Kiri: Informasi Detail -->
-    <div class="col-lg-5">
-        <div class="card info-card">
-            <div class="card-body p-4">
-                
-                <!-- Section 1: Informasi Surat -->
-                <div class="section-title">Informasi Surat</div>
-                
-                <div class="info-item">
-                    <span class="info-label">Kode Arsip / No Urut</span>
-                    <div class="info-value">
-                        <span class="badge-custom">
-                            {{ $suratmasuk->kodearsip->kode ?? '-' }} / {{ str_pad($suratmasuk->nomor_urut ?? 0, 3, '0', STR_PAD_LEFT) }}
-                        </span>
-                    </div>
-                </div>
-
-                <div class="info-item">
-                    <span class="info-label">Nomor Surat</span>
-                    <div class="info-value fw-semibold text-primary">{{ $suratmasuk->nomor_surat }}</div>
-                </div>
-
-                <div class="info-item">
-                    <span class="info-label">Jenis & Sumber Arsip</span>
-                    <div class="info-value">{{ $suratmasuk->jenis_surat ?? '-' }} ({{ $suratmasuk->sumber_arsip ?? '-' }})</div>
-                </div>
-
-                <div class="info-item">
-                    <span class="info-label">Judul Surat / Perihal</span>
-                    <div class="info-value">
-                        <strong>{{ $suratmasuk->judul }}</strong>
-                        <p class="text-secondary small mb-0 mt-1">{{ $suratmasuk->perihal }}</p>
-                    </div>
-                </div>
-
-                <div class="info-item">
-                    <span class="info-label">Pengirim</span>
-                    <div class="info-value">{{ $suratmasuk->pengirim }}</div>
-                </div>
-
-                <div class="info-item">
-                    <span class="info-label">Tanggal Surat</span>
-                    <div class="info-value">
-                        {{ \Carbon\Carbon::parse($suratmasuk->tanggal_surat)->translatedFormat('d F Y') }}
-                    </div>
-                </div>
-
-                <hr>
-
-                <!-- Section 2: Informasi Kegiatan -->
-                <div class="section-title">Informasi Kegiatan</div>
-
-                <div class="info-item">
-                    <span class="info-label">Tempat Pelaksanaan</span>
-                    <div class="info-value"><i class="bi bi-geo-alt-fill text-danger me-1"></i> {{ $suratmasuk->tempat ?? '-' }}</div>
-                </div>
-
-                <div class="row">
-                    <div class="col-sm-6">
-                        <div class="info-item">
-                            <span class="info-label">Tanggal Kegiatan</span>
-                            <div class="info-value">
-                                {{ $suratmasuk->tanggal_kegiatan ? \Carbon\Carbon::parse($suratmasuk->tanggal_kegiatan)->translatedFormat('d F Y') : '-' }}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="info-item">
-                            <span class="info-label">Jam Pelaksanaan</span>
-                            <div class="info-value">
-                                {{ $suratmasuk->jam_mulai ?? '-' }} - {{ $suratmasuk->jam_selesai ?? '-' }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="info-item">
-                    <span class="info-label">Materi Pembahasan</span>
-                    <div class="info-value">{{ $suratmasuk->materi ?? '-' }}</div>
-                </div>
-
-                <div class="info-item">
-                    <span class="info-label">Estimasi Peserta</span>
-                    <div class="info-value">{{ $suratmasuk->jumlah_peserta ?? 0 }} Orang</div>
-                </div>
-
-                <!-- Sub-Section: Kebutuhan Sarana Prasarana -->
-                <div class="info-item mt-3">
-                    <span class="info-label">Fasilitas & Sarpras Pendukung</span>
-                    <div class="d-flex flex-wrap gap-2 mt-2">
-                        <div class="facility-badge"><i class="bi bi-chair text-success"></i> Kursi: <strong>{{ $suratmasuk->kursi ?? 0 }}</strong></div>
-                        <div class="facility-badge"><i class="bi bi-calendar-minus text-success"></i> Meja: <strong>{{ $suratmasuk->meja ?? 0 }}</strong></div>
-                        <div class="facility-badge"><i class="bi bi-projector text-success"></i> Proyektor: <strong>{{ $suratmasuk->proyektor ?? 0 }}</strong></div>
-                        <div class="facility-badge"><i class="bi bi-mic text-success"></i> Mic: <strong>{{ $suratmasuk->mic ?? 0 }}</strong></div>
-                        <div class="facility-badge"><i class="bi bi-speaker text-success"></i> Sound: <strong>{{ $suratmasuk->sound_system ?? 0 }}</strong></div>
-                        <div class="facility-badge"><i class="bi bi-usb-plug text-success"></i> Kabel Roll: <strong>{{ $suratmasuk->kabel_roll ?? 0 }}</strong></div>
-                        @if($suratmasuk->lainnya)
-                            <div class="facility-badge bg-light w-100 mt-1"><i class="bi bi-plus-circle text-info"></i> Lainnya: <span class="small">{{ $suratmasuk->lainnya }}</span></div>
-                        @endif
-                    </div>
-                </div>
-
-                <hr>
-
-                <!-- Section 3: Status & Disposisi -->
-                <div class="section-title">Status & Disposisi</div>
-
-                <div class="info-item">
-                    <span class="info-label">Status Surat</span>
-                    <div class="info-value">
-                        @if($suratmasuk->status=='Menunggu Verifikasi' || $suratmasuk->status=='Belum Disposisi')
-                            <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold">
-                                {{ $suratmasuk->status }}
-                            </span>
-                        @elseif($suratmasuk->status=='Sudah Diverifikasi')
-                            <span class="badge bg-success px-3 py-2 rounded-pill fw-bold">
-                                {{ $suratmasuk->status }}
-                            </span>
-                        @elseif($suratmasuk->status=='Sudah Disposisi')
-                            <span class="badge bg-primary px-3 py-2 rounded-pill fw-bold">
-                                {{ $suratmasuk->status }}
-                            </span>
-                        @else
-                            <span class="badge bg-secondary px-3 py-2 rounded-pill fw-bold">
-                                {{ $suratmasuk->status }}
-                            </span>
-                        @endif
-                    </div>
-                </div>
-
-                <div class="info-item">
-                    <span class="info-label">Diteruskan Kepada (Pegawai)</span>
-                    <div class="info-value fw-semibold text-dark">
-                        <i class="bi bi-person-badge text-muted me-1"></i> {{ $suratmasuk->userDisposisi->name ?? '-' }}
-                    </div>
-                </div>
-
-                <div class="info-item">
-                    <span class="info-label">Catatan Rekomendasi / Admin</span>
-                    <div class="info-value p-3 bg-light border rounded text-secondary small" style="min-height: 60px;">
-                        {{ $suratmasuk->catatan_admin ?? 'Tidak ada catatan tambahan.' }}
-                    </div>
-                </div>
-
-                <hr>
-
-                <!-- Tombol Aksi -->
-                <div class="d-flex gap-2 flex-wrap">
-                    @if($suratmasuk->file_surat)
-                        <a href="{{ asset('storage/'.$suratmasuk->file_surat) }}" target="_blank" class="btn btn-download">
-                            <i class="bi bi-download me-1"></i> Download PDF
-                        </a>
-                    @endif
-                    <a href="{{ route('suratmasuk.index') }}" class="btn btn-light border btn-back">
-                        <i class="bi bi-arrow-left me-1"></i> Kembali
+<div class="container-fluid">
+    <div class="row">
+        <!-- DETAIL SURAT & LOGISTIK -->
+        <div class="col-md-7">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">Detail Surat Masuk</h6>
+                    <a href="{{ route('suratmasuk.index') }}" class="btn btn-sm btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Kembali
                     </a>
                 </div>
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <tr>
+                            <th width="35%">Nomor Registrasi</th>
+                            <td><b class="text-primary">{{ $suratmasuk->nomor_registrasi }}</b></td>
+                        </tr>
+                        <tr>
+                            <th>Nomor Surat</th>
+                            <td>{{ $suratmasuk->nomor_surat }}</td>
+                        </tr>
+                        <tr>
+                            <th>Jenis Surat</th>
+                            <td>
+                                <span class="badge {{ $suratmasuk->jenis_surat == 'Internal' ? 'badge-info' : 'badge-warning' }}">
+                                    {{ $suratmasuk->jenis_surat }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Kode / Kategori Arsip</th>
+                            <td>{{ $suratmasuk->kodearsip->kode ?? '-' }} - {{ $suratmasuk->kodearsip->nama ?? '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Judul / Perihal</th>
+                            <td>{{ $suratmasuk->judul }} <br><small class="text-muted">{{ $suratmasuk->perihal }}</small></td>
+                        </tr>
+                        <tr>
+                            <th>Pengirim</th>
+                            <td>{{ $suratmasuk->pengirim }}</td>
+                        </tr>
+                        <tr>
+                            <th>Tanggal Surat / Diterima</th>
+                            <td>{{ \Carbon\Carbon::parse($suratmasuk->tanggal_surat)->format('d-m-Y') }} / {{ \Carbon\Carbon::parse($suratmasuk->tanggal_diterima)->format('d-m-Y') }}</td>
+                        </tr>
+                        <tr>
+                            <th>Status Disposisi</th>
+                            <td>
+                                <span class="badge badge-secondary">{{ $suratmasuk->status }}</span>
+                            </td>
+                        </tr>
+                    </table>
 
+                    {{-- DETAIL LOGISTIK AGENDA (JIKA SURAT INTERNAL) --}}
+                    @if($suratmasuk->jenis_surat === 'Internal' && $suratmasuk->agenda)
+                        <h6 class="font-weight-bold text-primary mt-4 mb-3">Detail Agenda & Kebutuhan Logistik</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-striped table-bordered">
+                                <tr>
+                                    <th>Tempat Kegiatan</th>
+                                    <td>{{ $suratmasuk->agenda->tempat ?? '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Waktu Kegiatan</th>
+                                    <td>
+                                        {{ $suratmasuk->agenda->tanggal ? \Carbon\Carbon::parse($suratmasuk->agenda->tanggal)->format('d-m-Y') : '-' }} 
+                                        ({{ $suratmasuk->agenda->jam_mulai ?? '-' }} s/d {{ $suratmasuk->agenda->jam_selesai ?? '-' }})
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Jumlah Peserta</th>
+                                    <td>{{ $suratmasuk->agenda->jumlah_peserta ?? 0 }} Orang</td>
+                                </tr>
+                                <tr>
+                                    <th>Logistik/Peralatan</th>
+                                    <td>
+                                        <ul class="mb-0 pl-3">
+                                            <li>Kursi: {{ $suratmasuk->agenda->kursi ?? 0 }}</li>
+                                            <li>Meja: {{ $suratmasuk->agenda->meja ?? 0 }}</li>
+                                            <li>Proyektor: {{ $suratmasuk->agenda->proyektor ?? 0 }}</li>
+                                            <li>Mic: {{ $suratmasuk->agenda->mic ?? 0 }}</li>
+                                            <li>Sound System: {{ $suratmasuk->agenda->sound_system ?? 0 }}</li>
+                                            <li>Kabel Roll: {{ $suratmasuk->agenda->kabel_roll ?? 0 }}</li>
+                                            <li>Lainnya: {{ $suratmasuk->agenda->lainnya ?? '-' }}</li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    @endif
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Kolom Kanan: Preview Dokumen -->
-    <div class="col-lg-7">
-        <div class="card preview-card">
-            <div class="card-body p-4">
-                <div class="section-title">Preview Dokumen</div>
-                
-                @if($suratmasuk->file_surat)
-                    <div class="rounded overflow-hidden border">
-                        <iframe src="{{ asset('storage/'.$suratmasuk->file_surat) }}" width="100%" height="750" frameborder="0"></iframe>
-                    </div>
-                    <div class="mt-4 d-flex justify-content-end">
-                        <a href="{{ asset('storage/'.$suratmasuk->file_surat) }}" target="_blank" class="btn btn-download">
-                            <i class="bi bi-file-earmark-arrow-down-fill me-1"></i> Buka di Tab Baru
+        <!-- PREVIEW BERKAS DIRECT EMBED -->
+        <div class="col-md-5">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">Preview Berkas Surat</h6>
+                    @if($suratmasuk->file_surat)
+                        <a href="{{ asset('storage/' . $suratmasuk->file_surat) }}" target="_blank" class="btn btn-sm btn-success">
+                            <i class="fas fa-download"></i> Unduh File
                         </a>
-                    </div>
-                @else
-                    <div class="text-center py-5 my-5">
-                        <i class="bi bi-file-earmark-pdf-fill" style="font-size:80px; color:#dc3545;"></i>
-                        <h4 class="mt-3 fw-bold">Dokumen Tidak Ditemukan</h4>
-                        <p class="text-muted">File berkas lampiran surat masuk belum diunggah atau tidak tersedia di server.</p>
-                    </div>
-                @endif
+                    @endif
+                </div>
+                <div class="card-body p-2 text-center" style="min-height: 450px; background-color: #f8f9fc;">
+                    @if($suratmasuk->file_surat && Storage::disk('public')->exists($suratmasuk->file_surat))
+                        @php
+                            $extension = pathinfo($suratmasuk->file_surat, PATHINFO_EXTENSION);
+                            $fileUrl = asset('storage/' . $suratmasuk->file_surat);
+                        @endphp
+
+                        @if(in_array(strtolower($extension), ['jpg', 'jpeg', 'png']))
+                            <img src="{{ $fileUrl }}" class="img-fluid rounded border shadow-sm" style="max-height: 500px;" alt="Preview Surat">
+                        @elseif(strtolower($extension) === 'pdf')
+                            <iframe src="{{ $fileUrl }}" width="100%" height="500px" style="border: none;"></iframe>
+                        @else
+                            <div class="alert alert-info mt-5">
+                                Format file (<b>.{{ $extension }}</b>) tidak mendukung live preview.<br>
+                                Silakan unduh berkas untuk melihat.
+                            </div>
+                        @endif
+                    @else
+                        <div class="text-center py-5">
+                            <i class="fas fa-file-excel fa-3x text-gray-300 mb-3"></i>
+                            <p class="text-danger mb-0">Berkas/File fisik tidak ditemukan di server.</p>
+                        </div>
+                    @endif
+                </div>
             </div>
         </div>
     </div>
 </div>
-
-<!-- JAVASCRIPT LOGIC INTEGRATION -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-$(document).ready(function() {
-    // ==========================================
-    // 1. HANDLER MODAL PREVIEW (SURAT MASUK)
-    // ==========================================
-    $('.btn-preview').on('click', function() {
-        const kode = $(this).data('kode');
-        const nomor = $(this).data('nomor');
-        const judul = $(this).data('judul');
-        const pengirim = $(this).data('pengirim');
-        const tanggal = $(this).data('tanggal');
-        const status = $(this).data('status');
-        const perihal = $(this).data('perihal');
-        const fileUrl = $(this).data('file');
-
-        // Injeksikan data ke elemen modal
-        $('#md-kode').text(kode);
-        $('#md-nomor').text(nomor);
-        $('#md-judul').text(judul);
-        $('#md-pengirim').text(pengirim);
-        $('#md-tanggal').text(tanggal);
-        $('#md-perihal').text(perihal);
-        $('#md-status').text(status);
-
-        // Styling dinamis badge status di dalam modal
-        $('#md-status').removeClass('bg-secondary bg-warning text-dark bg-success bg-primary');
-        if(status === 'Sudah Disposisi') {
-            $('#md-status').addClass('bg-success text-white');
-        } else if(status === 'Diproses' || status === 'Menunggu Verifikasi') {
-            $('#md-status').addClass('bg-warning text-dark');
-        } else if(status === 'Sudah Dijadikan Agenda') {
-            $('#md-status').addClass('bg-primary text-white');
-        } else {
-            $('#md-status').addClass('bg-secondary text-white');
-        }
-
-        // Kontrol tampilan preview berkas
-        if (fileUrl && (fileUrl.toLowerCase().endsWith('.pdf') || fileUrl.match(/\.(jpeg|jpg|gif|png)$/i) != null)) {
-            $('#md-pdf-viewer').removeClass('d-none').attr('src', fileUrl);
-            $('#md-file-fallback').addClass('d-none');
-        } else {
-            $('#md-pdf-viewer').addClass('d-none').attr('src', '');
-            $('#md-file-fallback').removeClass('d-none');
-            $('#md-download-btn').attr('href', fileUrl || '#');
-        }
-    });
-
-    // Reset iframe saat modal ditutup agar ringkas memory browser
-    $('#previewModalSuratMasuk').on('hidden.bs.modal', function () {
-        $('#md-pdf-viewer').attr('src', '');
-    });
-
-    // ==========================================
-    // 2. FUNGSI CEK BOOKING JADWAL (AGENDA)
-    // ==========================================
-    function cekBooking(){
-        let tempat = $("#tempat").val();
-        let tanggal = $("#tanggal").val();
-        let mulai = $("#jam_mulai").val();
-        let selesai = $("#jam_selesai").val();
-    
-        // Jika form belum terisi semua, jangan kirim request dulu
-        if(tempat == '' || tanggal == '' || mulai == '' || selesai == ''){
-            return;
-        }
-    
-        // Ajax request ke route pengecekan agenda
-        $.get("{{ route('agenda.cekBooking') }}", {
-            tempat: tempat,
-            tanggal: tanggal,
-            jam_mulai: mulai,
-            jam_selesai: selesai
-        }, function(res){
-            if(res.bentrok){
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Jadwal Bentrok',
-                    text: 'Ruangan sudah dipakai pada jam tersebut.',
-                    confirmButtonColor: '#dc3545'
-                });
-                $(".btn-save").prop("disabled", true);
-            } else {
-                $(".btn-save").prop("disabled", false);
-            }
-        });
-    }
-    
-    // Trigger pengecekan otomatis setiap kali ada perubahan input agenda
-    $("#tempat, #tanggal, #jam_mulai, #jam_selesai").on("change", cekBooking);
-});
-</script>
-
 @endsection

@@ -180,7 +180,8 @@ document.addEventListener('DOMContentLoaded',function(){
                                     <i class="bi bi-arrow-clockwise"></i> Reset
                                 </a>
 
-                                @if(Auth::user()->role == 'admin' || Auth::user()->role == 'pegawai')
+                                {{-- Tombol Tambah, sekarang ikut switch "tambah" --}}
+                                @if(userCan('suratmasuk', 'tambah'))
                                     <a href="{{ route('suratmasuk.create') }}" class="btn btn-primary">
                                         @if(request('type') == 'agenda')
                                             <i class="bi bi-calendar-plus"></i> Tambah Agenda
@@ -199,188 +200,186 @@ document.addEventListener('DOMContentLoaded',function(){
                 </div>
             </div>
         </form>
-
-        <div class="table-responsive">
-            <table class="table align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>No</th>
-                        <th>Kode Arsip</th>
-                        <th>Nomor Surat</th>
-                        <th>Judul Surat</th>
-                        @if(request('type') == 'agenda')
-                            <th>Tempat Booking</th>
-                            <th>Jadwal Kegiatan</th>
-                        @else
-                            <th>Asal Surat</th>
-                            <th>Tanggal</th>
-                        @endif
-                        <th>Status</th>
-                        <th>Tujuan Disposisi</th>
-                        <th>File</th>
-                        <th class="text-center">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($suratmasuk as $item)
-                        <tr>
-                            <td>{{ $loop->iteration }}</td>
-                            
-                            {{-- KODE ARSIP --}}
-                            <td>
-                                <span class="badge bg-dark">{{ $item->kodearsip->kode ?? '-' }}</span>
-                            </td>
-                            
-                            {{-- NOMOR SURAT --}}
-                            <td>
-                                <small class="fw-bold text-primary">{{ $item->nomor_surat }}</small>
-                            </td>
-                            
-                            {{-- JUDUL --}}
-                            <td>
-                                <strong>{{ $item->judul }}</strong>
-                                <br>
-                                <small class="text-muted">{{ Str::limit($item->perihal, 40) }}</small>
-                            </td>
-                            
-                            {{-- KOLOM CONDITIONAL (SURAT VS AGENDA) --}}
-                            @if(request('type') == 'agenda')
-                                <td>
-                                    <span class="badge bg-info text-dark">
-                                        <i class="bi bi-geo-alt-fill me-1"></i> {{ $item->tempat ?? '-' }}
-                                    </span>
-                                </td>
-                                <td>
-                                    <small class="fw-bold d-block text-dark">
-                                        <i class="bi bi-calendar-event me-1"></i> {{ $item->tanggal_kegiatan ? \Carbon\Carbon::parse($item->tanggal_kegiatan)->format('d M Y') : '-' }}
-                                    </small>
-                                    <small class="text-muted d-block">
-                                        <i class="bi bi-clock me-1"></i> {{ $item->jam_mulai ? \Carbon\Carbon::parse($item->jam_mulai)->format('H:i') : '' }} - {{ $item->jam_selesai ? \Carbon\Carbon::parse($item->jam_selesai)->format('H:i') : '' }}
-                                    </small>
-                                </td>
-                            @else
-                                <td>
-                                    <i class="bi bi-building"></i> {{ $item->pengirim }}
-                                </td>
-                                <td>
-                                    {{ $item->tanggal_surat ? \Carbon\Carbon::parse($item->tanggal_surat)->format('d M Y') : '-' }}
-                                </td>
-                            @endif
-                            
-                            {{-- STATUS --}}
-                            <td>
-                                @if($item->status == 'Belum Disposisi')
-                                    <span class="badge bg-secondary">Belum Disposisi</span>
-                                @elseif($item->status == 'Diproses')
-                                    <span class="badge bg-warning text-dark">Diproses</span>
-                                @elseif($item->status == 'Sudah Disposisi')
-                                    <span class="badge bg-success">Sudah Disposisi</span>
-                                @elseif($item->status == 'Sudah Dijadikan Agenda')
-                                    <span class="badge bg-primary">Sudah Dijadikan Agenda</span>
-                                @else
-                                    <span class="badge bg-secondary">{{ $item->status }}</span>
-                                @endif
-                            </td>
-                            
-                            {{-- TUJUAN DISPOSISI --}}
-                            <td>
-                                @if($item->userDisposisi)
-                                    <span class="badge bg-secondary">{{ $item->userDisposisi->name }}</span>
-                                @else
-                                    -
-                                @endif
-                            </td>
-                            
-                            {{-- FILE --}}
-                            <td>
-                                @if($item->file_surat)
-                                    <a href="{{ asset('storage/'.$item->file_surat) }}" target="_blank" class="btn btn-info btn-sm text-white" title="Lihat File">
-                                        <i class="bi bi-file-earmark-pdf-fill"></i>
-                                    </a>
-                                @else
-                                    <span class="text-danger small">Belum Ada</span>
-                                @endif
-                            </td>
-                            
-                            {{-- AKSI --}}
-                            <td class="text-center">
-                                <div class="d-flex gap-1 justify-content-center">
-                                    @if(Auth::user()->role == 'admin')
-                                        <button type="button" 
-                                                class="btn btn-info btn-sm text-white btn-preview" 
-                                                data-bs-toggle="modal" 
-                                                data-bs-target="#previewModalSuratMasuk"
-                                                data-kode="{{ $item->kodearsip->kode ?? '-' }}"
-                                                data-nomor="{{ $item->nomor_surat }}"
-                                                data-judul="{{ $item->judul }}"
-                                                data-pengirim="{{ $item->pengirim }}"
-                                                data-tanggal="{{ $item->tanggal_surat ? \Carbon\Carbon::parse($item->tanggal_surat)->format('d M Y') : '-' }}"
-                                                data-status="{{ $item->status }}"
-                                                data-perihal="{{ $item->perihal }}"
-                                                data-file="{{ $item->file_surat ? asset('storage/' . str_replace('public/', '', $item->file_surat)) : '' }}"
-                                                title="Detail & Preview Surat">
-                                            <i class="bi bi-eye"></i>
-                                        </button>
-
-                                        <a href="{{ route('suratmasuk.disposisi', $item->id) }}" class="btn btn-primary btn-sm" title="Kirim Disposisi">
-                                            <i class="bi bi-send-fill"></i>
-                                        </a>
-
-                                        <a href="{{ route('suratmasuk.edit', $item->id) }}" class="btn btn-warning btn-sm text-white" title="Edit Surat">
-                                            <i class="bi bi-pencil-square"></i>
-                                        </a>
-
-                                        <form action="{{ route('suratmasuk.destroy', $item->id) }}" method="POST" style="display:inline;">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus data ini?')" title="Hapus">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </form>
-
-                                    @elseif(Auth::user()->role == 'pegawai')
-                                        <button type="button" 
-                                                class="btn btn-info btn-sm text-white btn-preview" 
-                                                data-bs-toggle="modal" 
-                                                data-bs-target="#previewModalSuratMasuk"
-                                                data-kode="{{ $item->kodearsip->kode ?? '-' }}"
-                                                data-nomor="{{ $item->nomor_surat }}"
-                                                data-judul="{{ $item->judul }}"
-                                                data-pengirim="{{ $item->pengirim }}"
-                                                data-tanggal="{{ $item->tanggal_surat ? \Carbon\Carbon::parse($item->tanggal_surat)->format('d M Y') : '-' }}"
-                                                data-status="{{ $item->status }}"
-                                                data-perihal="{{ $item->perihal }}"
-                                                data-file="{{ $item->file_surat ? asset('storage/' . str_replace('public/', '', $item->file_surat)) : '' }}"
-                                                title="Detail & Preview Surat">
-                                            <i class="bi bi-eye"></i>
-                                        </button>
-
-                                        <a href="{{ route('suratmasuk.edit', $item->id) }}" class="btn btn-warning btn-sm text-white" title="Edit Surat">
-                                            <i class="bi bi-pencil-square"></i>
-                                        </a>
-                                    @endif
-                                </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="10" class="text-center py-5">
-                                <i class="bi bi-inbox fs-1 text-secondary"></i>
-                                <br><br>
-                                <strong>
-                                    {{ request('type') == 'agenda' ? 'Belum ada agenda kegiatan terdaftar.' : 'Belum ada data surat masuk.' }}
-                                </strong>
-                                <br>
-                                <small class="text-muted">
-                                    {{ request('type') == 'agenda' ? 'Jadwal agenda akan muncul setelah surat internal dimasukkan.' : 'Silakan tambahkan surat masuk terlebih dahulu.' }}
-                                </small>
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
     </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>No</th>
+                <th>Kode Arsip</th>
+                <th>Nomor Surat</th>
+                <th>Judul Surat</th>
+                @if(request('type') == 'agenda')
+                    <th>Tempat Booking</th>
+                    <th>Jadwal Kegiatan</th>
+                @else
+                    <th>Asal Surat</th>
+                    <th>Tanggal</th>
+                @endif
+                <th>Status</th>
+                <th>Tujuan Disposisi</th>
+                <th>File</th>
+                <th class="text-center">Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse($suratmasuk as $item)
+                <tr>
+                    <td>{{ $loop->iteration }}</td>
+                    
+                    {{-- KODE ARSIP --}}
+                    <td>
+                        <span class="badge bg-dark">{{ $item->kodearsip->kode ?? '-' }}</span>
+                    </td>
+                    
+                    {{-- NOMOR SURAT --}}
+                    <td>
+                        <small class="fw-bold text-primary">{{ $item->nomor_surat }}</small>
+                    </td>
+                    
+                    {{-- JUDUL --}}
+                    <td>
+                        <strong>{{ $item->judul }}</strong>
+                        <br>
+                        <small class="text-muted">{{ Str::limit($item->perihal, 40) }}</small>
+                    </td>
+                    
+                    {{-- KOLOM CONDITIONAL (SURAT VS AGENDA) --}}
+                    @if(request('type') == 'agenda')
+                        <td>
+                            <span class="badge bg-info text-dark">
+                                <i class="bi bi-geo-alt-fill me-1"></i> {{ $item->tempat ?? '-' }}
+                            </span>
+                        </td>
+                        <td>
+                            <small class="fw-bold d-block text-dark">
+                                <i class="bi bi-calendar-event me-1"></i> {{ $item->tanggal_kegiatan ? \Carbon\Carbon::parse($item->tanggal_kegiatan)->format('d M Y') : '-' }}
+                            </small>
+                            <small class="text-muted d-block">
+                                <i class="bi bi-clock me-1"></i> {{ $item->jam_mulai ? \Carbon\Carbon::parse($item->jam_mulai)->format('H:i') : '' }} - {{ $item->jam_selesai ? \Carbon\Carbon::parse($item->jam_selesai)->format('H:i') : '' }}
+                            </small>
+                        </td>
+                    @else
+                        <td>
+                            <i class="bi bi-building"></i> {{ $item->pengirim }}
+                        </td>
+                        <td>
+                            {{ $item->tanggal_surat ? \Carbon\Carbon::parse($item->tanggal_surat)->format('d M Y') : '-' }}
+                        </td>
+                    @endif
+                    
+                    {{-- STATUS --}}
+                    <td>
+                        @if($item->status == 'Belum Disposisi')
+                            <span class="badge bg-secondary">Belum Disposisi</span>
+                        @elseif($item->status == 'Diproses')
+                            <span class="badge bg-warning text-dark">Diproses</span>
+                        @elseif($item->status == 'Sudah Disposisi')
+                            <span class="badge bg-success">Sudah Disposisi</span>
+                        @elseif($item->status == 'Sudah Dijadikan Agenda')
+                            <span class="badge bg-primary">Sudah Dijadikan Agenda</span>
+                        @else
+                            <span class="badge bg-secondary">{{ $item->status }}</span>
+                        @endif
+                    </td>
+                    
+                    {{-- TUJUAN DISPOSISI --}}
+                    <td>
+                        @if($item->userDisposisi)
+                            <span class="badge bg-secondary">{{ $item->userDisposisi->name }}</span>
+                        @else
+                            -
+                        @endif
+                    </td>
+                    
+                    {{-- FILE --}}
+                    <td>
+                        @if($item->file_surat)
+                            <a href="{{ asset('storage/'.$item->file_surat) }}" target="_blank" class="btn btn-info btn-sm text-white" title="Lihat File">
+                                <i class="bi bi-file-earmark-pdf-fill"></i>
+                            </a>
+                        @else
+                            <span class="text-danger small">Belum Ada</span>
+                        @endif
+                    </td>
+                    
+                    {{-- AKSI --}}
+                    <td class="text-center">
+                        <div class="d-flex gap-1 justify-content-center">
+
+                            @if(userCan('suratmasuk', 'lihat'))
+                                <button type="button" 
+                                        class="btn btn-info btn-sm text-white btn-preview" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#previewModalSuratMasuk"
+                                        data-kode="{{ $item->kodearsip->kode ?? '-' }}"
+                                        data-nomor="{{ $item->nomor_surat }}"
+                                        data-judul="{{ $item->judul }}"
+                                        data-pengirim="{{ $item->pengirim }}"
+                                        data-tanggal="{{ $item->tanggal_surat ? \Carbon\Carbon::parse($item->tanggal_surat)->format('d M Y') : '-' }}"
+                                        data-status="{{ $item->status }}"
+                                        data-perihal="{{ $item->perihal }}"
+                                        data-file="{{ $item->file_surat ? asset('storage/' . str_replace('public/', '', $item->file_surat)) : '' }}"
+                                        title="Detail & Preview Surat">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            @endif
+
+                            @if(userCan('suratmasuk', 'disposisi'))
+                                <a href="{{ route('suratmasuk.disposisi', $item->id) }}" class="btn btn-primary btn-sm" title="Kirim Disposisi">
+                                    <i class="bi bi-send-fill"></i>
+                                </a>
+                            @endif
+
+                            @if(userCan('suratmasuk', 'ubah'))
+                                <a href="{{ route('suratmasuk.edit', $item->id) }}" class="btn btn-warning btn-sm text-white" title="Edit Surat">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                            @endif
+
+                            {{-- HAPUS — sekarang ikut switch "hapus" di Akses Role, bukan hardcode role admin lagi --}}
+                            @if(userCan('suratmasuk', 'hapus'))
+                                <form action="{{ route('suratmasuk.destroy', $item->id) }}"
+                                    method="POST"
+                                    class="d-inline"
+                                    onsubmit="return confirm('Yakin ingin menghapus surat masuk ini? Semua data terkait juga akan dihapus.');">
+
+                                    @csrf
+                                    @method('DELETE')
+
+                                    <button type="submit"
+                                            class="btn btn-danger btn-sm rounded-3"
+                                            title="Hapus Surat">
+                                        <i class="bi bi-trash-fill"></i>
+                                    </button>
+
+                                </form>
+                            @endif
+
+                        </div>
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="10" class="text-center py-5">
+                        <i class="bi bi-inbox fs-1 text-secondary"></i>
+                        <br><br>
+                        <strong>
+                            {{ request('type') == 'agenda' ? 'Belum ada agenda kegiatan terdaftar.' : 'Belum ada data surat masuk.' }}
+                        </strong>
+                        <br>
+                        <small class="text-muted">
+                            {{ request('type') == 'agenda' ? 'Jadwal agenda akan muncul setelah surat internal dimasukkan.' : 'Silakan tambahkan surat masuk terlebih dahulu.' }}
+                        </small>
+                    </td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
+</div>
+</div>
 </div>
 
 <!-- MODAL DETAIL & PREVIEW DOKUMEN -->

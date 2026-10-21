@@ -14,11 +14,48 @@ use App\Models\Arsip;
 use App\Models\KodeArsip;
 use App\Models\Notification;
 use App\Models\User;
-
-use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\Ruangan;
 
 class SuratMasukController extends Controller
 {
+    /*
+    |--------------------------------------------------------------------------
+    | HELPER: REUSABLE LOGIC NOMOR REGISTRASI
+    |--------------------------------------------------------------------------
+    */
+    private function generateNomorRegistrasi($kodeArsipId, $tahun = null, $nomorUrutExist = null)
+    {
+        $kodeArsip = KodeArsip::findOrFail($kodeArsipId);
+        $tahun = $tahun ?? date('Y');
+
+        if (!$nomorUrutExist) {
+            $lastNomorUrut = SuratMasuk::where('kode_arsip_id', $kodeArsipId)
+                ->whereYear('created_at', $tahun)
+                ->max('nomor_urut');
+
+            $nomorUrutInt = $lastNomorUrut ? $lastNomorUrut + 1 : 1;
+        } else {
+            $nomorUrutInt = $nomorUrutExist;
+        }
+
+        $kode = $kodeArsip->kode ?? $kodeArsip->kode_arsip ?? '00.00';
+        $nomorUrut = str_pad($nomorUrutInt, 3, '0', STR_PAD_LEFT);
+        $kodeUnit = $kodeArsip->kode_unit ?? 'Subbag.Umum';
+
+        $arrayRomawi = [
+            1 => 'I', 2 => 'II', 3 => 'III', 4 => 'IV', 5 => 'V', 6 => 'VI',
+            7 => 'VII', 8 => 'VIII', 9 => 'IX', 10 => 'X', 11 => 'XI', 12 => 'XII'
+        ];
+        $bulanRomawi = $arrayRomawi[(int)date('n')];
+
+        $nomorRegistrasi = "No." . $kode . "/" . $nomorUrut . "-" . $kodeUnit . "-Kec.MDLJ/T/" . $bulanRomawi . "/" . $tahun;
+
+        return [
+            'nomor_urut'       => $nomorUrutInt,
+            'nomor_registrasi' => $nomorRegistrasi
+        ];
+    }
+
     /*
     |--------------------------------------------------------------------------
     | DATA SURAT MASUK
@@ -26,7 +63,7 @@ class SuratMasukController extends Controller
     */
     public function index(Request $request)
     {
-        $suratmasuk = SuratMasuk::with('kodearsip');
+        $suratmasuk = SuratMasuk::with(['kodearsip', 'userDisposisi']);
 
         if ($request->filled('tanggal_awal')) {
             $suratmasuk->whereDate('tanggal_surat', '>=', $request->tanggal_awal);
@@ -52,129 +89,130 @@ class SuratMasukController extends Controller
 
         $suratmasuk = $suratmasuk->latest()->get();
         $kodearsip = KodeArsip::all();
+        
+        // AMBIL DATA USER/PEGAWAI DENGAN VARIABEL $users
+        $users = User::orderBy('name')->get(); 
 
-        return view('suratmasuk.index', compact('suratmasuk', 'kodearsip'));
+        return view('suratmasuk.index', compact('suratmasuk', 'kodearsip', 'users'));
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | FORM TAMBAH SURAT
-    |--------------------------------------------------------------------------
-    */
     public function create()
-    {
-        $kodearsip = KodeArsip::all();
-        return view('suratmasuk.create', compact('kodearsip'));
-    }
+{
+    // Ambil data kode arsip dan data ruangan dari database
+    $kodearsip = KodeArsip::all();
+    $daftar_ruangan = Ruangan::all(); 
 
+    // Kirim kedua variabel tersebut ke view suratmasuk.create
+    return view('suratmasuk.create', compact('kodearsip', 'daftar_ruangan'));
+}
     /*
     |--------------------------------------------------------------------------
     | SIMPAN SURAT MASUK
     |--------------------------------------------------------------------------
     */
-    /*
-    |--------------------------------------------------------------------------
-    | SIMPAN SURAT MASUK
-    |--------------------------------------------------------------------------
-    |*/
     public function store(Request $request)
     {
         $request->merge([
             'nomor_surat' => trim($request->nomor_surat)
         ]);
 
-        // Rules Validasi Utama
         $rules = [
-            'kode_arsip_id'    => 'required|exists:kode_arsips,id',
-            'nomor_surat'      => 'required|unique:surat_masuks,nomor_surat',
-            'jenis_surat'      => 'required|in:Internal,Eksternal',
-            'sumber_arsip'     => 'required',
-            'judul'            => 'required|max:255',
-            'pengirim'         => 'required|max:255',
-            'tanggal_surat'    => 'required|date',
-            'perihal'          => 'required',
-            'file_surat'       => 'required|mimes:pdf,jpg,jpeg,png|max:2048',
+            'kode_arsip_id'      => 'required|exists:kode_arsips,id',
+            'nomor_surat'        => 'required|unique:surat_masuks,nomor_surat',
+            'jenis_surat'        => 'required|in:Internal,Eksternal',
+            'judul'              => 'required|max:255',
+            'pengirim'           => 'required|max:255',
+            'tanggal_surat'      => 'required|date',
+            'tanggal_diterima'   => 'nullable|date',
+            'tanggal_kadaluarsa' => 'nullable|date',
+            'perihal'            => 'required',
+            'file_surat'         => 'required|mimes:pdf,jpg,jpeg,png|max:2048',
         ];
 
-        // Validasi bersyarat: Jika Internal, field Agenda/Booking bersifat Wajib (Required)
         if ($request->jenis_surat === 'Internal') {
-            $rules['tempat']           = 'required';
-            $rules['tanggal_kegiatan'] = 'required|date';
-            $rules['jam_mulai']        = 'required';
-            $rules['jam_selesai']      = 'required|after:jam_mulai';
-            $rules['jumlah_peserta']   = 'nullable|integer';
-            $rules['kursi']            = 'nullable|integer';
-            $rules['meja']             = 'nullable|integer';
-            $rules['proyektor']        = 'nullable|integer';
-            $rules['mic']              = 'nullable|integer';
-            $rules['sound_system']     = 'nullable|integer';
-            $rules['kabel_roll']       = 'nullable|integer';
-            $rules['lainnya']          = 'nullable';
+            $rules['tempat']           = 'nullable|string';
+            $rules['tanggal_kegiatan'] = 'required_with:tempat|date';
+            $rules['jam_mulai']        = 'required_with:tempat';
+            $rules['jam_selesai']      = 'required_with:tempat|after:jam_mulai';
+        
+            $rules['jumlah_peserta']   = 'nullable|numeric|min:0';
+            $rules['kursi']            = 'nullable|numeric|min:0';
+            $rules['meja']             = 'nullable|numeric|min:0';
+            $rules['proyektor']        = 'nullable|numeric|min:0';
+            $rules['mic']              = 'nullable|numeric|min:0';
+            $rules['sound_system']     = 'nullable|numeric|min:0';
+            $rules['kabel_roll']       = 'nullable|numeric|min:0';
+            $rules['lainnya']          = 'nullable|string|max:255';
         }
 
-        $validatedData = $request->validate($rules);
+        $request->validate($rules);
 
-        // Menggunakan Database Transaction demi keamanan integritas multi-tabel
+        // =========================================================================
+        // CEK BENTROK JADWAL RUANGAN (BOOKING CHECK)
+        // =========================================================================
+        if ($request->jenis_surat === 'Internal' && $request->filled('tempat') && $request->filled('tanggal_kegiatan')) {
+            $isBentrok = Agenda::where('tempat', $request->tempat)
+                ->whereDate('tanggal', $request->tanggal_kegiatan)
+                ->where(function ($query) use ($request) {
+                    $query->where('jam_mulai', '<', $request->jam_selesai)
+                          ->where('jam_selesai', '>', $request->jam_mulai);
+                })
+                ->exists();
+
+            if ($isBentrok) {
+                return redirect()->back()
+                    ->withInput()
+                    ->withErrors([
+                        'tempat' => '⚠️ RUANGAN SUDAH DIPAKAI! Ruangan "' . $request->tempat . '" sudah terpesan pada tanggal ' . date('d-m-Y', strtotime($request->tanggal_kegiatan)) . ' jam ' . $request->jam_mulai . ' s/d ' . $request->jam_selesai . '. Silakan pilih waktu atau ruangan lain.'
+                    ]);
+            }
+        }
+        // =========================================================================
+
         DB::beginTransaction();
         try {
-            // 1. Generate Nomor Urut dan Nomor Registrasi Otomatis
-            $kode = KodeArsip::findOrFail($request->kode_arsip_id);
-            $tahun = date('Y');
-            $last = SuratMasuk::where('kode_arsip_id', $request->kode_arsip_id)
-                ->whereYear('created_at', $tahun)
-                ->latest()
-                ->first();
-                
-            $nomorUrut = $last ? $last->nomor_urut + 1 : 1;
-            $nomorRegistrasi = "ARSIP/KEC-MND/{$kode->kode}." . str_pad($nomorUrut, 3, '0', STR_PAD_LEFT) . "/{$tahun}";
+            $regData = $this->generateNomorRegistrasi($request->kode_arsip_id);
+            $nomorUrut = $regData['nomor_urut'];
+            $nomorRegistrasi = $regData['nomor_registrasi'];
 
-            // 2. Upload Berkas Surat
             $file = null;
             if ($request->hasFile('file_surat')) {
                 $file = $request->file('file_surat')->store('surat_masuk', 'public');
             }
 
-            // 3. Simpan Entri Utama ke Tabel surat_masuks
             $surat = SuratMasuk::create([
-                'user_id'           => Auth::id(),
-                'kode_arsip_id'     => $request->kode_arsip_id,
-                'nomor_urut'        => $nomorUrut,
-                
-                // HAPUS ATAU KOMENTARI BARIS INI JIKA KOLOMNYA TIDAK ADA DI DB RAILWAY:
-                // 'nomor_registrasi'  => $nomorRegistrasi, 
-                
-                'nomor_surat'       => $request->nomor_surat,
-                'jenis_surat'       => $request->jenis_surat,
-                'sumber_arsip'      => $request->sumber_arsip,
-                'judul'             => $request->judul,
-                'pengirim'          => $request->pengirim,
-                'tanggal_surat'     => $request->tanggal_surat,
-                'perihal'           => $request->perihal,
-                'file_surat'        => $file,
-                'status'            => 'Belum Disposisi',
+                'user_id'            => Auth::id(),
+                'kode_arsip_id'      => $request->kode_arsip_id,
+                'nomor_urut'         => $nomorUrut,
+                'nomor_registrasi'   => $nomorRegistrasi, 
+                'nomor_surat'        => $request->nomor_surat,
+                'no_surat_asal'      => $request->no_surat_asal ?? $request->nomor_surat,
+                'jenis_surat'        => $request->jenis_surat,
+                'judul'              => $request->judul,
+                'pengirim'           => $request->pengirim,
+                'tanggal_surat'      => $request->tanggal_surat,
+                'tanggal_diterima'   => $request->tanggal_diterima ?? date('Y-m-d'),
+                'tanggal_kadaluarsa' => $request->tanggal_kadaluarsa,
+                'perihal'            => $request->perihal,
+                'file_surat'         => $file,
+                'status'             => 'Belum Disposisi',
+                'status_acc'         => 'pending',
             ]);
 
-            // 4. Jika Surat Internal, Simpan Logistik ke Tabel agendas secara otomatis
-            if ($request->jenis_surat === 'Internal') {
+            if ($request->jenis_surat === 'Internal' && $request->filled('tempat')) {
                 Agenda::create([
-
                     'surat_masuk_id' => $surat->id,
                     'user_id'        => Auth::id(),
-                
                     'nama_kegiatan'  => $surat->judul,
-                    'tanggal'        => $request->tanggal_kegiatan,
-                
+                    'tanggal'        => $request->tanggal_kegiatan ?? $surat->tanggal_surat,
                     'penyelenggara'  => $surat->pengirim,
-                    'keterangan'     => $request->perihal,
-                
+                    'keterangan'     => $surat->perihal,
                     'tempat'         => $request->tempat,
                     'status'         => 'Terjadwal',
-                
                     'jam_mulai'      => $request->jam_mulai,
                     'jam_selesai'    => $request->jam_selesai,
-                
-                    'materi'         => $request->materi,
-                
+                    'materi'         => $request->materi ?? $surat->judul,
+                    
                     'jumlah_peserta' => $request->jumlah_peserta ?? 0,
                     'kursi'          => $request->kursi ?? 0,
                     'meja'           => $request->meja ?? 0,
@@ -182,22 +220,19 @@ class SuratMasukController extends Controller
                     'mic'            => $request->mic ?? 0,
                     'sound_system'   => $request->sound_system ?? 0,
                     'kabel_roll'     => $request->kabel_roll ?? 0,
-                    'lainnya'        => $request->lainnya,
-                
+                    'lainnya'        => $request->lainnya ?? null,
                 ]);
             }
 
-            // 5. Integrasikan Arsip Digital secara Otomatis
-            // Tetap menggunakan $nomorRegistrasi yang di-generate di atas untuk mencatat nomor arsipnya
             Arsip::create([
-                'kode_arsip'    => $nomorRegistrasi,
-                'nama_arsip'    => $surat->judul,
-                'tanggal_arsip' => $surat->tanggal_surat,
-                'kategori'      => 'Surat Masuk',
-                'file_arsip'    => $surat->file_surat,
+                'kode_arsip'       => $nomorRegistrasi,
+                'nomor_registrasi' => $nomorRegistrasi,
+                'nama_arsip'       => $surat->judul,
+                'tanggal_arsip'    => $surat->tanggal_surat,
+                'kategori'         => 'Surat Masuk',
+                'file_arsip'       => $surat->file_surat,
             ]);
 
-            // 6. Kirim Notifikasi Sistem ke Admin
             $admins = User::where('role', 'admin')->get();
             foreach ($admins as $admin) {
                 Notification::create([
@@ -211,7 +246,7 @@ class SuratMasukController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('suratmasuk.index')->with('success', 'Surat masuk dan data logistik berhasil disimpan.');
+            return redirect()->route('suratmasuk.index')->with('success', 'Surat masuk berhasil disimpan.');
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -222,14 +257,8 @@ class SuratMasukController extends Controller
         }
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | FORM EDIT SURAT
-    |--------------------------------------------------------------------------
-    */
     public function edit($id)
     {
-        // Memuat relasi agenda untuk mengisi field logistik saat form edit dibuka
         $surat = SuratMasuk::with('agenda')->findOrFail($id);
         $kodearsip = KodeArsip::all();
 
@@ -248,25 +277,59 @@ class SuratMasukController extends Controller
         ]);
 
         $rules = [
-            'kode_arsip_id' => 'required|exists:kode_arsips,id',
-            'nomor_surat'   => 'required|unique:surat_masuks,nomor_surat,' . $id,
-            'jenis_surat'   => 'required|in:Internal,Eksternal',
-            'sumber_arsip'  => 'required',
-            'judul'         => 'required|max:255',
-            'pengirim'      => 'required|max:255',
-            'tanggal_surat' => 'required|date',
-            'perihal'       => 'required',
-            'file_surat'    => 'nullable|mimes:pdf,jpg,jpeg,png|max:2048',
+            'kode_arsip_id'      => 'required|exists:kode_arsips,id',
+            'nomor_surat'        => 'required|unique:surat_masuks,nomor_surat,' . $id,
+            'jenis_surat'        => 'required|in:Internal,Eksternal',
+            'judul'              => 'required|max:255',
+            'pengirim'           => 'required|max:255',
+            'tanggal_surat'      => 'required|date',
+            'tanggal_diterima'   => 'nullable|date',
+            'tanggal_kadaluarsa' => 'nullable|date',
+            'perihal'            => 'required',
+            'file_surat'         => 'nullable|mimes:pdf,jpg,jpeg,png|max:2048',
         ];
 
         if ($request->jenis_surat === 'Internal') {
-            $rules['tempat']           = 'required';
-            $rules['tanggal_kegiatan'] = 'required|date';
-            $rules['jam_mulai']        = 'required';
-            $rules['jam_selesai']      = 'required|after:jam_mulai';
+            $rules['tempat']           = 'nullable|string';
+            $rules['tanggal_kegiatan'] = 'required_with:tempat|date';
+            $rules['jam_mulai']        = 'required_with:tempat';
+            $rules['jam_selesai']      = 'required_with:tempat|after:jam_mulai';
+        
+            $rules['jumlah_peserta']   = 'nullable|numeric|min:0';
+            $rules['kursi']            = 'nullable|numeric|min:0';
+            $rules['meja']             = 'nullable|numeric|min:0';
+            $rules['proyektor']        = 'nullable|numeric|min:0';
+            $rules['mic']              = 'nullable|numeric|min:0';
+            $rules['sound_system']     = 'nullable|numeric|min:0';
+            $rules['kabel_roll']       = 'nullable|numeric|min:0';
+            $rules['lainnya']          = 'nullable|string|max:255';
         }
 
         $request->validate($rules);
+
+        // =========================================================================
+        // CEK BENTROK JADWAL RUANGAN SAAT UPDATE
+        // =========================================================================
+        if ($request->jenis_surat === 'Internal' && $request->filled('tempat') && $request->filled('tanggal_kegiatan')) {
+            $isBentrok = Agenda::where('tempat', $request->tempat)
+                ->whereDate('tanggal', $request->tanggal_kegiatan)
+                ->where('surat_masuk_id', '!=', $id)
+                ->where(function ($query) use ($request) {
+                    $query->where('jam_mulai', '<', $request->jam_selesai)
+                          ->where('jam_selesai', '>', $request->jam_mulai);
+                })
+                ->exists();
+
+            if ($isBentrok) {
+                return redirect()->back()
+                    ->withInput()
+                    ->withErrors([
+                        'tempat' => '⚠️ RUANGAN SUDAH DIPAKAI! Ruangan "' . $request->tempat . '" sudah terpesan pada tanggal ' . date('d-m-Y', strtotime($request->tanggal_kegiatan)) . ' jam ' . $request->jam_mulai . ' s/d ' . $request->jam_selesai . '.'
+                    ]);
+            }
+        }
+        // =========================================================================
+
         $surat = SuratMasuk::findOrFail($id);
         
         DB::beginTransaction();
@@ -274,21 +337,15 @@ class SuratMasukController extends Controller
             $oldNomorRegistrasi = $surat->nomor_registrasi;
             $tahun = date('Y', strtotime($surat->created_at));
 
-            // Jika Kategori Kode Arsip berubah, hitung ulang nomor registrasi baru
             if ($surat->kode_arsip_id != $request->kode_arsip_id) {
-                $kode = KodeArsip::findOrFail($request->kode_arsip_id);
-                $last = SuratMasuk::where('kode_arsip_id', $request->kode_arsip_id)
-                    ->whereYear('created_at', $tahun)
-                    ->latest()
-                    ->first();
-                $nomorUrut = $last ? $last->nomor_urut + 1 : 1;
-                $nomorRegistrasi = "ARSIP/KEC-MND/{$kode->kode}." . str_pad($nomorUrut, 3, '0', STR_PAD_LEFT) . "/{$tahun}";
+                $regData = $this->generateNomorRegistrasi($request->kode_arsip_id, $tahun);
+                $nomorUrut = $regData['nomor_urut'];
+                $nomorRegistrasi = $regData['nomor_registrasi'];
             } else {
                 $nomorUrut = $surat->nomor_urut;
                 $nomorRegistrasi = $surat->nomor_registrasi;
             }
 
-            // Ganti berkas fisik jika ada file baru diunggah
             $file = $surat->file_surat;
             if ($request->hasFile('file_surat')) {
                 if ($surat->file_surat && Storage::disk('public')->exists($surat->file_surat)) {
@@ -297,31 +354,35 @@ class SuratMasukController extends Controller
                 $file = $request->file('file_surat')->store('surat_masuk', 'public');
             }
 
-            // Update Master Surat
             $surat->update([
-                'kode_arsip_id'    => $request->kode_arsip_id,
-                'nomor_urut'       => $nomorUrut,
-                'nomor_registrasi' => $nomorRegistrasi,
-                'nomor_surat'      => $request->nomor_surat,
-                'jenis_surat'      => $request->jenis_surat,
-                'sumber_arsip'     => $request->sumber_arsip,
-                'judul'            => $request->judul,
-                'pengirim'         => $request->pengirim,
-                'tanggal_surat'    => $request->tanggal_surat,
-                'perihal'          => $request->perihal,
-                'file_surat'       => $file,
+                'kode_arsip_id'      => $request->kode_arsip_id,
+                'nomor_urut'         => $nomorUrut,
+                'nomor_registrasi'   => $nomorRegistrasi,
+                'nomor_surat'        => $request->nomor_surat,
+                'no_surat_asal'      => $request->no_surat_asal ?? $request->nomor_surat,
+                'jenis_surat'        => $request->jenis_surat,
+                'judul'              => $request->judul,
+                'pengirim'           => $request->pengirim,
+                'tanggal_surat'      => $request->tanggal_surat,
+                'tanggal_diterima'   => $request->tanggal_diterima,
+                'tanggal_kadaluarsa' => $request->tanggal_kadaluarsa,
+                'perihal'            => $request->perihal,
+                'file_surat'         => $file,
             ]);
 
-            // Sinkronisasi Data Agenda / Logistik Internal Mandalaajati
-            if ($request->jenis_surat === 'Internal') {
+            if ($request->jenis_surat === 'Internal' && $request->filled('tempat')) {
                 Agenda::updateOrCreate(
                     ['surat_masuk_id' => $surat->id],
                     [
+                        'user_id'          => Auth::id(),
+                        'nama_kegiatan'    => $surat->judul,
+                        'penyelenggara'    => $surat->pengirim,
+                        'keterangan'       => $surat->perihal,
                         'tempat'           => $request->tempat,
-                        'tanggal_kegiatan' => $request->tanggal_kegiatan,
+                        'tanggal'          => $request->tanggal_kegiatan ?? $surat->tanggal_surat,
                         'jam_mulai'        => $request->jam_mulai,
                         'jam_selesai'      => $request->jam_selesai,
-                        'materi'           => $request->materi ?? $request->judul,
+                        'materi'           => $request->materi ?? $surat->judul,
                         'jumlah_peserta'   => $request->jumlah_peserta ?? 0,
                         'kursi'            => $request->kursi ?? 0,
                         'meja'             => $request->meja ?? 0,
@@ -329,25 +390,24 @@ class SuratMasukController extends Controller
                         'mic'              => $request->mic ?? 0,
                         'sound_system'     => $request->sound_system ?? 0,
                         'kabel_roll'       => $request->kabel_roll ?? 0,
-                        'lainnya'          => $request->lainnya,
+                        'lainnya'          => $request->lainnya ?? null,
                     ]
                 );
             } else {
-                // Jika jenis diubah ke Eksternal, hapus rekaman logistik terkait
                 Agenda::where('surat_masuk_id', $surat->id)->delete();
             }
 
-            // Update entri data di tabel Arsip Digital
             Arsip::where('kode_arsip', $oldNomorRegistrasi)->update([
-                'kode_arsip'    => $nomorRegistrasi,
-                'nama_arsip'    => $request->judul,
-                'tanggal_arsip' => $request->tanggal_surat,
-                'kategori'      => 'Surat Masuk',
-                'file_arsip'    => $file,
+                'kode_arsip'       => $nomorRegistrasi,
+                'nomor_registrasi' => $nomorRegistrasi,
+                'nama_arsip'       => $request->judul,
+                'tanggal_arsip'    => $request->tanggal_surat,
+                'kategori'         => 'Surat Masuk',
+                'file_arsip'       => $file,
             ]);
 
             DB::commit();
-            return redirect()->route('suratmasuk.index')->with('success', 'Surat masuk dan data arsip berhasil diperbarui.');
+            return redirect()->route('suratmasuk.index')->with('success', 'Surat masuk berhasil diperbarui.');
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -355,52 +415,82 @@ class SuratMasukController extends Controller
         }
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | HAPUS SURAT
-    |--------------------------------------------------------------------------
-    */
     public function destroy($id)
-    {
-        // Batasi hanya untuk admin
-        if (Auth::user()->role !== 'admin') {
-            abort(403, 'Unauthorized action.');
-        }
-
-        $surat = SuratMasuk::findOrFail($id);
-
-        DB::beginTransaction();
-        try {
-            if ($surat->file_surat && Storage::disk('public')->exists($surat->file_surat)) {
-                Storage::disk('public')->delete($surat->file_surat);
-            }
-
-            // Hapus rekam jejak di tabel relasi pendukung
-            Arsip::where('kode_arsip', $surat->nomor_registrasi)->delete();
-            Agenda::where('surat_masuk_id', $surat->id)->delete();
-            Notification::where('reference_id', $surat->id)->where('jenis', 'surat')->delete();
-
-            $surat->delete();
-
-            DB::commit();
-            return redirect()->route('suratmasuk.index')->with('success', 'Seluruh data berkas dan logistik terkait berhasil dihapus.');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()->back()->with('error', 'Gagal menghapus data: ' . $e->getMessage());
-        }
+{
+    // Hanya admin yang boleh menghapus
+    if (strtolower(trim(Auth::user()->role)) !== 'admin') {
+        abort(403, 'Unauthorized action.');
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | VERIFIKASI SURAT
-    |--------------------------------------------------------------------------
-    */
+    $surat = SuratMasuk::findOrFail($id);
+
+    DB::beginTransaction();
+
+    try {
+
+        // Hapus file surat
+        if (
+            $surat->file_surat &&
+            Storage::disk('public')->exists($surat->file_surat)
+        ) {
+            Storage::disk('public')->delete($surat->file_surat);
+        }
+
+        // Hapus arsip yang terkait
+        Arsip::where(
+            'kode_arsip',
+            $surat->nomor_registrasi
+        )->delete();
+
+        // Hapus agenda yang terkait
+        Agenda::where(
+            'surat_masuk_id',
+            $surat->id
+        )->delete();
+
+        // Hapus notifikasi
+        Notification::where(
+            'reference_id',
+            $surat->id
+        )
+        ->where(
+            'jenis',
+            'surat'
+        )
+        ->delete();
+
+        // Hapus surat masuk
+        $surat->delete();
+
+        DB::commit();
+
+        return redirect()
+            ->route('suratmasuk.index')
+            ->with(
+                'success',
+                'Surat masuk dan seluruh data terkait berhasil dihapus.'
+            );
+
+    } catch (\Exception $e) {
+
+        DB::rollBack();
+
+        return redirect()
+            ->back()
+            ->with(
+                'error',
+                'Gagal menghapus data: ' . $e->getMessage()
+            );
+    }
+}
+
     public function verifikasi($id)
     {
         $surat = SuratMasuk::findOrFail($id);
 
         $surat->update([
-            'status' => 'Belum Disposisi'
+            'status'     => 'Belum Disposisi',
+            'status_acc' => 'approved'
         ]);
 
         Notification::create([
@@ -415,11 +505,6 @@ class SuratMasukController extends Controller
         return redirect()->route('suratmasuk.index')->with('success', 'Surat berhasil diverifikasi.');
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | PRINT
-    |--------------------------------------------------------------------------
-    */
     public function print()
     {
         $suratmasuk = SuratMasuk::with([
@@ -431,11 +516,6 @@ class SuratMasukController extends Controller
         return view('suratmasuk.print', compact('suratmasuk'));
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | DETAIL SURAT
-    |--------------------------------------------------------------------------
-    */
     public function show($id)
     {
         $suratmasuk = SuratMasuk::with([
@@ -448,54 +528,48 @@ class SuratMasukController extends Controller
         return view('suratmasuk.show', compact('suratmasuk'));
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | HALAMAN DISPOSISI
-    |--------------------------------------------------------------------------
-    */
-    public function disposisi($id)
+    public function preview($id)
     {
-        // Batasi hanya untuk admin
-        if (Auth::user()->role !== 'admin') {
-            abort(403, 'Unauthorized action.');
+        $surat = SuratMasuk::findOrFail($id);
+
+        if (!$surat->file_surat || !Storage::disk('public')->exists($surat->file_surat)) {
+            return response()->json(['error' => 'File tidak ditemukan.'], 404);
         }
 
+        return response()->json([
+            'file_url' => asset('storage/' . $surat->file_surat),
+            'judul'    => $surat->judul
+        ]);
+    }
+
+    public function disposisi($id)
+    {
         $surat = SuratMasuk::with([
             'kodearsip',
             'user',
             'userDisposisi'
         ])->findOrFail($id);
 
-        $users = User::where('role', 'pegawai')
-                    ->orderBy('name')
-                    ->get();
+        $users = User::orderBy('name')->get();
 
         return view('suratmasuk.disposisi', compact('surat', 'users'));
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | KIRIM DISPOSISI
-    |--------------------------------------------------------------------------
-    */
     public function kirimDisposisi(Request $request, $id)
     {
-        // Batasi hanya untuk admin
-        if (Auth::user()->role !== 'admin') {
-            abort(403, 'Unauthorized action.');
-        }
-
         $request->validate([
-            'user_disposisi_id' => 'required|exists:users,id',
-            'catatan_admin'     => 'required'
+            'user_disposisi_id'   => 'required|exists:users,id',
+            'catatan_admin'       => 'required',
+            'tgl_batas_disposisi' => 'nullable|date'
         ]);
 
         $surat = SuratMasuk::findOrFail($id);
 
         $surat->update([
-            'user_disposisi_id' => $request->user_disposisi_id,
-            'catatan_admin'     => $request->catatan_admin,
-            'status'            => 'Sudah Disposisi'
+            'user_disposisi_id'   => $request->user_disposisi_id,
+            'catatan_admin'       => $request->catatan_admin,
+            'tgl_batas_disposisi' => $request->tgl_batas_disposisi,
+            'status'              => 'Sudah Disposisi'
         ]);
 
         Notification::create([
@@ -510,16 +584,11 @@ class SuratMasukController extends Controller
         return redirect()->route('suratmasuk.index')->with('success', 'Disposisi berhasil dikirim.');
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | KIRIM KE AGENDA
-    |--------------------------------------------------------------------------
-    */
     public function pilihAgenda($id)
     {
         $surat = SuratMasuk::findOrFail($id);
 
-        if ($surat->user_disposisi_id != Auth::id()) {
+        if ($surat->user_disposisi_id != Auth::id() && Auth::user()->role !== 'admin') {
             abort(403);
         }
 
@@ -531,25 +600,77 @@ class SuratMasukController extends Controller
                          ->with('success', 'Silakan lengkapi data Agenda.');
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | AJAX NOMOR REGISTRASI
-    |--------------------------------------------------------------------------
-    */
     public function getNomorRegistrasi($id)
     {
-        $kode = KodeArsip::findOrFail($id);
+        try {
+            $regData = $this->generateNomorRegistrasi($id);
+
+            return response()->json([
+                'nomor_registrasi' => $regData['nomor_registrasi']
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function getLastNomor(Request $request)
+    {
+        $kasi = $request->get('kasi');
         $tahun = date('Y');
-        $last = SuratMasuk::where('kode_arsip_id', $id)
+
+        $lastSurat = SuratMasuk::where('jenis_surat', 'Internal')
+            ->where('pengirim', 'LIKE', "%{$kasi}%")
             ->whereYear('created_at', $tahun)
             ->latest()
             ->first();
+
+        if ($lastSurat) {
+            $lastNomorFull = $lastSurat->nomor_surat;
             
-        $nomor = $last ? $last->nomor_urut + 1 : 1;
-        $nomorLengkap = "ARSIP/KEC-MND/{$kode->kode}." . str_pad($nomor, 3, '0', STR_PAD_LEFT) . "/{$tahun}";
+            $parts = explode('/', $lastNomorFull);
+            $lastNumberInt = isset($parts[0]) ? (int) $parts[0] : 0;
+            
+            $nextNumberInt = $lastNumberInt + 1;
+            $nextNumberPadded = str_pad($nextNumberInt, 3, '0', STR_PAD_LEFT);
+        } else {
+            $lastNomorFull = 'Belum ada surat';
+            $nextNumberPadded = '001';
+        }
 
         return response()->json([
-            'nomor_registrasi' => $nomorLengkap
+            'last_full_nomor' => $lastNomorFull,
+            'next_number'     => $nextNumberPadded
         ]);
     }
+
+    public function storeRuanganAjax(Request $request)
+{
+    try {
+        $request->validate([
+            'nama_ruangan' => 'required|string|max:255',
+            'status'       => 'required|in:tersedia,renovasi',
+        ]);
+
+        // Gunakan updateOrCreate: Cari berdasarkan nama_ruangan, update/buat statusnya
+        $ruangan = Ruangan::updateOrCreate(
+            ['nama_ruangan' => $request->nama_ruangan], // Kunci pencarian
+            ['status'       => $request->status]        // Data yang diupdate/diisi
+        );
+
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'Status ruangan berhasil diperbarui!',
+            'data'    => $ruangan
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status'  => 'error',
+            'message' => $e->getMessage()
+        ], 500);
+    }
+}
+
 }

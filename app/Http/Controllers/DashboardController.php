@@ -10,15 +10,17 @@ use App\Models\SuratMasuk;
 use App\Models\SuratKeluar;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        // Statistik
-        $totalSuratMasuk = SuratMasuk::count();
+        $user = Auth::user();
+
+        // Statistik (Total Arsip dihapus)
+        $totalSuratMasuk  = SuratMasuk::count();
         $totalSuratKeluar = SuratKeluar::count();
-        $totalArsip       = Arsip::count();
         $totalAgenda      = Agenda::count();
         $totalUser        = User::count();
         $totalPejabat     = Pejabat::count();
@@ -52,7 +54,7 @@ class DashboardController extends Controller
                         'icon'=>'bi-envelope-fill',
                         'warna'=>'success',
                         'judul'=>'Surat Masuk',
-                        'isi'=>$item->judul,
+                        'isi'=>$item->judul ?? $item->perihal ?? '-',
                         'waktu'=>$item->created_at
                     ];
                 })
@@ -64,7 +66,7 @@ class DashboardController extends Controller
                         'icon'=>'bi-send-fill',
                         'warna'=>'primary',
                         'judul'=>'Surat Keluar',
-                        'isi'=>$item->judul,
+                        'isi'=>$item->judul ?? $item->perihal ?? '-',
                         'waktu'=>$item->created_at
                     ];
                 })
@@ -97,63 +99,53 @@ class DashboardController extends Controller
             ->sortByDesc('waktu')
             ->take(6);
     
-            $hour = now()->hour;
+        $hour = now()->hour;
 
-            if ($hour >= 5 && $hour < 11) {
+        if ($hour >= 5 && $hour < 11) {
+            $greeting = "☀️ Selamat Pagi";
+        } elseif ($hour >= 11 && $hour < 15) {
+            $greeting = "🌤 Selamat Siang";
+        } elseif ($hour >= 15 && $hour < 18) {
+            $greeting = "🌥 Selamat Sore";
+        } else {
+            $greeting = "🌙 Selamat Malam";
+        }
 
-                $greeting = "☀️ Selamat Pagi";
+        // Agenda terbaru
+        $agendaTerbaru = Agenda::latest()
+            ->take(5)
+            ->get();
 
-            } elseif ($hour >= 11 && $hour < 15) {
+        $belumVerifikasi = SuratMasuk::where(
+            'status',
+            'Belum Disposisi'
+        )->count();
 
-                $greeting = "🌤 Selamat Siang";
+        // Surat Keluar Pending / Belum di-ACC (Khusus Pegawai yang login)
+        $suratKeluarPending = SuratKeluar::where('user_id', $user->id)
+            ->where('status', 'pending')
+            ->get();
 
-            } elseif ($hour >= 15 && $hour < 18) {
+        // Pengingat Agenda Selesai tapi Belum Ada Laporan/Notulen (Pastikan tabel agendas sudah memiliki kolom notulen atau ganti kolomnya)
+        $agendaBelumLaporan = Agenda::where('status', 'Selesai')
+            ->where(function($q) {
+                $q->whereNull('notulen')->orWhere('notulen', '');
+            })
+            ->get();
 
-                $greeting = "🌥 Selamat Sore";
-
-            } else {
-
-                $greeting = "🌙 Selamat Malam";
-
-            }
-
-            // Agenda terbaru
-$agendaTerbaru = Agenda::latest()
-->take(5)
-->get();
-
-$agendaTerbaru = Agenda::latest()
-    ->take(5)
-    ->get();
-
-$belumVerifikasi = SuratMasuk::where(
-    'status',
-    'Belum Disposisi'
-)->count();
-
-$suratKeluarPending = 0;
-
-$agendaBelumLaporan = Agenda::where(
-    'status',
-    'Selesai'
-)->count();
-
-            {
-                return view('dashboard', compact(
-                    'totalSuratMasuk',
-                    'totalSuratKeluar',
-                    'totalArsip',
-                    'totalAgenda',
-                    'totalUser',
-                    'totalPejabat',
-                    'aktivitas',
-                    'agendaBesok',
-                    'agendaTerbaru',
-                    'belumVerifikasi',
-                    'suratKeluarPending',
-                    'agendaBelumLaporan',
-                    'greeting'
-                ));
-            }
+        return view('dashboard', compact(
+            'totalSuratMasuk',
+            'totalSuratKeluar',
+            'totalAgenda',
+            'totalUser',
+            'totalPejabat',
+            'aktivitas',
+            'agendaBesok',
+            'agendaTerbaru',
+            'belumVerifikasi',
+            'suratKeluarPending',
+            'agendaBelumLaporan',
+            'greeting'
+        ));
     }
 }

@@ -586,19 +586,15 @@ height:auto;
 
 <div class="dashboard-wrapper">
 
+    <!-- RUNNING TEXT / BANNER -->
     <div class="running-box">
-
         <div class="d-flex align-items-center">
-    
             <div class="icon">
                 <i class="bi bi-megaphone-fill"></i>
             </div>
-    
             <div class="running-text">
-    
                 <span>
-    
-                    📢 Selamat Datang di Sistem Informasi E-Arsip Kecamatan Mandalajati •
+                    📢 {{ $greeting ?? 'Selamat Datang' }} di Sistem Informasi E-Arsip Kecamatan Mandalajati •
                     📥 Silakan cek Surat Masuk secara berkala •
                     📤 Pastikan Surat Keluar telah diverifikasi •
                     📂 Arsip digital disimpan dengan aman •
@@ -607,356 +603,256 @@ height:auto;
                     📊 Gunakan menu Laporan untuk melihat rekapitulasi data •
                     🔒 Jaga keamanan akun Anda dan jangan membagikan password kepada siapa pun •
                     🌟 Terima kasih telah menggunakan Sistem Informasi E-Arsip.
-    
                 </span>
-    
             </div>
-    
         </div>
-    
     </div>
     
     @yield('content')
 
+    <!-- STATS CARDS (Data Arsip card removed) -->
     <div class="row g-4">
 
         <!-- Surat Masuk -->
         <div class="col-lg-4 col-md-6">
-    
             <div class="stat-card">
-    
                 <div class="stat-icon bg-primary-soft">
                     <i class="bi bi-envelope-fill"></i>
                 </div>
-    
                 <div class="stat-title">
                     Surat Masuk
                 </div>
-    
-                <div class="stat-number counter"
-                data-target="{{ $totalSuratMasuk }}">
-               0
-           </div>
+                <div class="stat-number counter" data-target="{{ $totalSuratMasuk }}">
+                   0
+               </div>
                 <div class="stat-footer">
                     Total Surat Masuk
                 </div>
-    
             </div>
-    
         </div>
-    
+
         <!-- Surat Keluar -->
         <div class="col-lg-4 col-md-6">
-    
             <div class="stat-card">
-    
                 <div class="stat-icon bg-success-soft">
                     <i class="bi bi-send-fill"></i>
                 </div>
-    
                 <div class="stat-title">
                     Surat Keluar
                 </div>
-    
-                <div class="stat-number counter"
-                     data-target="{{ $totalSuratKeluar }}">
+                <div class="stat-number counter" data-target="{{ $totalSuratKeluar }}">
                     0
                 </div>
-    
                 <div class="stat-footer">
                     Total Surat Keluar
                 </div>
-    
             </div>
-    
         </div>
-    
-        <!-- Arsip -->
-        <div class="col-lg-4 col-md-6">
-    
-            <div class="stat-card">
-    
-                <div class="stat-icon bg-info-soft">
-                    <i class="bi bi-folder-fill"></i>
-                </div>
-    
-                <div class="stat-title">
-                    Data Arsip
-                </div>
-    
-                <div class="stat-number counter"
-                     data-target="{{ $totalArsip }}">
-                    0
-                </div>
-    
-                <div class="stat-footer">
-                    Total Arsip Digital
-                </div>
-    
-            </div>
-    
-        </div>
-    
+
         <!-- Agenda -->
         <div class="col-lg-4 col-md-6">
-    
             <div class="stat-card">
-    
                 <div class="stat-icon bg-warning-soft">
                     <i class="bi bi-calendar-event-fill"></i>
                 </div>
-    
                 <div class="stat-title">
                     Agenda
                 </div>
-    
-                <div class="stat-number counter"
-                     data-target="{{ $totalAgenda }}">
+                <div class="stat-number counter" data-target="{{ $totalAgenda }}">
                     0
                 </div>
-    
                 <div class="stat-footer">
                     Agenda Kegiatan
                 </div>
-    
             </div>
-    
         </div>
-    
-        @if(Auth::user()->role_id==1)
-    
+
+        @if(Auth::user()->role_id == 1)
         <!-- User -->
         <div class="col-lg-4 col-md-6">
-    
             <div class="stat-card">
-    
                 <div class="stat-icon bg-danger-soft">
                     <i class="bi bi-people-fill"></i>
                 </div>
-    
                 <div class="stat-title">
                     Data User
                 </div>
-    
-                <div class="stat-number counter"
-                     data-target="{{ $totalUser }}">
+                <div class="stat-number counter" data-target="{{ $totalUser }}">
                     0
                 </div>
-    
                 <div class="stat-footer">
                     Total Pengguna
                 </div>
-    
             </div>
-    
         </div>
-    
+
         <!-- Pejabat -->
         <div class="col-lg-4 col-md-6">
-    
             <div class="stat-card">
-    
                 <div class="stat-icon bg-dark-soft">
                     <i class="bi bi-person-badge-fill"></i>
                 </div>
-    
                 <div class="stat-title">
                     Data Pejabat
                 </div>
-    
-                <div class="stat-number counter"
-                     data-target="{{ $totalPejabat }}">
+                <div class="stat-number counter" data-target="{{ $totalPejabat }}">
                     0
                 </div>
-    
                 <div class="stat-footer">
                     Data Pejabat Kecamatan
                 </div>
-    
             </div>
-    
         </div>
-    
         @endif
-    
+
     </div>
     
     <br>
 
+    <!-- AGENDA & PENGINGAT SECTION -->
     <div class="row">
 
+        <!-- Agenda Terbaru -->
         <div class="col-lg-7 mb-4">
-        
-        <div class="card border-0 shadow-sm rounded-4">
-        
-        <div class="card-header bg-white">
-        
-        <h5 class="fw-bold mb-0">
-        
-        <i class="bi bi-calendar-event me-2 text-primary"></i>
-        
-        Agenda Terbaru
-        
-        </h5>
-        
-        </div>
-        
-        <div class="card-body">
-        
-        <table class="table align-middle">
-        
-        <thead>
-        
-        <tr>
-        
-        <th>Kegiatan</th>
-        
-        <th>Tanggal</th>
-        
-        <th>Status</th>
-        
-        </tr>
-        
-        </thead>
-        
-        <tbody>
-        
-        @forelse($agendaTerbaru as $agenda)
-        
-        <tr>
-        
-        <td>{{ $agenda->nama_kegiatan }}</td>
-        
-        <td>{{ \Carbon\Carbon::parse($agenda->tanggal)->format('d M Y') }}</td>
-        
-        <td>
-        
-        <span class="badge bg-success">
-        
-        {{ $agenda->status }}
-        
-        </span>
-        
-        </td>
-        
-        </tr>
-        
-        @empty
-        
-        <tr>
-        
-        <td colspan="3" class="text-center text-muted">
-        
-        Belum ada agenda.
-        
-        </td>
-        
-        </tr>
-        
-        @endforelse
-        
-        </tbody>
-        
-        </table>
-        
-        </div>
-        
-        </div>
-        
-        </div>
-
-        <div class="col-lg-5">
-
             <div class="card border-0 shadow-sm rounded-4">
-            
-            <div class="card-header bg-white">
-            
-            <h5 class="fw-bold mb-0">
-            
-            🔔 Pengingat
-            
-            </h5>
-            
+                <div class="card-header bg-white">
+                    <h5 class="fw-bold mb-0">
+                        <i class="bi bi-calendar-event me-2 text-primary"></i>
+                        Agenda Terbaru
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Kegiatan</th>
+                                    <th>Tanggal</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($agendaTerbaru as $agenda)
+                                <tr>
+                                    <td>{{ $agenda->nama_kegiatan }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($agenda->tanggal)->format('d M Y') }}</td>
+                                    <td>
+                                        <span class="badge bg-success">
+                                            {{ $agenda->status }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted">
+                                        Belum ada agenda.
+                                    </td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
-            
-            <div class="card-body">
-            
-            <div class="alert alert-warning">
-            
-            Surat Masuk belum diverifikasi
-            
-            <strong>{{ $belumVerifikasi }}</strong>
-            
-            </div>
-            
-            <div class="alert alert-info">
-            
-            Surat Keluar menunggu ACC
-            
-            <strong>{{ $suratKeluarPending }}</strong>
-            
-            </div>
-            
-            <div class="alert alert-danger">
-            
-            Agenda belum dibuat laporan
-            
-            <strong>{{ $agendaBelumLaporan }}</strong>
-            
-            </div>
-            
-            </div>
-            
-            </div>
-            
-            </div>
-            
-            </div>
+        </div>
 
-    {{-- Aktivitas --}}
+        <!-- Pengingat -->
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-white">
+                    <h5 class="fw-bold mb-0">
+                        🔔 Pengingat
+                    </h5>
+                </div>
+                <div class="card-body">
+                    
+                    <!-- Surat Masuk Belum Diverifikasi -->
+                    <div class="alert alert-warning mb-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>Surat Masuk belum diverifikasi</span>
+                            <span class="badge bg-warning text-dark fs-6">{{ $belumVerifikasi }}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Surat Keluar Menunggu ACC -->
+                    <div class="alert alert-info mb-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>Surat Keluar menunggu ACC</span>
+                            <span class="badge bg-info text-dark fs-6">{{ $suratKeluarPending->count() }}</span>
+                        </div>
+                        @if($suratKeluarPending->count() > 0)
+                            <ul class="mt-2 mb-0 ps-3 small text-dark">
+                                @foreach($suratKeluarPending as $sk)
+                                    <li>{{ $sk->perihal ?? $sk->nomor_surat }}</li>
+                                @endforeach
+                            </ul>
+                        @endif
+                    </div>
+                    
+                    <!-- Agenda Belum Dibuat Laporan / Notulen -->
+                    <div class="alert alert-danger mb-0">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>Agenda belum dibuat laporan</span>
+                            <span class="badge bg-danger fs-6">{{ $agendaBelumLaporan->count() }}</span>
+                        </div>
+                        @if($agendaBelumLaporan->count() > 0)
+                            <ul class="mt-2 mb-0 ps-3 small text-dark">
+                                @foreach($agendaBelumLaporan as $ag)
+                                    <li>{{ $ag->nama_kegiatan }}</li>
+                                @endforeach
+                            </ul>
+                        @endif
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+    <!-- AKTIVITAS & NOTIFIKASI -->
     <div class="row">
 
-        <div class="col-lg-6">
-        
-        <div class="card border-0 shadow-sm rounded-4">
-        
-        <div class="card-header bg-white">
-        
-        Aktivitas Terbaru
-        
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-header bg-white fw-bold">
+                    <i class="bi bi-activity me-1 text-primary"></i> Aktivitas Terbaru
+                </div>
+                <div class="card-body">
+                    @if(isset($aktivitas) && $aktivitas->count() > 0)
+                        <div class="list-group list-group-flush">
+                            @foreach($aktivitas as $akt)
+                                <div class="list-group-item px-0 d-flex align-items-center">
+                                    <div class="icon-circle bg-{{ $akt['warna'] }}-soft text-{{ $akt['warna'] }} me-3 p-2 rounded-circle">
+                                        <i class="bi {{ $akt['icon'] }}"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0 fw-bold">{{ $akt['judul'] }}</h6>
+                                        <small class="text-muted">{{ $akt['isi'] }} • {{ \Carbon\Carbon::parse($akt['waktu'])->diffForHumans() }}</small>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <p class="text-muted mb-0">Belum ada aktivitas.</p>
+                    @endif
+                </div>
+            </div>
         </div>
         
-        <div class="card-body">
-        
-        Belum ada aktivitas.
-        
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-header bg-white fw-bold">
+                    <i class="bi bi-bell me-1 text-warning"></i> Notifikasi Sistem
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-0">Semua sistem berjalan normal. Tidak ada kendala eror pada modul arsip maupun surat.</p>
+                </div>
+            </div>
         </div>
         
-        </div>
-        
-        </div>
-        
-        <div class="col-lg-6">
-        
-        <div class="card border-0 shadow-sm rounded-4">
-        
-        <div class="card-header bg-white">
-        
-        Notifikasi Sistem
-        
-        </div>
-        
-        <div class="card-body">
-        
-        Belum ada notifikasi.
-        
-        </div>
-        
-        </div>
-        
-        </div>
-        
-        </div>
+    </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
@@ -1010,7 +906,6 @@ if (canvas && typeof Chart !== "undefined") {
                 data: [
                     {{ $totalSuratMasuk }},
                     {{ $totalSuratKeluar }},
-                    {{ $totalArsip }},
                     {{ $totalAgenda }}
                 ],
                 backgroundColor:[

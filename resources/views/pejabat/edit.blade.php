@@ -1,147 +1,69 @@
 @extends('layouts.app')
 
+@section('page-icon')
+<i class="bi bi-pencil-square"></i>
+@endsection
+
+@section('page-title')
+Edit Data Pejabat
+@endsection
+
+@section('page-description')
+Kelola dan perbarui data pejabat Kecamatan Mandalajati.
+@endsection
+
 @section('content')
 
-<link rel="stylesheet"
-href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
-<!-- HEADER -->
-<div class="card border-0 shadow-sm mb-4"
-style="background:linear-gradient(135deg,#667eea,#4f46e5); border-radius:20px;">
-
-    <div class="card-body text-white">
-
-        <h2 class="fw-bold">
-
-            <i class="bi bi-person-plus-fill"></i>
-
-            Edit Data Pejabat
-
-        </h2>
-
-    </div>
-
-</div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
 <!-- FORM -->
 <div class="card border-0 shadow-sm">
-
-    <div class="card-body">
-
-        <form action="{{ route('pejabat.store') }}"
-              method="POST">
-
+    <div class="card-body p-4">
+        <form action="{{ route('pejabat.update', $pejabat->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
+            @method('PUT')
 
-            <div class="row">
-
-                <div class="col-md-6 mb-3">
-
-                    <label class="form-label fw-bold">
-
-                        Nama Pejabat
-
-                    </label>
-
-                    <input
-                        type="text"
-                        name="nama"
-                        class="form-control"
-                        value="{{ old('nama') }}"
-                        required>
-
-                </div>
-
-                <div class="col-md-6 mb-3">
-
-                    <label class="form-label fw-bold">
-
-                        NIP
-
-                    </label>
-
-                    <input
-                        type="text"
-                        name="nip"
-                        class="form-control"
-                        value="{{ old('nip') }}"
-                        required>
-
-                </div>
-
-                <div class="mb-3">
-
-                    <label class="form-label fw-semibold">
-                        Jabatan
-                    </label>
-                
-                    <select name="jabatan"
-                            class="form-select"
-                            required>
-                
-                        <option value="">
-                            -- Pilih Jabatan --
-                        </option>
-                
-                        <option value="Camat"
-                            {{ $pejabat->jabatan=='Camat' ? 'selected' : '' }}>
-                            Camat
-                            </option>
-                
-                        <option value="Kasubag Umum"
-                            {{ $pejabat->jabatan=='Kasubag Umum' ? 'selected' : '' }}>
-                            Kasubag Umum
-                        </option>
-                
-                    </select>
-                
-                </div>
-
-                <div class="col-md-6 mb-3">
-
-                    <label class="form-label fw-bold">
-                
-                        Upload Tanda Tangan
-                
-                    </label>
-                
-                    <input
-                        type="file"
-                        name="tanda_tangan"
-                        class="form-control">
-                
-                </div>
+            <div class="mb-3">
+                <label for="nama_pejabat" class="form-label">Nama Pejabat</label>
+                <input type="text" class="form-control" id="nama_pejabat" name="nama_pejabat" 
+                 value="{{ old('nama_pejabat', $pejabat->nama_pejabat ?? optional($pejabat->user)->name) }}" required>
             </div>
-            
+        
+            <div class="mb-3">
+                <label for="nip" class="form-label">NIP</label>
+                <input type="text" class="form-control" id="nip" name="nip" value="{{ old('nip', $pejabat->nip) }}" required>
             </div>
 
-            <div class="mt-4">
+            <div class="mb-3">
+                <label for="jabatan" class="form-label">Jabatan</label>
+                <input type="text" class="form-control" id="jabatan" name="jabatan" value="{{ old('jabatan', $pejabat->jabatan) }}" required>
+            </div>
 
-                <button
-                    type="submit"
-                    class="btn btn-primary">
+                <!-- Upload Tanda Tangan Baru -->
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Upload Tanda Tangan Baru</label>
+                    <input type="file" name="tanda_tangan" class="form-control" accept="image/png, image/jpeg">
+                    <small class="text-muted">Biarkan kosong jika tidak ingin mengubah tanda tangan.</small>
+                </div>
 
-                    <i class="bi bi-save"></i>
+            @if($pejabat->tanda_tangan)
+            <div class="mb-3">
+                <label class="form-label fw-bold d-block">Tanda Tangan Saat Ini:</label>
+                <img src="{{ asset('storage/'.$pejabat->tanda_tangan) }}" width="150" class="rounded border shadow-sm p-1 bg-light">
+            </div>
+            @endif
 
-                    Simpan
-
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary px-4">
+                    <i class="bi bi-save me-1"></i> Perbarui Data
                 </button>
-
-                <a href="{{ route('pejabat.index') }}"
-                   class="btn btn-secondary">
-
-                    <i class="bi bi-arrow-left"></i>
-
-                    Kembali
-
+                <a href="{{ route('pejabat.index') }}" class="btn btn-secondary px-4">
+                    <i class="bi bi-arrow-left me-1"></i> Kembali
                 </a>
-
             </div>
 
         </form>
-
     </div>
-
 </div>
 
 @endsection

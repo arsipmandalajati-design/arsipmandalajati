@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         // 1. Tabel Surat Masuk
-        Schema::create('surat_masuks', function (Blueprint $table) {
+        Schema::create('surat_masuk', function (Blueprint $table) {
             $table->id();
             // Relasi ke User penginput & Kode Arsip
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
@@ -36,6 +36,21 @@ return new class extends Migration
             $table->string('status')->default('Belum Disposisi');
             $table->foreignId('user_disposisi_id')->nullable()->constrained('users')->onDelete('set null');
             $table->text('catatan_admin')->nullable();
+
+            // Kolom Opsional Booking / Logistik Internal (Disamakan dengan Fillable Model)
+            $table->string('tempat')->nullable();
+            $table->date('tanggal_kegiatan')->nullable();
+            $table->time('jam_mulai')->nullable();
+            $table->time('jam_selesai')->nullable();
+            $table->string('materi')->nullable();
+            $table->integer('jumlah_peserta')->default(0);
+            $table->integer('kursi')->default(0);
+            $table->integer('meja')->default(0);
+            $table->integer('proyektor')->default(0);
+            $table->integer('mic')->default(0);
+            $table->integer('sound_system')->default(0);
+            $table->integer('kabel_roll')->default(0);
+            $table->string('lainnya')->nullable();
             
             $table->timestamps();
         });
@@ -44,7 +59,7 @@ return new class extends Migration
         Schema::create('agendas', function (Blueprint $table) {
             $table->id();
             // Relasi Cascading: Jika data surat dihapus, agenda otomatis terhapus
-            $table->foreignId('surat_masuk_id')->constrained('surat_masuks')->onDelete('cascade');
+            $table->foreignId('surat_masuk_id')->constrained('surat_masuk')->onDelete('cascade');
             $table->string('tempat');
             $table->date('tanggal_kegiatan');
             $table->time('jam_mulai');
@@ -68,6 +83,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('agendas');
-        Schema::dropIfExists('surat_masuks');
+        Schema::dropIfExists('surat_masuk');
     }
 };

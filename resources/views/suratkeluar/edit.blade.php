@@ -122,7 +122,7 @@ Perbarui data surat keluar Kecamatan Mandalajati.
 
 <div class="card form-card">
     <div class="card-body p-4">
-        <form action="{{ route('suratkeluar.update', $surat->id) }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('suratkeluar.update', $suratKeluar->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
@@ -137,7 +137,7 @@ Perbarui data surat keluar Kecamatan Mandalajati.
                     <select name="kode_arsip_id" id="kode_arsip" class="form-select @error('kode_arsip_id') is-invalid @enderror" required>
                         @foreach($kodearsip as $item)
                             <option value="{{ $item->id }}" data-kode="{{ $item->kode }}"
-                                {{ old('kode_arsip_id', $surat->kode_arsip_id) == $item->id ? 'selected' : '' }}>
+                                {{ old('kode_arsip_id', $suratKeluar->kode_arsip_id) == $item->id ? 'selected' : '' }}>
                                 {{ $item->kode }} - {{ $item->nama_arsip }}
                             </option>
                         @endforeach
@@ -152,7 +152,7 @@ Perbarui data surat keluar Kecamatan Mandalajati.
                     <label class="form-label fw-semibold">Nomor Registrasi / Manual</label>
                     <input type="text" id="nomor_manual" name="nomor_manual" class="form-control" 
                            placeholder="Contoh : 035-Pel.DN" 
-                           value="{{ old('nomor_manual', $surat->nomor_manual ?? '') }}">
+                           value="{{ old('nomor_manual', $suratKeluar->nomor_manual ?? '') }}">
                     <small class="text-muted">Isi jika ingin memicu pembuatan nomor surat baru secara otomatis.</small>
                 </div>
             </div>
@@ -172,7 +172,7 @@ Perbarui data surat keluar Kecamatan Mandalajati.
 
                     <input type="text" id="nomor_surat" name="nomor_surat" 
                            class="form-control bg-readonly" 
-                           value="{{ old('nomor_surat', $surat->nomor_surat) }}" readonly>
+                           value="{{ old('nomor_surat', $suratKeluar->nomor_surat) }}" readonly>
 
                     <small class="text-muted">Nomor surat otomatis diperbarui jika kode arsip & nomor manual diubah.</small>
                 </div>
@@ -184,23 +184,9 @@ Perbarui data surat keluar Kecamatan Mandalajati.
                     </label>
 
                     <input type="text" name="judul" class="form-control @error('judul') is-invalid @enderror"
-                           value="{{ old('judul', $surat->judul) }}" required>
+                           value="{{ old('judul', $suratKeluar->judul) }}" required>
 
                     @error('judul')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <!-- PENGIRIM -->
-                <div class="col-md-6 mb-4">
-                    <label class="form-label fw-semibold">
-                        <i class="bi bi-person-fill me-1 text-success"></i> Pengirim <span class="required">*</span>
-                    </label>
-
-                    <input type="text" name="pengirim" class="form-control @error('pengirim') is-invalid @enderror"
-                           value="{{ old('pengirim', $surat->pengirim) }}" required>
-
-                    @error('pengirim')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
@@ -212,7 +198,7 @@ Perbarui data surat keluar Kecamatan Mandalajati.
                     </label>
 
                     <input type="text" name="tujuan" class="form-control @error('tujuan') is-invalid @enderror"
-                           value="{{ old('tujuan', $surat->tujuan) }}" required>
+                           value="{{ old('tujuan', $suratKeluar->tujuan) }}" required>
 
                     @error('tujuan')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -226,7 +212,7 @@ Perbarui data surat keluar Kecamatan Mandalajati.
                     </label>
 
                     <input type="date" name="tanggal_surat" class="form-control @error('tanggal_surat') is-invalid @enderror"
-                           value="{{ old('tanggal_surat', $surat->tanggal_surat) }}" required>
+                           value="{{ old('tanggal_surat', $suratKeluar->tanggal_surat) }}" required>
 
                     @error('tanggal_surat')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -239,7 +225,7 @@ Perbarui data surat keluar Kecamatan Mandalajati.
                         <i class="bi bi-chat-left-text-fill me-1 text-success"></i> Perihal <span class="required">*</span>
                     </label>
 
-                    <textarea name="perihal" rows="4" class="form-control @error('perihal') is-invalid @enderror" required>{{ old('perihal', $surat->perihal) }}</textarea>
+                    <textarea name="perihal" rows="4" class="form-control @error('perihal') is-invalid @enderror" required>{{ old('perihal', $suratKeluar->perihal) }}</textarea>
 
                     @error('perihal')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -253,7 +239,7 @@ Perbarui data surat keluar Kecamatan Mandalajati.
                     </label>
 
                     <div class="preview-file">
-                        @if($surat->file_surat)
+                        @if($suratKeluar->file_surat)
                             <div class="d-flex justify-content-between align-items-center flex-wrap">
                                 <div>
                                     <i class="bi bi-file-earmark-pdf-fill text-danger fs-4 me-2"></i>
@@ -261,7 +247,7 @@ Perbarui data surat keluar Kecamatan Mandalajati.
                                     <br>
                                     <small class="text-muted">Klik tombol di samping untuk membuka dokumen.</small>
                                 </div>
-                                <a href="{{ asset('storage/' . $surat->file_surat) }}" target="_blank" class="btn btn-danger rounded-pill mt-3 mt-md-0">
+                                <a href="{{ asset('storage/' . $suratKeluar->file_surat) }}" target="_blank" class="btn btn-danger rounded-pill mt-3 mt-md-0">
                                     <i class="bi bi-eye-fill me-2"></i> Lihat PDF
                                 </a>
                             </div>
@@ -280,7 +266,7 @@ Perbarui data surat keluar Kecamatan Mandalajati.
                     </label>
 
                     <input type="file" id="file_surat" name="file_surat" class="form-control @error('file_surat') is-invalid @enderror" accept=".pdf">
-                    <small class="text-muted">Kosongkan apabila tidak ingin mengganti file lama (Maksimal PDF 2MB).</small>
+                    <small class="text-muted">Kosongkan apabila tidak ingin mengganti file lama (Maksimal PDF 5MB).</small>
 
                     @error('file_surat')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -323,7 +309,7 @@ Perbarui data surat keluar Kecamatan Mandalajati.
         const inputNomorManual = document.getElementById('nomor_manual');
         const inputNomorSurat = document.getElementById('nomor_surat');
         const inputFileSurat = document.getElementById('file_surat');
-        const defaultNomorSurat = "{{ $surat->nomor_surat }}";
+        const defaultNomorSurat = "{{ $suratKeluar->nomor_surat }}";
 
         // Generate Nomor Surat Otomatis
         function generateNomor() {
@@ -338,16 +324,13 @@ Perbarui data surat keluar Kecamatan Mandalajati.
 
                 inputNomorSurat.value = `No.${kode}/${manual}-Kec.MDLJ/T/${romawi[bulan]}/${tahun}`;
             } else if (!manual) {
-                // Jika nomor manual dikosongkan, kembalikan ke nomor surat asli dari database
                 inputNomorSurat.value = defaultNomorSurat;
             }
         }
 
-        // Event Listeners untuk pemicu penomoran
         inputKodeArsip.addEventListener('change', generateNomor);
         inputNomorManual.addEventListener('input', generateNomor);
 
-        // Preview Nama File PDF Baru
         inputFileSurat.addEventListener('change', function() {
             let file = this.files[0];
             let container = document.getElementById('namaFile');
@@ -363,7 +346,6 @@ Perbarui data surat keluar Kecamatan Mandalajati.
             }
         });
 
-        // Form Entrance Animation
         const card = document.querySelector(".form-card");
         card.style.opacity = "0";
         card.style.transform = "translateY(25px)";
@@ -374,7 +356,6 @@ Perbarui data surat keluar Kecamatan Mandalajati.
         }, 150);
     });
 
-    // SweetAlert Flash Notifications
     @if(session('success'))
         Swal.fire({
             icon: 'success',

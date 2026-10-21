@@ -4,32 +4,30 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\SuratMasuk;
 
 class Agenda extends Model
 {
     use HasFactory;
 
-    protected $table = 'agendas';
-
     protected $fillable = [
 
         'surat_masuk_id',
         'user_id',
-    
         'nama_kegiatan',
         'tanggal',
-        'tempat',
         'jam_mulai',
         'jam_selesai',
-    
-        'penyelenggara',
-        'keterangan',
-        'status',
-    
+        'tempat',
         'materi',
+        'penyelenggara',
+        'status',
+        'keterangan',
     
-        'jumlah_peserta',
+        'hasil_kegiatan',
+        'hasil_materi',
+        'catatan',
+        'dokumentasi',
+    
         'kursi',
         'meja',
         'proyektor',
@@ -40,17 +38,11 @@ class Agenda extends Model
     
     ];
 
-    protected $casts = [
-        'tanggal' => 'date',
-    ];
-
     public function suratMasuk()
     {
-        return $this->belongsTo(
-            SuratMasuk::class,
-            'surat_masuk_id'
-        );
+        return $this->belongsTo(SuratMasuk::class, 'surat_masuk_id');
     }
+
 
     public function user()
     {

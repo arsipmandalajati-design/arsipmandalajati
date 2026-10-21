@@ -366,7 +366,7 @@ foreach ($admins as $admin) {
 
 Notification::create([
 
-    'user_id'      => $admin->id,
+    'user_id'     => $admin->id,
 
     'judul'        => 'Agenda Baru',
 
@@ -399,165 +399,158 @@ return redirect()
 
 }
 
-/*
-|--------------------------------------------------------------------------
-| EDIT AGENDA
-|--------------------------------------------------------------------------
-*/
-public function edit(Agenda $agenda)
-{
-    // Pegawai hanya boleh mengedit agenda miliknya
-    if (
-        Auth::user()->role == 'pegawai' &&
-        $agenda->user_id != Auth::id()
-    ) {
-        abort(403);
+    /*
+    |--------------------------------------------------------------------------
+    | EDIT AGENDA
+    |--------------------------------------------------------------------------
+    */
+    public function edit(Agenda $agenda)
+    {
+        // Pegawai hanya boleh mengedit agenda miliknya
+        if (
+            Auth::user()->role == 'pegawai' &&
+            $agenda->user_id != Auth::id()
+        ) {
+            abort(403);
+        }
+
+        return view(
+            'agenda.edit',
+            compact('agenda')
+        );
     }
-
-    return view(
-        'agenda.edit',
-        compact('agenda')
-    );
-}
-
-/*
-|--------------------------------------------------------------------------
-| UPDATE AGENDA
-|--------------------------------------------------------------------------
-*/
-
-public function update(Request $request, Agenda $agenda)
-{
-    // Pegawai hanya boleh mengedit agenda miliknya
-    if (
-        Auth::user()->role == 'pegawai' &&
-        $agenda->user_id != Auth::id()
-    ) {
-        abort(403);
-    }
-
-    $request->validate([
-
-        'nama_kegiatan' => 'required',
-
-        'tanggal' => 'required|date',
-
-        'jam_mulai' => 'required',
-
-        'jam_selesai' => 'required',
-
-        'tempat' => 'required',
-
-        'penyelenggara' => 'required',
-
-        'status' => 'required',
-
-        'materi' => 'nullable',
-
-        'dokumentasi' => 'nullable|image|max:4096',
-
-    ]);
 
     /*
     |--------------------------------------------------------------------------
-    | CEK BOOKING (SELAIN AGENDA INI)
+    | UPDATE AGENDA
     |--------------------------------------------------------------------------
     */
 
-    $booking = Agenda::whereDate('tanggal', $request->tanggal)
+    public function update(Request $request, Agenda $agenda)
+    {
+        // Pegawai hanya boleh mengedit agenda miliknya
+        if (
+            Auth::user()->role == 'pegawai' &&
+            $agenda->user_id != Auth::id()
+        ) {
+            abort(403);
+        }
 
-        ->where('tempat', $request->tempat)
+        $request->validate([
 
-        ->where('status', '!=', 'Ditunda')
+            'nama_kegiatan' => 'required',
 
-        ->where('id', '!=', $agenda->id)
+            'tanggal' => 'required|date',
 
-        ->where(function ($q) use ($request) {
+            'jam_mulai' => 'required',
 
-            $q->whereBetween(
-                'jam_mulai',
-                [
-                    $request->jam_mulai,
-                    $request->jam_selesai
-                ]
-            )
+            'jam_selesai' => 'required',
 
-            ->orWhereBetween(
-                'jam_selesai',
-                [
-                    $request->jam_mulai,
-                    $request->jam_selesai
-                ]
-            )
+            'tempat' => 'required',
 
-            ->orWhere(function ($qq) use ($request) {
+            'penyelenggara' => 'required',
 
-                $qq->where(
-                        'jam_mulai',
-                        '<=',
-                        $request->jam_mulai
-                    )
+            'status' => 'required',
 
-                    ->where(
-                        'jam_selesai',
-                        '>=',
+            'materi' => 'nullable',
+
+            'dokumentasi' => 'nullable|image|max:4096',
+
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | CEK BOOKING (SELAIN AGENDA INI)
+        |--------------------------------------------------------------------------
+        */
+
+        $booking = Agenda::whereDate('tanggal', $request->tanggal)
+
+            ->where('tempat', $request->tempat)
+
+            ->where('status', '!=', 'Ditunda')
+
+            ->where('id', '!=', $agenda->id)
+
+            ->where(function ($q) use ($request) {
+
+                $q->whereBetween(
+                    'jam_mulai',
+                    [
+                        $request->jam_mulai,
                         $request->jam_selesai
-                    );
+                    ]
+                )
 
-            });
+                ->orWhereBetween(
+                    'jam_selesai',
+                    [
+                        $request->jam_mulai,
+                        $request->jam_selesai
+                    ]
+                )
 
-        })
+                ->orWhere(function ($qq) use ($request) {
 
-        ->first();
+                    $qq->where(
+                            'jam_mulai',
+                            '<=',
+                            $request->jam_mulai
+                        )
 
-    if ($booking) {
+                        ->where(
+                            'jam_selesai',
+                            '>=',
+                            $request->jam_selesai
+                        );
 
-        return back()
+                });
 
-            ->withInput()
+            })
 
-            ->with(
-                'booking_error',
-                'Tempat "' .
-                $booking->tempat .
-                '" sudah digunakan pada tanggal ' .
-                $booking->tanggal .
-                ' pukul ' .
-                $booking->jam_mulai .
-                ' - ' .
-                $booking->jam_selesai
-            );
+            ->first();
 
-    }
+        if ($booking) {
 
-    /*
-    |--------------------------------------------------------------------------
-    | UPLOAD DOKUMENTASI BARU
-    |--------------------------------------------------------------------------
-    */
+            return back()
 
-    $dokumentasi = $agenda->dokumentasi;
+                ->withInput()
 
-    if ($request->hasFile('dokumentasi')) {
+                ->with(
+                    'booking_error',
+                    'Tempat "' .
+                    $booking->tempat .
+                    '" sudah digunakan pada tanggal ' .
+                    $booking->tanggal .
+                    ' pukul ' .
+                    $booking->jam_mulai .
+                    ' - ' .
+                    $booking->jam_selesai
+                );
 
-        $dokumentasi = $request->file('dokumentasi')
-            ->store('dokumentasi', 'public');
+        }
 
-    }
+        /*
+        |--------------------------------------------------------------------------
+        | UPLOAD DOKUMENTASI BARU
+        |--------------------------------------------------------------------------
+        */
 
-    /*
-    |--------------------------------------------------------------------------
-    | UPDATE DATA AGENDA
-    |--------------------------------------------------------------------------
-    */
-    $path = $agenda->dokumentasi;
+        $dokumentasi = $agenda->dokumentasi;
 
-if ($request->hasFile('dokumentasi')) {
+        if ($request->hasFile('dokumentasi')) {
 
-    $path = $request->file('dokumentasi')
-        ->store('dokumentasi', 'public');
+            $dokumentasi = $request->file('dokumentasi')
+                ->store('dokumentasi', 'public');
 
-}
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | UPDATE DATA AGENDA
+        |--------------------------------------------------------------------------
+        */
+        
 $agenda->update([
 
     'nama_kegiatan'=>$request->nama_kegiatan,
@@ -586,45 +579,45 @@ $agenda->update([
 
 ]);
 
-    /*
-    |--------------------------------------------------------------------------
-    | NOTIFIKASI ADMIN
-    |--------------------------------------------------------------------------
-    */
+        /*
+        |--------------------------------------------------------------------------
+        | NOTIFIKASI ADMIN
+        |--------------------------------------------------------------------------
+        */
 
-    $admins = User::where('role', 'admin')->get();
+        $admins = User::where('role', 'admin')->get();
 
-    foreach ($admins as $admin) {
+        foreach ($admins as $admin) {
 
-        Notification::create([
+            Notification::create([
 
-            'user_id' => $admin->id,
+                'user_id' => $admin->id,
 
-            'judul' => 'Agenda Diperbarui',
+                'judul' => 'Agenda Diperbarui',
 
-            'pesan' => 'Agenda "' .
-                        $agenda->nama_kegiatan .
-                        '" berhasil diperbarui.',
+                'pesan' => 'Agenda "' .
+                          $agenda->nama_kegiatan .
+                          '" berhasil diperbarui.',
 
-            'jenis' => 'agenda',
+                'jenis' => 'agenda',
 
-            'reference_id' => $agenda->id,
+                'reference_id' => $agenda->id,
 
-            'is_read' => 0,
+                'is_read' => 0,
 
-        ]);
+            ]);
 
+        }
+
+        return redirect()
+
+            ->route('agenda.index')
+
+            ->with(
+                'success',
+                'Agenda berhasil diperbarui.'
+            );
     }
-
-    return redirect()
-
-        ->route('agenda.index')
-
-        ->with(
-            'success',
-            'Agenda berhasil diperbarui.'
-        );
-}
 
     /*
     |--------------------------------------------------------------------------
@@ -827,9 +820,9 @@ public function whatsapp(Agenda $agenda)
 
 public function cekBooking(Request $request)
 {
-    // Logika pengecekan bentrok yang sesungguhnya di sisi server
+    // Logika pengecekan bentrok yang disesuaikan dengan kolom 'tanggal'
     $bentrok = Agenda::where('tempat', $request->tempat)
-        ->where('tanggal_kegiatan', $request->tanggal)
+        ->where('tanggal', $request->tanggal) // <-- Diubah dari tanggal_kegiatan menjadi tanggal
         ->where(function($query) use ($request) {
             $query->whereBetween('jam_mulai', [$request->jam_mulai, $request->jam_selesai])
                   ->orWhereBetween('jam_selesai', [$request->jam_mulai, $request->jam_selesai])
@@ -847,7 +840,8 @@ public function cekBooking(Request $request)
 
 public function show($id)
 {
-    $agenda = Agenda::findOrFail($id);
+    // Diperbarui dengan with('suratMasuk') agar relasi surat asal ikut terbawa
+    $agenda = Agenda::with('suratMasuk')->findOrFail($id);
 
     return view(
         'agenda.show',
@@ -879,16 +873,17 @@ public function hasil($id)
 
 public function simpanHasil(Request $request, $id)
 {
+
     $request->validate([
 
         'hasil_kegiatan' => 'required',
-
-        'hasil_materi'   => 'required',
-
-        'catatan'        => 'nullable',
-
-        'dokumentasi'    => 'nullable|image|max:4096',
-
+    
+        'hasil_materi' => 'nullable',
+    
+        'catatan' => 'nullable',
+    
+        'dokumentasi' => 'nullable|image|max:4096',
+    
     ]);
 
     $agenda = Agenda::findOrFail($id);
@@ -916,13 +911,10 @@ public function simpanHasil(Request $request, $id)
         'status'         => 'Selesai',
 
     ]);
-
+    
     return redirect()
-        ->route('agenda.show', $agenda->id)
-        ->with(
-            'success',
-            'Hasil agenda berhasil disimpan.'
-        );
+    ->route('agenda.index')
+    ->with('success', 'Hasil kegiatan berhasil disimpan.');
 }
 
 }

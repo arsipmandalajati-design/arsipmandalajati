@@ -9,44 +9,21 @@ class SuratKeluar extends Model
 {
     use HasFactory;
 
+    // Nama tabel di database (jika nama tabel Anda bentuk plural standar Laravel, baris ini opsional)
     protected $table = 'surat_keluars';
 
+    // Kolom yang diizinkan untuk diisi secara massal (Mass Assignment)
     protected $fillable = [
-
         'user_id',
-
         'kode_arsip_id',
-
-        'nomor_urut',
-
-        'nomor_registrasi',
-
+        'nomor_manual',
         'nomor_surat',
-
-        'judul',
-
-        'pengirim',
-
-        'tujuan',
-
         'tanggal_surat',
-
+        'tujuan',
+        'judul',
         'perihal',
-
         'file_surat',
-
-        'status',
-
-        'user_disposisi_id',
-
-        'catatan_admin',
-
-    ];
-
-    protected $casts = [
-
-        'tanggal_surat' => 'date',
-
+        'disposisi', // <-- Tambahkan ini
     ];
 
     /*
@@ -117,4 +94,8 @@ class SuratKeluar extends Model
 
     }
 
+    public function tujuanUser()
+{
+    return $this->belongsTo(User::class, 'tujuan'); 
+}
 }

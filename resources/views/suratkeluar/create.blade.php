@@ -1,437 +1,382 @@
 @extends('layouts.app')
 
 @section('page-icon')
-    <i class="bi bi-envelope-paper-fill"></i>
+<i class="bi bi-envelope-paper-fill"></i>
 @endsection
 
 @section('page-title')
-    Registrasi Surat Keluar
+Registrasi Surat Keluar
 @endsection
 
 @section('page-description')
-    Silakan lengkapi data surat keluar beserta dokumen digitalnya.
+Silakan lengkapi data surat keluar beserta dokumen digitalnya.
 @endsection
 
 @section('content')
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
-    /* Header Styles */
-    .page-header {
-        background: linear-gradient(135deg, #003844, #0f766e, #64c8b8);
-        border-radius: 28px;
-        padding: 35px 40px;
-        color: #fff;
-        margin-bottom: 25px;
-        position: relative;
-        overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0, 56, 68, .15);
-    }
+.form-card {
+    border: none;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #fff;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.04);
+}
 
-    .page-header::before {
-        content: "";
-        position: absolute;
-        width: 220px;
-        height: 220px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, .08);
-        right: -70px;
-        top: -70px;
-    }
+.card-header-custom {
+    background: #fff;
+    color: #1e293b;
+    font-size: 16px;
+    font-weight: 700;
+    padding: 16px 24px;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    align-items: center;
+}
 
-    .page-header::after {
-        content: "📤";
-        position: absolute;
-        right: 35px;
-        bottom: 15px;
-        font-size: 110px;
-        opacity: .08;
-    }
+.card-header-custom i {
+    color: #0d9488;
+    font-size: 18px;
+    margin-right: 10px;
+}
 
-    .page-title-text {
-        font-size: 34px;
-        font-weight: 700;
-        margin-bottom: 12px;
-    }
+.card-body {
+    padding: 24px;
+}
 
-    .page-subtitle {
-        font-size: 15px;
-        line-height: 1.8;
-        max-width: 650px;
-        opacity: .95;
-    }
+.form-label {
+    font-weight: 600;
+    color: #334155;
+    font-size: 13px;
+    margin-bottom: 6px;
+}
 
-    /* Form Styles */
-    .form-card {
-        border: none;
-        border-radius: 24px;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, .08);
-    }
+.required {
+    color: #ef4444;
+}
 
-    .section-title {
-        font-size: 18px;
-        font-weight: 700;
-        color: #0f766e;
-        border-left: 5px solid #0f766e;
-        padding-left: 14px;
-        margin-bottom: 20px;
-    }
+.form-control,
+.form-select {
+    height: 45px;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    font-size: 14px;
+    color: #1e293b;
+    padding: 0.5rem 0.875rem;
+}
 
-    .form-control,
-    .form-select {
-        border-radius: 14px;
-        min-height: 50px;
-        border: 1px solid #dbe5ef;
-    }
+textarea.form-control {
+    height: auto;
+    min-height: 110px;
+    padding: 0.75rem;
+}
 
-    .form-control:focus,
-    .form-select:focus {
-        border-color: #0f766e;
-        box-shadow: 0 0 0 .15rem rgba(15, 118, 110, .15);
-    }
+.form-control:focus,
+.form-select:focus {
+    border-color: #0d9488;
+    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+}
 
-    textarea.form-control {
-        min-height: 120px;
-    }
+.readonly-box {
+    background: #f8fafc;
+    font-weight: 600;
+    color: #475569;
+}
 
-    /* Button Styles */
-    .btn-save {
-        background: #0f766e;
-        color: white;
-        border: none;
-        border-radius: 14px;
-        padding: 12px 28px;
-        transition: .25s;
-    }
+.text-helper {
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 4px;
+}
 
-    .btn-save:hover {
-        background: #0b5f59;
-        color: white;
-        transform: translateY(-2px);
-    }
+.upload-area {
+    border: 2px dashed #99f6e4;
+    border-radius: 14px;
+    background: #f0fdfa;
+    padding: 30px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
 
-    .btn-back {
-        border-radius: 14px;
-        padding: 12px 28px;
-    }
+.upload-area:hover {
+    background: #ccfbf1;
+    border-color: #0d9488;
+}
 
-    /* Utility Styles */
-    .file-info {
-        font-size: 13px;
-        color: #6b7280;
-    }
+.upload-area i {
+    font-size: 42px;
+    color: #0d9488;
+}
 
-    .bg-readonly {
-        background: #f8fafc;
-    }
+.btn-primary {
+    background: #0d9488;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 24px;
+    font-weight: 600;
+    font-size: 14px;
+}
 
-    .required {
-        color: red;
-    }
+.btn-primary:hover {
+    background: #0f766e;
+}
+
+.btn-outline-secondary {
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-weight: 600;
+    font-size: 14px;
+    border-color: #cbd5e1;
+    color: #475569;
+}
+
+.btn-outline-secondary:hover {
+    background: #f1f5f9;
+    color: #1e293b;
+}
 </style>
 
-{{-- Page Header Component --}}
-<div class="page-header">
-    <div class="d-flex align-items-center">
-        <div class="fs-1 me-3">
-            @yield('page-icon')
-        </div>
-        <div>
-            <div class="page-title-text">@yield('page-title')</div>
-            <div class="page-subtitle">@yield('page-description')</div>
-        </div>
-    </div>
+@if ($errors->any())
+<div class="alert alert-danger rounded-3 mb-4">
+    <strong><i class="bi bi-exclamation-triangle-fill me-2"></i>Periksa kembali inputan Anda:</strong>
+    <ul class="mb-0 mt-1 ps-3">
+        @foreach($errors->all() as $error)
+        <li>{{ $error }}</li>
+        @endforeach
+    </ul>
 </div>
-
-{{-- SweetAlert Notifikasi Sukses --}}
-@if(session('success'))
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            Swal.fire({
-                icon: 'success',
-                title: 'Berhasil',
-                text: '{{ session("success") }}',
-                confirmButtonColor: '#0f766e'
-            });
-        });
-    </script>
 @endif
 
-{{-- Alert Validasi Error --}}
-@if($errors->any())
-    <div class="alert alert-danger border-0 shadow-sm rounded-4 mb-4">
-        <div class="d-flex align-items-center">
-            <i class="bi bi-exclamation-triangle-fill fs-3 me-3"></i>
-            <div>
-                <h6 class="fw-bold mb-1">Terjadi Kesalahan!</h6>
-                <small>Silakan periksa kembali data yang Anda masukkan.</small>
-            </div>
-        </div>
-        <hr>
-        <ul class="mb-0">
-            @foreach($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
+<form id="formRegistrasiSuratKeluar" action="{{ route('suratkeluar.store') }}" method="POST" enctype="multipart/form-data">
+@csrf
 
-{{-- Form Card --}}
+{{-- ===================================================== --}}
+{{-- KARTU: INFORMASI SURAT (KODE ARSIP & NOMOR REGISTRASI DIGABUNG DISINI) --}}
+{{-- ===================================================== --}}
 <div class="card form-card">
-    <div class="card-body p-4">
-        <form action="{{ route('suratkeluar.store') }}" method="POST" enctype="multipart/form-data">
-            @csrf
-
-            {{-- SECTION 1: INFORMASI ARSIP --}}
-            <div class="section-title">
-                <i class="bi bi-archive-fill me-2"></i> Informasi Arsip
+    <div class="card-header-custom">
+        <i class="bi bi-file-earmark-text"></i> Informasi Surat
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            {{-- KODE ARSIP --}}
+            <div class="col-md-6">
+                <label class="form-label"><i class="bi bi-folder me-1 text-muted"></i> Kode Arsip <span class="required">*</span></label>
+                <select name="kode_arsip_id" id="kode_arsip_id" class="form-control select2">
+                    <option value="" disabled selected>-- Pilih Kode Arsip --</option>
+                    @foreach($kodearsip as $item)
+                        <option value="{{ $item->id }}">
+                            {{ $item->kode }} - {{ $item->nama_arsip }}
+                        </option>
+                    @endforeach
+                </select>
+                <div class="text-helper">Pilih klasifikasi arsip untuk men-generate nomor registrasi.</div>
             </div>
 
-            <div class="row">
-                {{-- Kode Arsip --}}
-                <div class="col-md-6 mb-4">
-                    <label class="form-label fw-semibold" for="kode_arsip_id">
-                        <i class="bi bi-folder2-open me-1 text-success"></i> Kode Arsip
-                        <span class="required">*</span>
-                    </label>
-                    <select name="kode_arsip_id" id="kode_arsip_id"
-                        class="form-select @error('kode_arsip_id') is-invalid @enderror">
-                        <option value="">-- Pilih Kode Arsip --</option>
-                        @foreach($kodearsip as $item)
-                            <option value="{{ $item->id }}" data-kode="{{ $item->kode }}"
-                                {{ old('kode_arsip_id') == $item->id ? 'selected' : '' }}>
-                                {{ $item->kode }} - {{ $item->nama_arsip }}
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('kode_arsip_id')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                {{-- Kode Manual --}}
-                <div class="col-md-6 mb-4">
-                    <label class="form-label fw-semibold" for="kode_manual">
-                        <i class="bi bi-pencil-square me-1 text-success"></i> Kode Manual (Opsional)
-                    </label>
-                    <input type="text" id="kode_manual" class="form-control" value="{{ old('kode_manual') }}"
-                        placeholder="Contoh : HM.01">
-                    <small class="text-muted">Isi jika ingin menggunakan kode arsip khusus.</small>
-                </div>
+            {{-- NOMOR REGISTRASI --}}
+            <div class="col-md-6">
+                <label class="form-label"><i class="bi bi-123 me-1 text-muted"></i> Nomor Registrasi <span class="required">*</span></label>
+                <input type="text" id="nomor_registrasi" class="form-control readonly-box" readonly placeholder="Otomatis terisi dari kode arsip...">
+                <input type="hidden" name="nomor_registrasi" id="nomor_registrasi_hidden">
+                <div class="text-helper">Dibuat otomatis berdasarkan kode arsip.</div>
             </div>
 
-            <hr class="my-4">
-
-            {{-- SECTION 2: INFORMASI SURAT --}}
-            <div class="section-title">
-                <i class="bi bi-envelope-paper-fill me-2"></i> Informasi Surat
+            {{-- NOMOR SURAT KELUAR --}}
+            <div class="col-md-6">
+                <label class="form-label"><i class="bi bi-hash me-1 text-muted"></i> Nomor Surat Keluar <span class="required">*</span></label>
+                <input type="text" name="nomor_surat" id="nomor_surat" class="form-control" placeholder="Contoh: 005/123-Kec.Mandalajati/2026" value="{{ old('nomor_surat') }}" required>
+                <div class="text-helper">Masukkan nomor surat keluar resmi dari instansi.</div>
             </div>
 
-            <div class="row">
-                {{-- Nomor Registrasi --}}
-                <div class="col-md-6 mb-4">
-                    <label class="form-label fw-semibold" for="nomor_manual">
-                        <i class="bi bi-123 me-1 text-success"></i> Nomor Registrasi
-                        <span class="required">*</span>
-                    </label>
-                    <input type="text" id="nomor_manual" class="form-control" value="{{ old('nomor_manual') }}"
-                        placeholder="Contoh : 058-Pel.PDH">
-                    <small class="text-muted">Masukkan nomor registrasi surat.</small>
-                </div>
-
-                {{-- Nomor Surat Otomatis --}}
-                <div class="col-md-6 mb-4">
-                    <label class="form-label fw-semibold" for="nomor_surat">
-                        <i class="bi bi-hash me-1 text-success"></i> Nomor Surat Otomatis
-                    </label>
-                    <input type="text" id="nomor_surat" name="nomor_surat" class="form-control bg-readonly"
-                        value="{{ old('nomor_surat') }}" readonly>
-                    <small class="text-success">Dibuat otomatis berdasarkan kode arsip.</small>
-                </div>
-
-                {{-- Judul Surat --}}
-                <div class="col-md-6 mb-4">
-                    <label class="form-label fw-semibold" for="judul">
-                        <i class="bi bi-card-heading me-1 text-success"></i> Judul Surat
-                        <span class="required">*</span>
-                    </label>
-                    <input type="text" id="judul" name="judul" class="form-control @error('judul') is-invalid @enderror"
-                        value="{{ old('judul') }}" placeholder="Masukkan judul surat" required>
-                    @error('judul')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                {{-- Pengirim --}}
-                <div class="col-md-6 mb-4">
-                    <label class="form-label fw-semibold" for="pengirim">
-                        <i class="bi bi-person-fill me-1 text-success"></i> Pengirim
-                        <span class="required">*</span>
-                    </label>
-                    <input type="text" id="pengirim" name="pengirim" class="form-control @error('pengirim') is-invalid @enderror"
-                        value="{{ old('pengirim') }}" placeholder="Masukkan nama pengirim" required>
-                    @error('pengirim')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                {{-- Tujuan Surat --}}
-                <div class="col-md-6 mb-4">
-                    <label class="form-label fw-semibold" for="tujuan">
-                        <i class="bi bi-building me-1 text-success"></i> Tujuan Surat
-                        <span class="required">*</span>
-                    </label>
-                    <input type="text" id="tujuan" name="tujuan" class="form-control @error('tujuan') is-invalid @enderror"
-                        value="{{ old('tujuan') }}" placeholder="Masukkan instansi tujuan" required>
-                    @error('tujuan')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                {{-- Tanggal Surat --}}
-                <div class="col-md-6 mb-4">
-                    <label class="form-label fw-semibold" for="tanggal_surat">
-                        <i class="bi bi-calendar-event me-1 text-success"></i> Tanggal Surat
-                        <span class="required">*</span>
-                    </label>
-                    <input type="date" id="tanggal_surat" name="tanggal_surat" class="form-control @error('tanggal_surat') is-invalid @enderror"
-                        value="{{ old('tanggal_surat') }}" required>
-                    @error('tanggal_surat')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                {{-- Perihal --}}
-                <div class="col-md-12 mb-4">
-                    <label class="form-label fw-semibold" for="perihal">
-                        <i class="bi bi-chat-left-text-fill me-1 text-success"></i> Perihal
-                        <span class="required">*</span>
-                    </label>
-                    <textarea id="perihal" name="perihal" rows="5" class="form-control @error('perihal') is-invalid @enderror"
-                        placeholder="Tuliskan perihal surat..." required>{{ old('perihal') }}</textarea>
-                    @error('perihal')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                {{-- Disposisi --}}
-                <div class="col-md-12 mb-4">
-                    <label class="form-label fw-semibold" for="disposisi">
-                        <i class="bi bi-journal-text me-1 text-success"></i> Disposisi (Opsional)
-                    </label>
-                    <textarea id="disposisi" name="disposisi" rows="4" class="form-control @error('disposisi') is-invalid @enderror"
-                        placeholder="Tuliskan catatan disposisi surat...">{{ old('disposisi') }}</textarea>
-                    <small class="text-muted">Catatan instruksi atau disposisi pimpinan terhadap surat keluar.</small>
-                    @error('disposisi')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                {{-- File PDF --}}
-                <div class="col-md-12 mb-4">
-                    <label class="form-label fw-semibold" for="file_surat">
-                        <i class="bi bi-file-earmark-pdf-fill me-1 text-danger"></i> Upload File Surat (PDF)
-                        <span class="required">*</span>
-                    </label>
-                    <input type="file" name="file_surat" id="file_surat" class="form-control @error('file_surat') is-invalid @enderror"
-                        accept=".pdf" required>
-                    <div id="namaFile" class="file-info mt-2">
-                        <i class="bi bi-info-circle me-1"></i> Belum ada file dipilih.
-                    </div>
-                    @error('file_surat')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
+            {{-- JUDUL SURAT --}}
+            <div class="col-md-6">
+                <label class="form-label"><i class="bi bi-journal-text me-1 text-muted"></i> Judul Surat <span class="required">*</span></label>
+                <input type="text" name="judul" class="form-control" placeholder="Masukkan judul surat" value="{{ old('judul') }}" required>
             </div>
 
-            <hr class="my-4">
-
-            {{-- Footer Form / Aksi --}}
-            <div class="row align-items-center">
-                <div class="col-md-6">
-                    <div class="text-muted">
-                        <i class="bi bi-info-circle-fill text-success me-2"></i> Pastikan seluruh data telah benar sebelum menyimpan surat keluar.
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="d-flex justify-content-md-end justify-content-center gap-3 mt-3 mt-md-0">
-                        <a href="{{ route('suratkeluar.index') }}" class="btn btn-outline-secondary rounded-pill px-4">
-                            <i class="bi bi-arrow-left-circle me-2"></i> Kembali
-                        </a>
-                        <button type="submit" class="btn btn-save rounded-pill px-4">
-                            <i class="bi bi-check-circle-fill me-2"></i> Simpan Surat
-                        </button>
-                    </div>
-                </div>
+            {{-- TUJUAN SURAT --}}
+            <div class="col-md-6">
+                <label class="form-label"><i class="bi bi-building me-1 text-muted"></i> Tujuan Surat <span class="required">*</span></label>
+                <input type="text" name="tujuan" class="form-control" placeholder="Masukkan instansi tujuan" value="{{ old('tujuan') }}" required>
             </div>
-        </form>
+
+            {{-- TANGGAL SURAT --}}
+            <div class="col-md-6">
+                <label class="form-label"><i class="bi bi-calendar-event me-1 text-muted"></i> Tanggal Surat <span class="required">*</span></label>
+                <input type="date" name="tanggal_surat" class="form-control" value="{{ old('tanggal_surat', date('Y-m-d')) }}" required>
+            </div>
+
+            {{-- PERIHAL --}}
+            <div class="col-12">
+                <label class="form-label"><i class="bi bi-chat-left-text me-1 text-muted"></i> Perihal <span class="required">*</span></label>
+                <textarea name="perihal" class="form-control" placeholder="Tuliskan perihal surat..." required>{{ old('perihal') }}</textarea>
+            </div>
+        </div>
     </div>
 </div>
+
+{{-- ===================================================== --}}
+{{-- KARTU: DOKUMEN SURAT --}}
+{{-- ===================================================== --}}
+<div class="card form-card">
+    <div class="card-header-custom">
+        <i class="bi bi-cloud-arrow-up"></i> Dokumen Surat Keluar
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-lg-5">
+                <label class="form-label">Upload Dokumen <span class="required">*</span></label>
+                <div class="upload-area" id="btnUploadArea">
+                    <i class="bi bi-cloud-arrow-up"></i>
+                    <h6 class="mt-2 fw-bold text-dark">Pilih File Surat Keluar</h6>
+                    <p class="text-muted mb-1 small">PDF, JPG, JPEG, PNG</p>
+                    <span class="text-muted" style="font-size: 11px;">Maksimal ukuran 5 MB</span>
+                </div>
+                <input type="file" id="file_surat" name="file_surat" accept=".pdf,.jpg,.jpeg,.png" hidden required>
+                
+                <div id="fileInfo" class="alert alert-success mt-3 py-2 px-3 small d-none mb-0">
+                    <i class="bi bi-check-circle-fill me-1"></i>
+                    <span id="namaFile"></span>
+                </div>
+            </div>
+
+            <div class="col-lg-7">
+                <label class="form-label">Preview Dokumen</label>
+                <div id="previewArea" class="border rounded-3 bg-light d-flex align-items-center justify-content-center overflow-hidden" style="height: 230px;">
+                    <div id="previewEmpty" class="text-center p-3">
+                        <i class="bi bi-file-earmark-pdf fs-1 text-muted"></i>
+                        <p class="text-muted small mt-2 mb-0">Preview dokumen akan muncul setelah file dipilih.</p>
+                    </div>
+                    <iframe id="previewPDF" style="display:none; width:100%; height:100%; border:none;"></iframe>
+                    <img id="previewIMG" style="display:none; width:100%; height:100%; object-fit:contain;">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- ===================================================== --}}
+{{-- KARTU: DISPOSISI (KHUSUS HAK AKSES ADMIN) --}}
+{{-- ===================================================== --}}
+@if(auth()->check() && (auth()->user()->role == 'admin' || auth()->user()->is_admin))
+<div class="card form-card border-teal">
+    <div class="card-header-custom" style="background: #f0fdfa; color: #0f766e;">
+        <i class="bi bi-diagram-3-fill"></i> Disposisi & Catatan Pimpinan (Khusus Admin)
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-12">
+                <label class="form-label"><i class="bi bi-journal-check me-1 text-muted"></i> Catatan Disposisi</label>
+                <textarea name="disposisi" class="form-control" placeholder="Masukkan instruksi atau catatan disposisi untuk ditindaklanjuti...">{{ old('disposisi') }}</textarea>
+                <div class="text-helper">Catatan ini hanya dapat diisi oleh pihak Administrator/Pimpinan.</div>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+
+{{-- ===================================================== --}}
+{{-- BUTTON AKSI --}}
+{{-- ===================================================== --}}
+<div class="d-flex justify-content-end gap-2 mb-5">
+    <a href="{{ route('suratkeluar.index') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i> Kembali
+    </a>
+    <button type="submit" class="btn btn-primary">
+        <i class="bi bi-save me-1"></i> Simpan Surat Keluar
+    </button>
+</div>
+
+</form>
+
+{{-- ===================================================== --}}
+{{-- JAVASCRIPT --}}
+{{-- ===================================================== --}}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-    // Generate Nomor Surat Otomatis
-    function generateNomorSurat() {
-        let select = document.getElementById('kode_arsip_id');
-        let selected = select.options[select.selectedIndex];
-        let kodeDropdown = selected ? selected.getAttribute('data-kode') : '';
-
-        let kodeManual = document.getElementById('kode_manual').value.trim();
-        let nomorManual = document.getElementById('nomor_manual').value.trim();
-
-        let kode = kodeManual !== '' ? kodeManual : kodeDropdown;
-        let tahun = new Date().getFullYear();
-        let bulan = new Date().getMonth() + 1;
-
-        let romawi = [
-            '', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'
-        ];
-
-        if (kode && nomorManual) {
-            document.getElementById('nomor_surat').value =
-                'No.' + kode + '/' + nomorManual + '-Kec.MDLJ/T/' + romawi[bulan] + '/' + tahun;
-        } else {
-            document.getElementById('nomor_surat').value = '';
-        }
+function ambilNomorRegistrasi() {
+    let id = $('#kode_arsip_id').val();
+    
+    if(!id) {
+        $('#nomor_registrasi').val('');
+        $('#nomor_registrasi_hidden').val('');
+        return;
     }
 
-    // Event Listener untuk Generate Nomor Surat
-    document.getElementById('kode_arsip_id').addEventListener('change', generateNomorSurat);
-    document.getElementById('kode_manual').addEventListener('keyup', generateNomorSurat);
-    document.getElementById('nomor_manual').addEventListener('keyup', generateNomorSurat);
+    let fetchUrl = "{{ url('/suratkeluar/get-nomor-registrasi') }}/" + id;
 
-    // Preview Nama File PDF
-    document.getElementById('file_surat').addEventListener('change', function () {
-        let file = this.files[0];
-        let target = document.getElementById('namaFile');
-
-        if (file) {
-            target.innerHTML =
-                '<span class="badge bg-success rounded-pill px-3 py-2">' +
-                '<i class="bi bi-check-circle-fill me-2"></i>' + file.name +
-                '</span>';
-        } else {
-            target.innerHTML = '<i class="bi bi-info-circle me-1"></i> Belum ada file dipilih.';
+    $.ajax({
+        url: fetchUrl,
+        type: "GET",
+        dataType: "json",
+        success: function(data) {
+            if(data && data.nomor_registrasi) {
+                $('#nomor_registrasi').val(data.nomor_registrasi);
+                $('#nomor_registrasi_hidden').val(data.nomor_registrasi);
+            } else {
+                $('#nomor_registrasi').val('Gagal memuat nomor');
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("Fetch Error:", error);
+            $('#nomor_registrasi').val('Gagal mengambil data');
         }
     });
+}
 
-    // Animasi Masuk saat Halaman di-load
-    document.addEventListener("DOMContentLoaded", function () {
-        const card = document.querySelector(".form-card");
-        if (card) {
-            card.style.opacity = "0";
-            card.style.transform = "translateY(25px)";
+function previewDokumen(e){
+    let file = e.target.files[0];
+    if(!file) return;
 
-            setTimeout(function () {
-                card.style.transition = ".45s";
-                card.style.opacity = "1";
-                card.style.transform = "translateY(0)";
-            }, 150);
-        }
+    $('#namaFile').text(file.name);
+    $('#fileInfo').removeClass('d-none');
+    $('#previewEmpty').hide();
 
-        generateNomorSurat();
+    let url = URL.createObjectURL(file);
+
+    if(file.type === "application/pdf"){
+        $('#previewPDF').show().attr('src', url);
+        $('#previewIMG').hide();
+    } else {
+        $('#previewIMG').show().attr('src', url);
+        $('#previewPDF').hide();
+    }
+}
+
+$(document).ready(function() {
+    if($('#kode_arsip_id').val()){
+        ambilNomorRegistrasi();
+    }
+
+    $('#kode_arsip_id').on('change', function() {
+        ambilNomorRegistrasi();
     });
+
+    $('#btnUploadArea').on('click', function() {
+        $('#file_surat').click();
+    });
+
+    $('#file_surat').on('change', previewDokumen);
+
+    $("#formRegistrasiSuratKeluar").on("submit", function(){
+        if(this.checkValidity()) {
+            Swal.fire({
+                title: "Menyimpan Surat Keluar",
+                text: "Mohon tunggu sebentar...",
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+        }
+    });
+});
 </script>
-
 @endsection

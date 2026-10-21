@@ -150,31 +150,18 @@ SIDEBAR
 ==================================*/
 
 .sidebar{
-
-position:fixed;
-
-top:0;
-
-left:0;
-
-width:270px;
-
-height:100vh;
-
-background:#003844;
-
-display:flex;
-
-flex-direction:column;
-
-overflow:hidden;
-
-box-shadow:var(--shadow);
-
-transition:transform .35s ease;
-
-z-index:1100;
-
+    position:fixed;
+    top:0;
+    left:0;
+    width:270px;
+    height:100vh;
+    background:#003844;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    box-shadow:var(--shadow);
+    transition:.35s;
+    z-index:1100;
 }
 
 /*========================================
@@ -411,17 +398,25 @@ MAIN CONTENT
 ========================================*/
 
 .main-content{
+    position: relative;
+    margin-left:270px;
+    width:auto;
+    min-height:100vh;
 
-margin-left:270px;
+    padding:30px 35px;
 
-width:calc(100% - 270px);
+    background:#edf4fa;
 
-min-height:100vh;
+    transition:.35s;
 
-padding:30px;
+    box-sizing:border-box;
 
-background:#edf4fa;
+    overflow:visible;
+}
 
+.sidebar.close ~ .main-content{
+    margin-left:90px;
+    width:auto;
 }
 
 /*=========================================
@@ -1509,205 +1504,216 @@ body.dark-mode .page-title{
         </div>
     
         <!-- ================= MENU ================= -->
-    
         <div class="sidebar-menu">
     
-            <!-- Dashboard -->
-    
+            <!-- Dashboard (Selalu Tampil) -->
             <a href="{{ route('dashboard') }}"
                class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
-    
                 <span>
-    
                     <i class="bi bi-grid-fill"></i>
-    
                     Dashboard
-    
                 </span>
-    
             </a>
     
+            <!-- Ambil hak akses berdasarkan role user yang sedang login -->
+            @php
+                $userRoleId = Auth::user()->role_id ?? 1;
+
+                // Menu yang boleh dilihat = menu yang punya permission 'lihat' aktif untuk role ini
+                $allowedRoutes = DB::table('role_has_permissions')
+                    ->join('permissions', 'role_has_permissions.permission_id', '=', 'permissions.id')
+                    ->join('menus', 'permissions.module', '=', 'menus.slug')
+                    ->where('role_has_permissions.role_id', $userRoleId)
+                    ->where('permissions.name', 'lihat')
+                    ->pluck('menus.route')
+                    ->toArray();
+            @endphp
+
             <!-- ================= SURAT ================= -->
-    
+            @if(in_array('suratmasuk.index', $allowedRoutes) || in_array('suratkeluar.index', $allowedRoutes) || request()->routeIs('suratmasuk.*') || request()->routeIs('suratkeluar.*'))
+            
             <a
                 data-bs-toggle="collapse"
                 href="#suratMenu"
                 role="button"
-    
-                @if(
-                    request()->routeIs('suratmasuk.*') ||
-                    request()->routeIs('suratkeluar.*')
-                )
-    
+                @if(request()->routeIs('suratmasuk.*') || request()->routeIs('suratkeluar.*'))
                 aria-expanded="true"
-    
                 @else
-    
                 aria-expanded="false"
-    
                 @endif>
-    
                 <span>
-    
                     <i class="bi bi-envelope-paper"></i>
-    
                     Surat
-    
                 </span>
-    
                 <i class="bi bi-chevron-down"></i>
-    
             </a>
-    
-    
-            <div
-                class="collapse
-                @if(
-                    request()->routeIs('suratmasuk.*') ||
-                    request()->routeIs('suratkeluar.*')
-                )
-                show
-                @endif"
-    
-                id="suratMenu">
-    
-                <a href="{{ route('suratmasuk.index') }}"
-                   class="{{ request()->routeIs('suratmasuk.*') ? 'active' : '' }}">
-    
+
+            <div class="collapse @if(request()->routeIs('suratmasuk.*') || request()->routeIs('suratkeluar.*')) show @endif" id="suratMenu">
+
+                @if(in_array('suratmasuk.index', $allowedRoutes) || request()->routeIs('suratmasuk.*'))
+                <a href="{{ route('suratmasuk.index') }}" class="{{ request()->routeIs('suratmasuk.*') ? 'active' : '' }}">
                     <i class="bi bi-envelope-open"></i>
-    
                     Surat Masuk
-    
                 </a>
-    
-                <a href="{{ route('suratkeluar.index') }}"
-                   class="{{ request()->routeIs('suratkeluar.*') ? 'active' : '' }}">
-    
+                @endif
+
+                @if(in_array('suratkeluar.index', $allowedRoutes) || request()->routeIs('suratkeluar.*'))
+                <a href="{{ route('suratkeluar.index') }}" class="{{ request()->routeIs('suratkeluar.*') ? 'active' : '' }}">
                     <i class="bi bi-send"></i>
-    
                     Surat Keluar
-    
                 </a>
-    
+                @endif
+
             </div>
-    
-    
-            <!-- Agenda -->
-    
-            <a href="{{ route('agenda.index') }}"
-               class="{{ request()->routeIs('agenda.*') ? 'active' : '' }}">
-    
-                <span>
-    
-                    <i class="bi bi-calendar-event"></i>
-    
-                    Agenda
-    
-                </span>
-    
-            </a>
-    
-    
-            <!-- Laporan -->
-    
-            @if(Auth::user()->role_id==1)
-    
-            <a href="{{ route('laporan.index') }}"
-               class="{{ request()->routeIs('laporan.*') ? 'active' : '' }}">
-    
-                <span>
-    
-                    <i class="bi bi-file-earmark-bar-graph"></i>
-    
-                    Laporan
-    
-                </span>
-    
-            </a>
-    
             @endif
-            
-            <!-- ================= MASTER DATA ================= -->
     
+            <!-- ================= AGENDA ================= -->
+            @if(in_array('agenda.index', $allowedRoutes) || request()->routeIs('agenda.*'))
+            <a href="{{ route('agenda.index') }}" class="{{ request()->routeIs('agenda.*') ? 'active' : '' }}">
+                <span>
+                    <i class="bi bi-calendar-event"></i>
+                    Agenda
+                </span>
+            </a>
+            @endif
+    
+            <!-- ================= LAPORAN ================= -->
+            @if(in_array('laporan.index', $allowedRoutes) || request()->routeIs('laporan.*'))
+            <a href="{{ route('laporan.index') }}" class="{{ request()->routeIs('laporan.*') ? 'active' : '' }}">
+                <span>
+                    <i class="bi bi-file-earmark-bar-graph"></i>
+                    Laporan
+                </span>
+            </a>
+            @endif
+
+            <!-- ================= MASTER DATA (IKUT SWITCH AKSES ROLE) ================= -->
+            @php
+                $showMasterData = in_array('users.index', $allowedRoutes)
+                    || in_array('pejabat.index', $allowedRoutes)
+                    || in_array('arsip.index', $allowedRoutes)
+                    || in_array('kodearsip.index', $allowedRoutes);
+            @endphp
+
+            @if($showMasterData)
+
             <a
                 data-bs-toggle="collapse"
                 href="#masterMenu"
                 role="button"
-    
                 @if(
                     request()->routeIs('users.*') ||
                     request()->routeIs('pejabat.*') ||
-                    request()->routeIs('arsip.*')
+                    request()->routeIs('arsip.*') ||
+                    request()->routeIs('kodearsip.*')
                 )
-    
                 aria-expanded="true"
-    
                 @else
-    
                 aria-expanded="false"
-    
                 @endif
             >
-    
                 <span>
-    
                     <i class="bi bi-folder2-open"></i>
-    
                     Master Data
-    
                 </span>
-    
                 <i class="bi bi-chevron-down"></i>
-    
             </a>
-    
+
             <div
                 class="collapse
                 @if(
                     request()->routeIs('users.*') ||
                     request()->routeIs('pejabat.*') ||
-                    request()->routeIs('arsip.*')
+                    request()->routeIs('arsip.*') ||
+                    request()->routeIs('kodearsip.*')
                 )
                 show
                 @endif"
-    
                 id="masterMenu">
-    
-                @if(Auth::user()->role_id==1)
-    
-                <a href="{{ route('users.index') }}"
-                   class="{{ request()->routeIs('users.*') ? 'active' : '' }}">
-    
+
+                @if(in_array('users.index', $allowedRoutes))
+                <a href="{{ route('users.index') }}" class="{{ request()->routeIs('users.*') ? 'active' : '' }}">
                     <i class="bi bi-people"></i>
-    
                     Data User
-    
                 </a>
-    
-                <a href="{{ route('pejabat.index') }}"
-                   class="{{ request()->routeIs('pejabat.*') ? 'active' : '' }}">
-    
-                    <i class="bi bi-person-badge"></i>
-    
-                    Data Pejabat
-    
-                </a>
-    
                 @endif
-    
-                <a href="{{ route('arsip.index') }}"
-                   class="{{ request()->routeIs('arsip.*') ? 'active' : '' }}">
-    
-                    <i class="bi bi-folder-fill"></i>
-    
-                    Data Arsip
-    
+
+                @if(in_array('pejabat.index', $allowedRoutes))
+                <a href="{{ route('pejabat.index') }}" class="{{ request()->routeIs('pejabat.*') ? 'active' : '' }}">
+                    <i class="bi bi-person-badge"></i>
+                    Data Pejabat
                 </a>
-    
+                @endif
+
+                @if(in_array('arsip.index', $allowedRoutes))
+                <a href="{{ route('arsip.index') }}" class="{{ request()->routeIs('arsip.*') ? 'active' : '' }}">
+                    <i class="bi bi-folder-fill"></i>
+                    Data Arsip
+                </a>
+                @endif
+
+                @if(in_array('kodearsip.index', $allowedRoutes))
+                <a href="{{ route('kodearsip.index') }}" class="{{ request()->routeIs('kodearsip.*') ? 'active' : '' }}">
+                    <i class="bi bi-folder-fill"></i>
+                    Kode Arsip
+                </a>
+                @endif
+
             </div>
+
+            @endif
+
+            <!-- ================= KONFIGURASI (KHUSUS ADMIN, TIDAK IKUT SWITCH) ================= -->
+            @if(Auth::user()->role_id == 1)
+
+            <a
+            data-bs-toggle="collapse"
+            href="#konfigurasiMenu"
+            role="button"
+            @if(request()->routeIs('konfigurasi.*'))
+            aria-expanded="true"
+            @else
+            aria-expanded="false"
+            @endif
+            >
+            <span>
+                <i class="bi bi-gear-fill"></i>
+                Konfigurasi
+            </span>
+            <i class="bi bi-chevron-down"></i>
+            </a>
+
+            <div class="collapse @if(request()->routeIs('konfigurasi.*')) show @endif" id="konfigurasiMenu">
+
+            <a href="{{ route('konfigurasi.menu.index') }}"
+            class="{{ request()->routeIs('konfigurasi.menu.*') ? 'active' : '' }}">
+                <i class="bi bi-list"></i>
+                Menu
+            </a>
+
+            <a href="{{ route('konfigurasi.role.index') }}"
+            class="{{ request()->routeIs('konfigurasi.role.*') ? 'active' : '' }}">
+                <i class="bi bi-person-badge"></i>
+                Role
+            </a>
+
+            <a href="{{ route('konfigurasi.permission.index') }}"
+            class="{{ request()->routeIs('konfigurasi.permission.*') ? 'active' : '' }}">
+                <i class="bi bi-key-fill"></i>
+                Permission
+            </a>
+
+            <a href="{{ route('konfigurasi.akses-role.index') }}"
+            class="{{ request()->routeIs('konfigurasi.akses-role.*') ? 'active' : '' }}">
+                <i class="bi bi-shield-lock"></i>
+                Akses Role
+            </a>
+
+            </div>
+
+            @endif
     
         </div>
-
 <!-- ================= THEME ================= -->
 
 <div class="theme-box">

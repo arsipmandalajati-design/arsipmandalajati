@@ -2,26 +2,36 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\SuratMasuk;
-use App\Models\SuratKeluar;
 
 class KodeArsip extends Model
 {
+    use HasFactory;
+
     protected $table = 'kode_arsips';
 
     protected $fillable = [
+
         'kode',
-        'nama_arsip'
+
+        'nama_arsip',
+
+        'keterangan',
+
     ];
 
-    public function suratMasuk()
-{
-    return $this->hasMany(SuratMasuk::class, 'kode_arsip_id');
-}
+    /*
+    |--------------------------------------------------------------------------
+    | RELASI KE DATA ARSIP
+    |--------------------------------------------------------------------------
+    */
 
-public function suratKeluar()
-{
-    return $this->hasMany(SuratKeluar::class, 'kode_arsip_id');
-}
+    public function arsips()
+    {
+        return $this->hasMany(
+            Arsip::class,
+            'kode_arsip_id'
+        );
+    }
 }

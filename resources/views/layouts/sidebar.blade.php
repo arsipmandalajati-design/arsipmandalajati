@@ -17,32 +17,31 @@
             </span>
         </a>
 
-        {{-- ================= MASTER DATA ================= --}}
+       {{-- ================= MASTER DATA (HANYA UNTUK ADMIN) ================= --}}
+       
+        @if(auth()->check() && (auth()->user()->role_id == 1 || auth()->user()->role == 'admin'))
         <a class="dropdown-toggle"
-   data-bs-toggle="collapse"
-   href="#masterMenu">
-
-    <span>
-        <i class="bi bi-folder2-open"></i>
-        Master Data
-    </span>
-
-    <i class="bi bi-chevron-down"></i>
-
-</a>
+        data-bs-toggle="collapse"
+        href="#masterMenu">
+            <span>
+                <i class="bi bi-folder2-open"></i>
+                Master Data
+            </span>
+            <i class="bi bi-chevron-down"></i>
+        </a>
 
         <div class="collapse
             @if(
                 request()->routeIs('users.*') ||
                 request()->routeIs('pejabat.*') ||
-                request()->routeIs('arsip.*')
+                request()->routeIs('arsip.*') ||
+                request()->routeIs('role-permission.*')
             )
                 show
             @endif"
             id="masterMenu">
 
-            @if(Auth::user()->role_id == 1)
-
+            @if(auth()->user()->role_id == 1 || auth()->user()->role == 'admin')
                 <a href="{{ route('users.index') }}" class="ps-4">
                     <i class="bi bi-people"></i>
                     Data User
@@ -53,7 +52,16 @@
                     Data Pejabat
                 </a>
 
+                <a href="{{ route('role-permission.index') }}" class="ps-4">
+                    <i class="bi bi-shield-lock"></i>
+                    Role & Hak Akses
+                </a>
             @endif
+
+            <a href="{{ route('kodearsip.index') }}" class="ps-4">
+                <i class="bi bi-folder"></i>
+                Kode Arsip
+            </a>
 
             <a href="{{ route('arsip.index') }}" class="ps-4">
                 <i class="bi bi-folder"></i>
@@ -61,21 +69,18 @@
             </a>
 
         </div>
+        @endif
 
         {{-- ================= SURAT ================= --}}
-        <a
-    class="d-flex justify-content-between align-items-center"
-    data-bs-toggle="collapse"
-    href="#suratMenu">
-
-    <span>
-        <i class="bi bi-envelope"></i>
-        Surat
-    </span>
-
-    <i class="bi bi-chevron-down"></i>
-
-</a>
+        <a class="d-flex justify-content-between align-items-center"
+           data-bs-toggle="collapse"
+           href="#suratMenu">
+            <span>
+                <i class="bi bi-envelope"></i>
+                Surat
+            </span>
+            <i class="bi bi-chevron-down"></i>
+        </a>
 
         <div class="collapse
             @if(
@@ -108,14 +113,13 @@
 
         {{-- Laporan --}}
         @if(Auth::user()->role_id == 1)
-
         <a href="{{ route('laporan.index') }}">
             <span>
                 <i class="bi bi-file-earmark-text"></i>
                 Laporan
             </span>
         </a>
-
         @endif
 
     </div>
+</div>
