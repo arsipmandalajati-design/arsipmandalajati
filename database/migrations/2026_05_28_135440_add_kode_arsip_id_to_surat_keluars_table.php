@@ -28,7 +28,7 @@ return new class extends Migration
             $table->text('perihal')->nullable();
             
             // Disposisi diberikan default value agar konsisten
-            $table->text('disposisi')->nullable()->default('Menunggu ACC'); 
+            $table->text('disposisi')->nullable();
             
             $table->string('file_surat')->nullable();
             $table->string('status')->default('Menunggu ACC');

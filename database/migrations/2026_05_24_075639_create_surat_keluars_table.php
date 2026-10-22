@@ -21,7 +21,7 @@ return new class extends Migration
 
             $table->foreignId('kode_arsip_id')
                   ->nullable()
-                  ->constrained('kode_arsip') // Sesuaikan nama tabel kode_arsip kamu di DB
+                  ->constrained('kode_arsips') // Sesuaikan nama tabel kode_arsip kamu di DB
                   ->onDelete('set null');
 
             $table->string('nomor_surat');
@@ -32,7 +32,7 @@ return new class extends Migration
             $table->text('perihal')->nullable();
 
             // Fitur Disposisi & Status
-            $table->text('disposisi')->nullable()->default('Menunggu ACC'); 
+            $table->text('disposisi')->nullable();
             $table->string('status')->default('Menunggu ACC');
 
             $table->string('file_surat')->nullable();
