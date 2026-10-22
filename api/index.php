@@ -1,15 +1,40 @@
 <?php
 
-// Paksa tampilkan semua error PHP ke layar browser
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+// 1. Tangkap Request & Set Root Path
+define('LARAVEL_START', microtime(true));
 
-try {
-    require __DIR__ . '/../public/index.php';
-} catch (\Throwable $e) {
-    echo '<h1>PHP Uncaught Exception</h1>';
-    echo '<p><b>Message:</b> ' . htmlspecialchars($e->getMessage()) . '</p>';
-    echo '<p><b>File:</b> ' . htmlspecialchars($e->getFile()) . ' on line ' . $e->getLine() . '</p>';
-    echo '<pre>' . htmlspecialchars($e->getTraceAsString()) . '</pre>';
+// 2. Tentukan Direktori Storage & Cache ke /tmp (Wajib untuk Vercel Serverless)
+$_ENV['APP_STORAGE'] = '/tmp/storage';
+putenv('APP_STORAGE=/tmp/storage');
+
+// Pastikan folder /tmp/storage ada
+if (!is_dir('/tmp/storage')) {
+    mkdir('/tmp/storage', 0777, true);
+    mkdir('/tmp/storage/framework', 0777, true);
+    mkdir('/tmp/storage/framework/views', 0777, true);
+    mkdir('/tmp/storage/framework/cache', 0777, true);
+    mkdir('/tmp/storage/framework/sessions', 0777, true);
+    mkdir('/tmp/storage/logs', 0777, true);
 }
+
+// 3. Muat Composer Autoloader
+require __DIR__ . '/../vendor/autoload.php';
+
+// 4. Inisialisasi Aplikasi Laravel
+$app = require_once __DIR__ . '/../bootstrap/app.php';
+
+// 5. Timpa Storage Path & Cache Path ke /tmp
+$app->useStoragePath('/tmp/storage');
+$app->useBootstrapPath('/tmp/bootstrap');
+
+// 6. Jalankan Migrasi Otomatis ke Supabase (Opsional tapi aman untuk inisialisasi awal)
+try {
+    $app->make(\Illuminate\Contracts\Console\Kernel::class)->call('migrate', ['--force' => true]);
+} catch (\Exception $e) {
+    // Abaikan jika migrasi sudah pernah berjalan sebelumnya
+}
+
+// 7. Jalankan Request
+$response = $app->handleRequest(Request::capture());
+
+$response->send();
