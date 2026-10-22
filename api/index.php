@@ -1,10 +1,5 @@
 <?php
 
-// Paksa error reporting hurung supados teu HTTP 500 buta
-error_reporting(E_ALL);
-ini_set('display_errors', '1');
-
-// Set path direktori ka /tmp
 $_ENV['APP_STORAGE'] = '/tmp/storage';
 putenv('APP_STORAGE=/tmp/storage');
 
@@ -32,7 +27,6 @@ foreach ($dirs as $dir) {
 }
 
 require __DIR__ . '/../vendor/autoload.php';
-
 $app = require_once __DIR__ . '/../bootstrap/app.php';
 
 $app->useStoragePath('/tmp/storage');
