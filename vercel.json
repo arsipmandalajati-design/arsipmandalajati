@@ -1,16 +1,27 @@
 {
     "version": 2,
     "framework": "other",
-    "builds": [
-      {
-        "src": "public/index.php",
-        "use": "vercel-php@0.6.0"
+    "functions": {
+      "public/index.php": {
+        "runtime": "vercel-php@0.6.0"
       }
-    ],
+    },
     "routes": [
       {
+        "src": "/build/(.*)",
+        "dest": "/public/build/$1"
+      },
+      {
+        "src": "/favicon.ico",
+        "dest": "/public/favicon.ico"
+      },
+      {
+        "src": "/robots.txt",
+        "dest": "/public/robots.txt"
+      },
+      {
         "src": "/(.*)",
-        "dest": "public/index.php"
+        "dest": "/public/index.php"
       }
     ]
   }
