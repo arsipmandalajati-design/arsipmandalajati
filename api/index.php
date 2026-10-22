@@ -1,18 +1,49 @@
 <?php
 
+// Paksa error reporting hurung supados teu HTTP 500 buta
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
 
-echo "<h1>Debug Step 1: Cek Autoload</h1><br>";
+// Set path direktori ka /tmp
+$_ENV['APP_STORAGE'] = '/tmp/storage';
+putenv('APP_STORAGE=/tmp/storage');
 
-try {
-    require __DIR__ . '/../vendor/autoload.php';
-    echo "✔ Autoload Berhasil!<br>";
+$_ENV['APP_CONFIG_CACHE'] = '/tmp/config.php';
+putenv('APP_CONFIG_CACHE=/tmp/config.php');
 
-    $app = require_once __DIR__ . '/../bootstrap/app.php';
-    echo "✔ Bootstrap App Berhasil!<br>";
+$_ENV['APP_ROUTES_CACHE'] = '/tmp/routes.php';
+putenv('APP_ROUTES_CACHE=/tmp/routes.php');
 
-} catch (\Throwable $e) {
-    echo "<h3 style='color:red;'>❌ Error Tertangkap:</h3>";
-    echo "<pre>" . htmlspecialchars($e->getMessage()) . "\n\n" . htmlspecialchars($e->getTraceAsString()) . "</pre>";
+$_ENV['APP_SERVICES_CACHE'] = '/tmp/services.php';
+putenv('APP_SERVICES_CACHE=/tmp/services.php');
+
+$dirs = [
+    '/tmp/storage/framework/views',
+    '/tmp/storage/framework/cache/data',
+    '/tmp/storage/framework/sessions',
+    '/tmp/storage/logs',
+    '/tmp/bootstrap/cache'
+];
+
+foreach ($dirs as $dir) {
+    if (!is_dir($dir)) {
+        mkdir($dir, 0755, true);
+    }
 }
+
+require __DIR__ . '/../vendor/autoload.php';
+
+$app = require_once __DIR__ . '/../bootstrap/app.php';
+
+$app->useStoragePath('/tmp/storage');
+$app->useBootstrapPath('/tmp/bootstrap');
+
+$kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
+
+$response = $kernel->handle(
+    $request = Illuminate\Http\Request::capture()
+);
+
+$response->send();
+
+$kernel->terminate($request, $response);
