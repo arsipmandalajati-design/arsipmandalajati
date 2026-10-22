@@ -60,8 +60,7 @@ return [
             'strict' => true,
             'engine' => null,
             'options' => array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => base_path('cacert.pem'),
-                PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => true,
+                PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false,
             ]),
         ],
 
