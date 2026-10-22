@@ -59,10 +59,11 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
-            'options' => array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
-                PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false, // Tambahkan ini agar aman di Vercel
-            ]),
+            'options' => [
+                PDO::ATTR_PERSISTENT => false,
+                PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false,
+                // Jangan panggil PDO::MYSQL_ATTR_SSL_CA jika filenya tidak ada di server Vercel!
+            ],
         ],
 
         'mariadb' => [
