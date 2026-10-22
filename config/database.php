@@ -59,11 +59,11 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
-            'options' => [
-                PDO::ATTR_PERSISTENT => false,
-                PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false,
-                // Jangan panggil PDO::MYSQL_ATTR_SSL_CA jika filenya tidak ada di server Vercel!
-            ],
+            'options' => array_filter([
+                // Mengarahkan langsung ke file cacert.pem di root project
+                PDO::MYSQL_ATTR_SSL_CA => base_path('cacert.pem'),
+                PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => true,
+            ]),
         ],
 
         'mariadb' => [
