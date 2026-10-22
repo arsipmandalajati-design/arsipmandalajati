@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jul 20, 2026 at 04:08 AM
+-- Generation Time: Oct 20, 2026 at 10:44 AM
 -- Server version: 8.4.3
 -- PHP Version: 8.3.30
 
@@ -38,6 +38,7 @@ CREATE TABLE `agendas` (
   `updated_at` timestamp NULL DEFAULT NULL,
   `tempat` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `notulen` text COLLATE utf8mb4_unicode_ci,
   `surat_masuk_id` bigint UNSIGNED DEFAULT NULL,
   `jam_mulai` time DEFAULT NULL,
   `jam_selesai` time DEFAULT NULL,
@@ -55,16 +56,16 @@ CREATE TABLE `agendas` (
   `lainnya` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `hasil_kegiatan` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `hasil_materi` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `catatan` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+  `catatan` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `jumlah_peserta` int DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `agendas`
 --
 
-INSERT INTO `agendas` (`id`, `user_id`, `nama_kegiatan`, `tanggal`, `penyelenggara`, `keterangan`, `created_at`, `updated_at`, `tempat`, `status`, `surat_masuk_id`, `jam_mulai`, `jam_selesai`, `materi`, `kebutuhan`, `status_wa`, `penanggung_jawab`, `dokumentasi`, `kursi`, `meja`, `proyektor`, `mic`, `sound_system`, `kabel_roll`, `lainnya`, `hasil_kegiatan`, `hasil_materi`, `catatan`) VALUES
-(2, 2, 'PETUGASAN', '2026-07-14', 'KASUBAG', NULL, '2026-07-11 04:31:37', '2026-07-11 04:31:37', 'Aula Kecamatan', 'Diproses', 12, '08:00:00', '09:00:00', 'RAPAT EVALUASI', NULL, NULL, NULL, NULL, 50, 2, 2, 2, 2, 2, NULL, NULL, NULL, NULL),
-(4, 2, 'RAPAT', '2026-07-13', 'PKK', 'GFFHFH', '2026-07-12 16:06:44', '2026-07-12 16:07:27', 'Ruang Rapat', 'Terjadwal', 15, '08:00:00', '10:00:00', NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL);
+INSERT INTO `agendas` (`id`, `user_id`, `nama_kegiatan`, `tanggal`, `penyelenggara`, `keterangan`, `created_at`, `updated_at`, `tempat`, `status`, `notulen`, `surat_masuk_id`, `jam_mulai`, `jam_selesai`, `materi`, `kebutuhan`, `status_wa`, `penanggung_jawab`, `dokumentasi`, `kursi`, `meja`, `proyektor`, `mic`, `sound_system`, `kabel_roll`, `lainnya`, `hasil_kegiatan`, `hasil_materi`, `catatan`, `jumlah_peserta`) VALUES
+(8, 1, 'PETUGASAN', '2026-08-26', 'Kelurahan JatiHandap', 'cgdhfhj', '2026-08-24 10:46:35', '2026-08-24 10:46:35', 'Aula Kecamatan', 'Terjadwal', NULL, 27, '08:00:00', '12:00:00', 'RAPAT EVALUASI', NULL, NULL, NULL, NULL, 80, 2, 2, 2, 2, 2, NULL, NULL, NULL, NULL, 0);
 
 -- --------------------------------------------------------
 
@@ -77,22 +78,22 @@ CREATE TABLE `arsips` (
   `kode_arsip` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `nama_arsip` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `tanggal_arsip` date NOT NULL,
-  `kategori` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `file_arsip` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `nomor_registrasi` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `retensi_tahun` int NOT NULL DEFAULT '5',
+  `tanggal_kadaluarsa` date DEFAULT NULL,
+  `kategori` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `arsips`
 --
 
-INSERT INTO `arsips` (`id`, `kode_arsip`, `nama_arsip`, `tanggal_arsip`, `kategori`, `file_arsip`, `created_at`, `updated_at`) VALUES
-(1, 'HM', 'pppp', '2026-06-23', 'Surat Keluar', 'arsip/CEdu4c3zBXjo6jNQb3hD3j3AJmCdzKkNGEkjIxUz.docx', '2026-06-24 06:32:44', '2026-06-24 06:32:44'),
-(4, 'HM.02', 'RAPAT', '2026-07-06', 'Surat Masuk', 'surat/utcLemi3Asn1nr46tLkB4MYCkPkUqQfAiedoiYbF.pdf', '2026-07-11 02:23:51', '2026-07-11 02:23:51'),
-(5, 'HM.03.02', 'RAPAT', '2026-07-06', 'Surat Masuk', 'surat_masuk/xvGfKnxVsyBHUMV8Ym8Xu68hDceDzoEFmFtBPM1S.pdf', '2026-07-11 02:59:44', '2026-07-11 02:59:44'),
-(6, 'HM.04.03', 'Surat Undangan', '2026-07-06', 'Surat Masuk', 'surat_masuk/bQ5s2GDursXakRt1Z2oa3Sjc3qcYnmjhyKp6T9Iq.pdf', '2026-07-11 03:05:35', '2026-07-11 03:05:35'),
-(10, 'HM.05', 'RAPAT', '2026-07-10', 'Surat Masuk', 'surat_masuk/FvuNdloiFDYjzNfYKoC1Nhg3IR1wGyeXpg6pWMuO.pdf', '2026-07-12 16:04:37', '2026-07-12 16:04:37');
+INSERT INTO `arsips` (`id`, `kode_arsip`, `nama_arsip`, `tanggal_arsip`, `file_arsip`, `created_at`, `updated_at`, `nomor_registrasi`, `retensi_tahun`, `tanggal_kadaluarsa`, `kategori`) VALUES
+(19, 'No.HM.03.01/001-Subbag.Umum-Kec.MDLJ/T/VIII/2026', 'PETUGASAN', '2026-08-24', 'surat_masuk/8QsuTJipwUetoNTh3vzTT8n5X6rUr5H0FUtCF5Je.pdf', '2026-08-24 10:46:35', '2026-08-24 10:46:35', 'No.HM.03.01/001-Subbag.Umum-Kec.MDLJ/T/VIII/2026', 5, NULL, 'Surat Masuk'),
+(20, 'No.HM.03.01/002-Subbag.Umum-Kec.MDLJ/T/VIII/2026', 'SURAT PEMOHONAN', '2026-08-18', 'surat_masuk/HPbHPkCmGSOXbvHECPGEObrRyZGKRCfcuAFXbnML.pdf', '2026-08-24 10:51:12', '2026-08-24 10:51:12', 'No.HM.03.01/002-Subbag.Umum-Kec.MDLJ/T/VIII/2026', 5, NULL, 'Surat Masuk');
 
 -- --------------------------------------------------------
 
@@ -220,6 +221,38 @@ INSERT INTO `kode_arsips` (`id`, `kode`, `nama_arsip`, `created_at`, `updated_at
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `menus`
+--
+
+CREATE TABLE `menus` (
+  `id` bigint UNSIGNED NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `route` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `icon` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `order` int NOT NULL DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `menus`
+--
+
+INSERT INTO `menus` (`id`, `name`, `slug`, `route`, `icon`, `order`, `created_at`, `updated_at`) VALUES
+(1, 'Dashboard', 'dashboard', 'dashboard', 'bi bi-grid', 1, NULL, NULL),
+(2, 'Data User', 'users', 'users.index', 'bi bi-people', 2, NULL, NULL),
+(3, 'Data Pejabat', 'pejabat', 'pejabat.index', 'bi bi-person-badge', 3, NULL, NULL),
+(4, 'Kode Arsip', 'kodearsip', 'kodearsip.index', 'bi bi-folder', 4, NULL, NULL),
+(5, 'Data Arsip', 'arsip', 'arsip.index', 'bi bi-folder', 5, NULL, NULL),
+(6, 'Surat Masuk', 'suratmasuk', 'suratmasuk.index', 'bi bi-envelope-open', 6, NULL, NULL),
+(7, 'Surat Keluar', 'suratkeluar', 'suratkeluar.index', 'bi bi-envelope-arrow-up', 7, NULL, NULL),
+(8, 'Agenda Kegiatan', 'agenda', 'agenda.index', 'bi bi-calendar-event', 8, NULL, NULL),
+(9, 'Laporan', 'laporan', 'laporan.index', 'bi bi-file-earmark-text', 9, NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `migrations`
 --
 
@@ -275,7 +308,17 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (39, '2026_07_06_202701_add_reference_id_to_notifications_table', 4),
 (40, '2026_07_09_011926_add_detail_surat_to_surat_masuks_table', 5),
 (41, '2026_07_11_095729_add_booking_columns_to_surat_masuks_table', 6),
-(42, '2026_07_12_211552_add_hasil_to_agendas_table', 7);
+(42, '2026_07_12_211552_add_hasil_to_agendas_table', 7),
+(43, '2026_07_20_114542_update_surat_masuks_table', 8),
+(44, '2026_07_20_153703_add_nomor_urut_to_surat_masuks_table', 8),
+(45, '2026_07_20_154616_add_nomor_registrasi_to_surat_masuks_table', 8),
+(46, '2026_07_23_211306_add_disposisi_fields_to_surat_keluars_table', 8),
+(47, '2026_07_24_165953_add_logistik_to_agendas_table', 9),
+(48, '2026_07_24_231220_add_notulen_to_agendas_table', 10),
+(49, '2026_07_25_211505_add_retensi_to_arsips_table', 11),
+(50, '2026_07_25_212423_add_tanggal_kadaluarsa_to_arsips_table', 12),
+(51, '2026_07_30_125409_create_menus_table', 12),
+(52, '2026_07_30_125409_create_role_menu_table', 12);
 
 -- --------------------------------------------------------
 
@@ -300,26 +343,23 @@ CREATE TABLE `notifications` (
 --
 
 INSERT INTO `notifications` (`id`, `user_id`, `judul`, `pesan`, `jenis`, `reference_id`, `is_read`, `created_at`, `updated_at`) VALUES
-(1, 1, 'Surat Masuk Baru', 'Pegawai Kecamatan menambahkan surat \"PETUGASAN\".', 'surat', 7, 1, '2026-07-08 17:39:13', '2026-07-10 16:50:42'),
-(2, 2, 'Surat Diverifikasi', 'Surat \"PETUGASAN\" telah diverifikasi.', 'surat', 7, 1, '2026-07-10 20:09:15', '2026-07-10 20:10:34'),
-(3, 2, 'Disposisi Baru', 'Anda menerima disposisi surat \"PETUGASAN\".', 'surat', 7, 1, '2026-07-10 20:10:00', '2026-07-10 20:10:34'),
-(4, 1, 'Surat Masuk Baru', 'Pegawai Kecamatan menambahkan surat \"RAPAT\".', 'surat', 8, 0, '2026-07-11 02:23:51', '2026-07-11 02:23:51'),
-(5, 1, 'Surat Masuk Baru', 'Pegawai Kecamatan menambahkan surat \"RAPAT\".', 'surat', 9, 0, '2026-07-11 02:59:44', '2026-07-11 02:59:44'),
-(6, 1, 'Surat Masuk Baru', 'Pegawai Kecamatan menambahkan surat \"Surat Undangan\".', 'surat', 10, 0, '2026-07-11 03:05:35', '2026-07-11 03:05:35'),
-(7, 1, 'Surat Masuk Baru', 'Pegawai Kecamatan menambahkan surat \"PETUGASAN\".', 'surat', 12, 0, '2026-07-11 04:31:37', '2026-07-11 04:31:37'),
-(8, 1, 'Surat Masuk Baru', 'Pegawai Kecamatan menambahkan surat \"PETUGASAN\".', 'surat', 13, 0, '2026-07-11 09:22:42', '2026-07-11 09:22:42'),
-(9, 2, 'Disposisi Baru', 'Anda menerima disposisi surat \"RAPAT\".', 'surat', 11, 1, '2026-07-11 11:52:44', '2026-07-11 11:54:11'),
-(10, 2, 'Disposisi Baru', 'Anda menerima disposisi surat \"PETUGASAN\".', 'surat', 13, 1, '2026-07-11 11:53:18', '2026-07-11 11:54:11'),
-(11, 2, 'Disposisi Baru', 'Anda menerima disposisi surat \"PETUGASAN\".', 'surat', 12, 1, '2026-07-11 11:53:36', '2026-07-11 11:54:11'),
-(12, 1, 'Agenda Baru', 'Pegawai Kecamatan membuat agenda \"RAPAT\".', 'agenda', 3, 0, '2026-07-11 12:03:09', '2026-07-11 12:03:09'),
-(13, 1, 'Surat Masuk Baru', 'Pegawai Kecamatan menambahkan surat \"PETUGASAN\".', 'surat', 14, 0, '2026-07-11 15:04:44', '2026-07-11 15:04:44'),
-(14, 1, 'Agenda Dihapus', 'Agenda \"Rapat\" telah dihapus.', 'agenda', NULL, 0, '2026-07-12 13:46:02', '2026-07-12 13:46:02'),
-(15, 1, 'Surat Masuk Baru', 'Pegawai Kecamatan menambahkan surat \"RAPAT\".', 'surat', 15, 0, '2026-07-12 16:04:37', '2026-07-12 16:04:37'),
-(16, 2, 'Surat Diverifikasi', 'Surat \"RAPAT\" telah diverifikasi.', 'surat', 15, 0, '2026-07-12 16:05:11', '2026-07-12 16:05:11'),
-(17, 2, 'Disposisi Baru', 'Anda menerima disposisi surat \"RAPAT\".', 'surat', 15, 0, '2026-07-12 16:05:26', '2026-07-12 16:05:26'),
-(18, 1, 'Agenda Baru', 'Pegawai Kecamatan membuat agenda \"RAPAT\".', 'agenda', 4, 0, '2026-07-12 16:06:44', '2026-07-12 16:06:44'),
-(19, 1, 'Agenda Diperbarui', 'Agenda \"RAPAT\" berhasil diperbarui.', 'agenda', 4, 0, '2026-07-12 16:07:27', '2026-07-12 16:07:27'),
-(20, 1, 'Agenda Dihapus', 'Agenda \"RAPAT\" telah dihapus.', 'agenda', NULL, 0, '2026-07-12 16:14:46', '2026-07-12 16:14:46');
+(4, 1, 'Surat Masuk Baru', 'Pegawai Kecamatan menambahkan surat \"RAPAT\".', 'surat', 8, 1, '2026-07-11 02:23:51', '2026-07-24 10:33:53'),
+(5, 1, 'Surat Masuk Baru', 'Pegawai Kecamatan menambahkan surat \"RAPAT\".', 'surat', 9, 1, '2026-07-11 02:59:44', '2026-07-24 10:33:53'),
+(6, 1, 'Surat Masuk Baru', 'Pegawai Kecamatan menambahkan surat \"Surat Undangan\".', 'surat', 10, 1, '2026-07-11 03:05:35', '2026-07-24 10:33:53'),
+(12, 1, 'Agenda Baru', 'Pegawai Kecamatan membuat agenda \"RAPAT\".', 'agenda', 3, 1, '2026-07-11 12:03:09', '2026-07-24 10:33:53'),
+(13, 1, 'Surat Masuk Baru', 'Pegawai Kecamatan menambahkan surat \"PETUGASAN\".', 'surat', 14, 1, '2026-07-11 15:04:44', '2026-07-24 10:33:53'),
+(14, 1, 'Agenda Dihapus', 'Agenda \"Rapat\" telah dihapus.', 'agenda', NULL, 1, '2026-07-12 13:46:02', '2026-07-24 10:33:53'),
+(18, 1, 'Agenda Baru', 'Pegawai Kecamatan membuat agenda \"RAPAT\".', 'agenda', 4, 1, '2026-07-12 16:06:44', '2026-07-24 10:33:53'),
+(19, 1, 'Agenda Diperbarui', 'Agenda \"RAPAT\" berhasil diperbarui.', 'agenda', 4, 1, '2026-07-12 16:07:27', '2026-07-24 10:33:53'),
+(20, 1, 'Agenda Dihapus', 'Agenda \"RAPAT\" telah dihapus.', 'agenda', NULL, 1, '2026-07-12 16:14:46', '2026-07-24 10:33:53'),
+(24, 1, 'Agenda Dihapus', 'Agenda \"PETUGASAN\" telah dihapus.', 'agenda', NULL, 1, '2026-07-24 10:36:13', '2026-07-26 15:14:19'),
+(25, 1, 'Agenda Dihapus', 'Agenda \"RAPAT\" telah dihapus.', 'agenda', NULL, 1, '2026-07-24 10:36:20', '2026-07-26 15:14:19'),
+(27, 1, 'Agenda Dihapus', 'Agenda \"BANTUAN\" telah dihapus.', 'agenda', NULL, 1, '2026-07-25 14:10:09', '2026-07-26 15:14:19'),
+(28, 1, 'Agenda Dihapus', 'Agenda \"Surat Undangan\" telah dihapus.', 'agenda', NULL, 1, '2026-07-25 14:10:14', '2026-07-26 15:14:19'),
+(37, 1, 'Surat Masuk Baru', 'EVY OKTAVIYANTI, S.STP., MM menambahkan surat \"PETUGASAN\".', 'surat', 27, 1, '2026-08-24 10:46:35', '2026-09-08 07:56:28'),
+(38, 1, 'Disposisi Baru', 'Anda menerima disposisi surat \"PETUGASAN\".', 'surat', 27, 1, '2026-08-24 10:47:06', '2026-09-08 07:56:28'),
+(39, 1, 'Surat Masuk Baru', 'EVY OKTAVIYANTI, S.STP., MM menambahkan surat \"SURAT PEMOHONAN\".', 'surat', 28, 1, '2026-08-24 10:51:12', '2026-09-08 07:56:28'),
+(40, 1, 'Disposisi Baru', 'Anda menerima disposisi surat \"SURAT PEMOHONAN\".', 'surat', 28, 1, '2026-08-24 10:51:43', '2026-09-08 07:56:28');
 
 -- --------------------------------------------------------
 
@@ -341,13 +381,76 @@ CREATE TABLE `password_reset_tokens` (
 
 CREATE TABLE `pejabats` (
   `id` bigint UNSIGNED NOT NULL,
-  `nama_pejabat` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nama_pejabat` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `nip` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `jabatan` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `tanda_tangan` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `user_id` bigint NOT NULL,
+  `golongan` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `unit_kerja` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `pejabats`
+--
+
+INSERT INTO `pejabats` (`id`, `nama_pejabat`, `nip`, `jabatan`, `tanda_tangan`, `created_at`, `updated_at`, `user_id`, `golongan`, `unit_kerja`) VALUES
+(2, NULL, '197102082007011012', 'Kepala Sub Bagian Umum, Kepegawaian, Data dan Informasi Kec. Mandalajati', NULL, '2026-07-26 11:15:59', '2026-07-26 11:15:59', 2, 'III/b', 'Sub Bagian Umum dan Kepegawaian'),
+(3, NULL, '198007132011012004', 'Kepala Seksi Kesejahteraan Sosial Kec. Mandalajati', NULL, '2026-07-26 11:19:34', '2026-07-26 11:19:34', 4, 'III/d', 'Seksi Kesejahteraan Sosial (Kesos)'),
+(4, NULL, '19999', 'Camat Mandalajati', NULL, '2026-07-29 14:19:59', '2026-07-29 14:19:59', 1, '1', 'Kepala Kecamatan Mandalajati');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `permissions`
+--
+
+CREATE TABLE `permissions` (
+  `id` int NOT NULL,
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `module` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `permissions`
+--
+
+INSERT INTO `permissions` (`id`, `name`, `module`) VALUES
+(31, 'lihat', 'dashboard'),
+(32, 'lihat', 'suratmasuk'),
+(33, 'tambah', 'suratmasuk'),
+(34, 'ubah', 'suratmasuk'),
+(35, 'disposisi', 'suratmasuk'),
+(36, 'hapus', 'suratmasuk'),
+(37, 'lihat', 'suratkeluar'),
+(38, 'tambah', 'suratkeluar'),
+(39, 'ubah', 'suratkeluar'),
+(40, 'verifikasi', 'suratkeluar'),
+(41, 'hapus', 'suratkeluar'),
+(42, 'lihat', 'agenda'),
+(43, 'tambah', 'agenda'),
+(44, 'ubah', 'agenda'),
+(45, 'hapus', 'agenda'),
+(46, 'lihat', 'users'),
+(47, 'tambah', 'users'),
+(48, 'ubah', 'users'),
+(49, 'hapus', 'users'),
+(50, 'lihat', 'pejabat'),
+(51, 'tambah', 'pejabat'),
+(52, 'ubah', 'pejabat'),
+(53, 'hapus', 'pejabat'),
+(54, 'lihat', 'kodearsip'),
+(55, 'tambah', 'kodearsip'),
+(56, 'ubah', 'kodearsip'),
+(57, 'hapus', 'kodearsip'),
+(58, 'lihat', 'arsip'),
+(59, 'tambah', 'arsip'),
+(60, 'ubah', 'arsip'),
+(61, 'hapus', 'arsip'),
+(62, 'cetak', 'laporan'),
+(63, 'lihat', 'laporan');
 
 -- --------------------------------------------------------
 
@@ -361,6 +464,113 @@ CREATE TABLE `roles` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `roles`
+--
+
+INSERT INTO `roles` (`id`, `nama_role`, `created_at`, `updated_at`) VALUES
+(1, 'Admin', '2026-07-30 07:14:33', '2026-07-30 07:14:33'),
+(2, 'Pegawai', '2026-07-30 07:14:33', '2026-07-30 07:14:33');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `role_has_permissions`
+--
+
+CREATE TABLE `role_has_permissions` (
+  `role_id` int NOT NULL,
+  `permission_id` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `role_has_permissions`
+--
+
+INSERT INTO `role_has_permissions` (`role_id`, `permission_id`) VALUES
+(1, 31),
+(1, 32),
+(1, 33),
+(1, 34),
+(1, 35),
+(1, 36),
+(1, 37),
+(1, 38),
+(1, 39),
+(1, 40),
+(1, 41),
+(1, 42),
+(1, 43),
+(1, 44),
+(1, 45),
+(1, 46),
+(1, 47),
+(1, 48),
+(1, 49),
+(1, 50),
+(1, 51),
+(1, 52),
+(1, 53),
+(1, 54),
+(1, 55),
+(1, 56),
+(1, 57),
+(1, 58),
+(1, 59),
+(1, 60),
+(1, 61),
+(1, 62),
+(1, 63),
+(2, 31),
+(2, 32),
+(2, 33),
+(2, 34),
+(2, 35),
+(2, 37),
+(2, 38),
+(2, 39),
+(2, 42),
+(2, 43),
+(2, 44),
+(2, 54),
+(2, 58),
+(2, 59),
+(2, 60);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `role_menu`
+--
+
+CREATE TABLE `role_menu` (
+  `id` bigint UNSIGNED NOT NULL,
+  `role_id` bigint UNSIGNED NOT NULL,
+  `menu_id` bigint UNSIGNED NOT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `role_menu`
+--
+
+INSERT INTO `role_menu` (`id`, `role_id`, `menu_id`, `is_active`, `created_at`, `updated_at`) VALUES
+(3, 2, 6, 0, NULL, NULL),
+(9, 1, 7, 0, NULL, NULL),
+(10, 1, 8, 0, NULL, NULL),
+(12, 1, 5, 0, NULL, NULL),
+(13, 1, 4, 0, NULL, NULL),
+(14, 1, 3, 0, NULL, NULL),
+(17, 2, 7, 0, NULL, NULL),
+(18, 2, 8, 0, NULL, NULL),
+(19, 2, 1, 0, NULL, NULL),
+(21, 1, 2, 0, NULL, NULL),
+(24, 1, 1, 0, NULL, NULL),
+(25, 1, 9, 0, NULL, NULL),
+(27, 1, 6, 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -397,23 +607,28 @@ CREATE TABLE `surat_keluars` (
   `id` bigint UNSIGNED NOT NULL,
   `user_id` bigint UNSIGNED NOT NULL,
   `kode_arsip_id` bigint UNSIGNED DEFAULT NULL,
+  `nomor_urut` int DEFAULT NULL,
+  `nomor_registrasi` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `nomor_surat` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `judul` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `pengirim` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `tujuan` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `tanggal_surat` date NOT NULL,
   `perihal` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `file_surat` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Belum ACC',
+  `user_disposisi_id` bigint UNSIGNED DEFAULT NULL,
+  `catatan_disposisi` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `disposisi` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `surat_keluars`
 --
 
-INSERT INTO `surat_keluars` (`id`, `user_id`, `kode_arsip_id`, `nomor_surat`, `judul`, `pengirim`, `tujuan`, `tanggal_surat`, `perihal`, `file_surat`, `created_at`, `updated_at`) VALUES
-(4, 1, 2, 'No.HM.01/035-Pel.DN-Kec.MDLJ/T/VI/2026', 'PETUGASAN', 'kesos', 'camat', '2026-06-24', 'TUGAS', 'surat/d0ENOW5iUdcRTudSpBI8catetCjfSRL9eK8wCyBX.pdf', '2026-06-23 00:12:01', '2026-06-23 00:14:59');
+INSERT INTO `surat_keluars` (`id`, `user_id`, `kode_arsip_id`, `nomor_urut`, `nomor_registrasi`, `nomor_surat`, `judul`, `tujuan`, `tanggal_surat`, `perihal`, `file_surat`, `status`, `user_disposisi_id`, `catatan_disposisi`, `created_at`, `updated_at`, `disposisi`) VALUES
+(8, 1, 3, NULL, NULL, '001.PEL', 'SURAT TUGAS', 'KELURAHAN', '2026-08-25', 'TUGAS SASAPU', 'surat_keluar/xJ9K70u4nK4sdUtWUOir028896Q1FR8mDu3jqIWf.pdf', 'Belum ACC', NULL, NULL, '2026-08-26 15:33:40', '2026-08-26 15:33:40', '-');
 
 -- --------------------------------------------------------
 
@@ -423,22 +638,28 @@ INSERT INTO `surat_keluars` (`id`, `user_id`, `kode_arsip_id`, `nomor_surat`, `j
 
 CREATE TABLE `surat_masuks` (
   `id` bigint UNSIGNED NOT NULL,
+  `nomor_registrasi` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `user_id` bigint UNSIGNED DEFAULT NULL,
   `nomor_surat` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `nomor_manual` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `pengirim` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `tanggal_surat` date NOT NULL,
+  `tanggal_kadaluarsa` date DEFAULT NULL,
+  `tanggal_diterima` date DEFAULT NULL,
   `perihal` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `file_surat` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `kode_arsip_id` bigint UNSIGNED NOT NULL,
+  `nomor_urut` int DEFAULT NULL,
   `jenis_surat` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sumber_arsip` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `judul` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `disposisi` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `tgl_batas_disposisi` date DEFAULT NULL,
   `pejabat_id` bigint UNSIGNED DEFAULT NULL,
   `status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'Menunggu Verifikasi',
+  `status_acc` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT 'pending',
   `user_disposisi_id` bigint UNSIGNED DEFAULT NULL,
   `catatan_admin` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `tempat` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -451,21 +672,17 @@ CREATE TABLE `surat_masuks` (
   `meja` int NOT NULL DEFAULT '0',
   `proyektor` int NOT NULL DEFAULT '0',
   `mic` int NOT NULL DEFAULT '0',
-  `sound_system` int NOT NULL DEFAULT '0',
-  `kabel_roll` int NOT NULL DEFAULT '0',
-  `lainnya` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL
+  `lainnya` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `no_surat_asal` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `surat_masuks`
 --
 
-INSERT INTO `surat_masuks` (`id`, `user_id`, `nomor_surat`, `nomor_manual`, `pengirim`, `tanggal_surat`, `perihal`, `created_at`, `updated_at`, `file_surat`, `kode_arsip_id`, `jenis_surat`, `sumber_arsip`, `judul`, `disposisi`, `pejabat_id`, `status`, `user_disposisi_id`, `catatan_admin`, `tempat`, `tanggal_kegiatan`, `jam_mulai`, `jam_selesai`, `materi`, `jumlah_peserta`, `kursi`, `meja`, `proyektor`, `mic`, `sound_system`, `kabel_roll`, `lainnya`) VALUES
-(7, 2, 'No.HM.02/035-Pel.DN-Kec.MDLJ/T/VII/2026', NULL, 'KASUBAG', '2026-07-06', 'FHRHBFBF', '2026-07-08 17:39:13', '2026-07-10 20:10:00', 'surat/s13TEc8sZggrfZBKfyGKFDL3aC8omhjt2ukXiVDi.pdf', 3, NULL, NULL, 'PETUGASAN', NULL, NULL, 'Sudah Disposisi', 2, 'OKE', NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, NULL),
-(11, 2, 'No.HM.08/200-PLN-Kec.MDLJ/T/VII/2026', NULL, 'PKK', '2026-07-06', 'dhdydfjyjy', '2026-07-11 04:28:26', '2026-07-12 16:14:46', 'surat_masuk/68P8wtJoBQYKK0RGszTawgcfPzyYgWTlo7unPKDL.pdf', 20, 'Internal', 'Dokumen Digital', 'RAPAT', NULL, NULL, 'Sudah Disposisi', 2, 'OKAY', 'Aula Kecamatan', '2026-07-13', '08:00:00', '10:00:00', 'RAPAT EVALUASI', 50, 50, 3, 2, 2, 2, 2, NULL),
-(12, 2, 'No.HM.06/035-Pel.DN-Kec.MDLJ/T/VII/2026', NULL, 'KASUBAG', '2026-07-07', 'hfjffuf', '2026-07-11 04:31:37', '2026-07-11 11:53:36', 'surat_masuk/FCM1Dl8RLAYlIoqLNdYYunp8aBLoWgd0Qos6kjuB.pdf', 18, 'Internal', 'Dokumen Digital', 'PETUGASAN', NULL, NULL, 'Sudah Disposisi', 2, 'HGHGJ', 'Aula Kecamatan', '2026-07-14', '08:00:00', '09:00:00', 'RAPAT EVALUASI', 50, 50, 2, 2, 2, 2, 2, NULL),
-(13, 2, 'No.HK/200-PLN-Kec.MDLJ/T/VII/2026', NULL, 'KASUBAG', '2026-07-06', 'chcjhcjhch', '2026-07-11 09:22:42', '2026-07-11 11:53:18', 'surat_masuk/0REeKJaY7PzdPE2eNE4Ik0DefI0Zr5mGhfVt3uzf.pdf', 21, 'Internal', 'Dokumen Digital', 'PETUGASAN', NULL, NULL, 'Sudah Disposisi', 2, 'FHFHF', 'Aula Kecamatan', '2026-07-14', '08:00:00', '10:00:00', 'RAPAT EVALUASI', 15, 15, 1, 1, 2, 2, 3, NULL),
-(15, 2, 'No.HM.05/035-Pel.DN-Kec.MDLJ/T/VII/2026', NULL, 'PKK', '2026-07-10', 'GFFHFH', '2026-07-12 16:04:37', '2026-07-12 16:06:44', 'surat_masuk/FvuNdloiFDYjzNfYKoC1Nhg3IR1wGyeXpg6pWMuO.pdf', 17, 'Internal', 'Dokumen Digital', 'RAPAT', NULL, NULL, 'Sudah Dijadikan Agenda', 2, 'HFHH', 'Ruang Rapat', '2026-07-14', '08:00:00', '10:00:00', NULL, 50, 50, 2, 2, 2, 2, 2, NULL);
+INSERT INTO `surat_masuks` (`id`, `nomor_registrasi`, `user_id`, `nomor_surat`, `nomor_manual`, `pengirim`, `tanggal_surat`, `tanggal_kadaluarsa`, `tanggal_diterima`, `perihal`, `created_at`, `updated_at`, `file_surat`, `kode_arsip_id`, `nomor_urut`, `jenis_surat`, `sumber_arsip`, `judul`, `disposisi`, `tgl_batas_disposisi`, `pejabat_id`, `status`, `status_acc`, `user_disposisi_id`, `catatan_admin`, `tempat`, `tanggal_kegiatan`, `jam_mulai`, `jam_selesai`, `materi`, `jumlah_peserta`, `kursi`, `meja`, `proyektor`, `mic`, `lainnya`, `no_surat_asal`) VALUES
+(27, 'No.HM.03.01/001-Subbag.Umum-Kec.MDLJ/T/VIII/2026', 1, '001/Jthndp/2026', NULL, 'Kelurahan JatiHandap', '2026-08-24', NULL, NULL, 'cgdhfhj', '2026-08-24 10:46:35', '2026-08-24 10:47:06', 'surat_masuk/8QsuTJipwUetoNTh3vzTT8n5X6rUr5H0FUtCF5Je.pdf', 5, 1, 'Internal', NULL, 'PETUGASAN', NULL, NULL, NULL, 'Sudah Disposisi', 'pending', 1, 'diteruskan', NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, NULL, NULL),
+(28, 'No.HM.03.01/002-Subbag.Umum-Kec.MDLJ/T/VIII/2026', 1, '421p/ 1245 - Disdik / 2026', NULL, 'Dinas Pendidikan', '2026-08-18', NULL, NULL, 'pemohonan petugassan', '2026-08-24 10:51:12', '2026-08-24 10:51:43', 'surat_masuk/HPbHPkCmGSOXbvHECPGEObrRyZGKRCfcuAFXbnML.pdf', 5, 2, 'Eksternal', NULL, 'SURAT PEMOHONAN', NULL, NULL, NULL, 'Sudah Disposisi', 'pending', 1, 'diteruskan', NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -484,7 +701,7 @@ CREATE TABLE `users` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `role` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'user',
-  `photo` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `photo` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `nomor_wa` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -493,8 +710,23 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `role_id`, `name`, `email`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`, `role`, `photo`, `nomor_wa`) VALUES
-(1, 1, 'Camat Mandalajati', 'adminarsip@mandja.com', NULL, '$2y$12$Zb6pFsgYiA3SJQzUoKCpU.JMdMz4118tSorKc7m8qb42ecVs5Vi..', NULL, '2026-05-28 07:20:15', '2026-06-30 10:41:07', 'admin', 'profile/user_1.png', NULL),
-(2, 2, 'Pegawai Kecamatan', 'pegawaiarsip@mandja.com', NULL, '$2y$12$I3Dg75tsZM5kOb5S1HPBb.t7N.hfEiJCsgn1cWqHToYTGZ3Tz7Vka', NULL, NULL, '2026-06-30 13:43:11', 'pegawai', 'profile/user_2.png', NULL);
+(1, 1, 'EVY OKTAVIYANTI, S.STP., MM', 'adminarsip@mandja.com', NULL, '$2y$12$28Gq/6rso89xZD3zaERGDet3gWUSQTaG.wocfAI8nuFoPWSI7FF4G', 'eZNxECWGAbweQZ1ajj8JHjAi5qTzJEoAecvHZT07wyQtt2Aixpqtn1VTm0wE', '2026-05-28 07:20:15', '2026-07-29 14:19:59', 'Admin', 'profile/user_1.png', '62'),
+(2, 2, 'Adang Sugandi,SE., MM', 'pegawaiarsip@mandja.com', NULL, '$2y$12$/bp9DH2uxsMrOXIuCQoZj.gRS/RRieI8ZRek7E8FuvdeU2ypjaik6', NULL, NULL, '2026-07-26 11:15:59', 'Pegawai', 'profile/user_2.png', NULL),
+(4, 2, 'Lina Yulinar,S.IP., M.A.P', 'pegawaikesosarsip@mandja.com', NULL, '$2y$12$cESEoQN0wWEz57uTfiq.LeK/bsiHkVtoLNeHkQMOeRn9NlcI2BI6a', NULL, '2026-07-26 11:19:34', '2026-07-26 11:19:34', 'Pegawai', NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_has_permissions`
+--
+
+CREATE TABLE `user_has_permissions` (
+  `id` bigint UNSIGNED NOT NULL,
+  `user_id` bigint UNSIGNED NOT NULL,
+  `permission_id` bigint UNSIGNED NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Indexes for dumped tables
@@ -554,6 +786,13 @@ ALTER TABLE `kode_arsips`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `menus`
+--
+ALTER TABLE `menus`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `menus_slug_unique` (`slug`);
+
+--
 -- Indexes for table `migrations`
 --
 ALTER TABLE `migrations`
@@ -578,10 +817,30 @@ ALTER TABLE `pejabats`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `permissions`
+--
+ALTER TABLE `permissions`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `roles`
 --
 ALTER TABLE `roles`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `role_has_permissions`
+--
+ALTER TABLE `role_has_permissions`
+  ADD PRIMARY KEY (`role_id`,`permission_id`);
+
+--
+-- Indexes for table `role_menu`
+--
+ALTER TABLE `role_menu`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `role_menu_role_id_menu_id_unique` (`role_id`,`menu_id`),
+  ADD KEY `role_menu_menu_id_foreign` (`menu_id`);
 
 --
 -- Indexes for table `sessions`
@@ -595,7 +854,8 @@ ALTER TABLE `sessions`
 -- Indexes for table `surat_keluars`
 --
 ALTER TABLE `surat_keluars`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `surat_keluars_user_disposisi_id_foreign` (`user_disposisi_id`);
 
 --
 -- Indexes for table `surat_masuks`
@@ -615,6 +875,13 @@ ALTER TABLE `users`
   ADD UNIQUE KEY `users_email_unique` (`email`);
 
 --
+-- Indexes for table `user_has_permissions`
+--
+ALTER TABLE `user_has_permissions`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `user_permission_unique` (`user_id`,`permission_id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -622,13 +889,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `agendas`
 --
 ALTER TABLE `agendas`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `arsips`
 --
 ALTER TABLE `arsips`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `failed_jobs`
@@ -649,46 +916,70 @@ ALTER TABLE `kode_arsips`
   MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
+-- AUTO_INCREMENT for table `menus`
+--
+ALTER TABLE `menus`
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
 
 --
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT for table `pejabats`
 --
 ALTER TABLE `pejabats`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `permissions`
+--
+ALTER TABLE `permissions`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
 
 --
 -- AUTO_INCREMENT for table `roles`
 --
 ALTER TABLE `roles`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `role_menu`
+--
+ALTER TABLE `role_menu`
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `surat_keluars`
 --
 ALTER TABLE `surat_keluars`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `surat_masuks`
 --
 ALTER TABLE `surat_masuks`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `user_has_permissions`
+--
+ALTER TABLE `user_has_permissions`
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- Constraints for dumped tables
@@ -699,6 +990,19 @@ ALTER TABLE `users`
 --
 ALTER TABLE `agendas`
   ADD CONSTRAINT `fk_agenda_surat` FOREIGN KEY (`surat_masuk_id`) REFERENCES `surat_masuks` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `role_menu`
+--
+ALTER TABLE `role_menu`
+  ADD CONSTRAINT `role_menu_menu_id_foreign` FOREIGN KEY (`menu_id`) REFERENCES `menus` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `role_menu_role_id_foreign` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `surat_keluars`
+--
+ALTER TABLE `surat_keluars`
+  ADD CONSTRAINT `surat_keluars_user_disposisi_id_foreign` FOREIGN KEY (`user_disposisi_id`) REFERENCES `users` (`id`) ON DELETE SET NULL;
 
 --
 -- Constraints for table `surat_masuks`
