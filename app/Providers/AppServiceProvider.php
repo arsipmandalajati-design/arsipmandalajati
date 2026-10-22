@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\URL; // <--- Pastikan ada ini
+use Illuminate\Support\Facades\URL; // <-- Tambihkeun ieu di luhur
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,8 +20,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Memaksa skema URL ke HTTPS di Vercel / Production
-        if (config('app.env') !== 'local' || isset($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
+        // Paksa HTTPS di serverless/production (Vercel)
+        if (config('app.env') !== 'local' || isset($_SERVER['HTTPS'])) {
             URL::forceScheme('https');
         }
     }
