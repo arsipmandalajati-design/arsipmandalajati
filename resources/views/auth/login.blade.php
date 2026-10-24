@@ -20,7 +20,7 @@
             <div class="left-side">
                 <br>
                 <br>
-                <img src="{{ asset('images/logo.png') }}" class="logo-kabupaten">
+                <img src="/images/logo.png" class="logo-kabupaten">
     
                 <h1 class="judul">
                     E - ARSIP
@@ -57,8 +57,8 @@
                     class="mb-3"
                     :status="session('status')" />
     
-                <!-- Perbaikan pada action form menggunakan url() agar otomatis menyesuaikan HTTPS Vercel -->
-                <form method="POST" action="{{ route('login') }}">
+                <!-- Alamat relatif supaya otomatis mengikuti https dari domain -->
+                <form method="POST" action="/login">
     
                     @csrf
                     <br>
