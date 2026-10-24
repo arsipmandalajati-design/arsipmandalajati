@@ -1,15 +1,3 @@
 {
-  "version": 2,
-  "framework": "laraveL",
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "X-Forwarded-Proto",
-          "value": "https"
-        }
-      ]
-    }
-  ]
+  "version": 2
 }
