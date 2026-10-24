@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\URL; // <-- Tambahkan ini di atas jika belum ada
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,7 +19,10 @@ class AppServiceProvider extends ServiceProvider
      * Bootstrap any application services.
      */
     public function boot(): void
-{
-    \Illuminate\Support\Facades\URL::forceScheme('http');
-}
+    {
+        // Paksa HTTPS di Vercel atau environment production
+        if (config('app.env') !== 'local' || isset($_ENV['VERCEL']) || getenv('VERCEL')) {
+            URL::forceScheme('https');
+        }
+    }
 }
