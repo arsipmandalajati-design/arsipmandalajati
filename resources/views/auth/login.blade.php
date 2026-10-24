@@ -58,7 +58,7 @@
                     :status="session('status')" />
     
                 <!-- Perbaikan pada action form menggunakan url() agar otomatis menyesuaikan HTTPS Vercel -->
-                <form method="POST" action="{{ url('/login') }}">
+                <form method="POST" action="/login">
     
                     @csrf
                     <br>
