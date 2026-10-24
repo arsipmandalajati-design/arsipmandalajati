@@ -1,9 +1,6 @@
 {
   "version": 2,
   "framework": "laraveL",
-  "projectSettings": {
-    "framework": "laravel"
-  },
   "headers": [
     {
       "source": "/(.*)",
