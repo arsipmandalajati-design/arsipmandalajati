@@ -3,12 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-
-// Jika dijalankan di Vercel (sistem serverless), ubah lokasi storage ke /tmp
-if (isset($_ENV['VERCEL']) || getenv('VERCEL') || file_exists('/tmp')) {
-    $_ENV['APP_STORAGE'] = '/tmp/storage';
-    putenv('APP_STORAGE=/tmp/storage');
-}
+use Illuminate\Http\Request; // <-- Tambahkan ini di atas
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -17,7 +12,14 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        // PERCAYA SEMUA PROXY DARI VERCEL UNTUK HTTPS
+        $middleware->trustProxies(at: '*');
+        $middleware->trustProxies(headers: Request::HEADER_X_FORWARDED_FOR |
+            Request::HEADER_X_FORWARDED_HOST |
+            Request::HEADER_X_FORWARDED_PORT |
+            Request::HEADER_X_FORWARDED_PROTO |
+            Request::HEADER_X_FORWARDED_AWS_ELB
+        );
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
