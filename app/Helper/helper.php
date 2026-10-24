@@ -8,7 +8,7 @@ if (!function_exists('userCan')) {
         static $cache = null;
 
         if ($cache === null) {
-            $roleId = auth()->user()->role_id ?? null;
+            $roleId = Auth::user()?->role_id;
 
             $cache = DB::table('role_has_permissions')
                 ->join('permissions', 'role_has_permissions.permission_id', '=', 'permissions.id')
