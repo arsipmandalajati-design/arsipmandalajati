@@ -35,9 +35,9 @@ class DashboardController extends Controller
     
         // Chart Surat Masuk
         $chart = DB::table('surat_masuks')
-            ->selectRaw('MONTH(tanggal_surat) as bulan, COUNT(*) as total')
-            ->groupByRaw('MONTH(tanggal_surat)')
-            ->pluck('total','bulan');
+    ->selectRaw('EXTRACT(MONTH FROM tanggal_surat)::int as bulan, COUNT(*) as total')
+    ->groupByRaw('EXTRACT(MONTH FROM tanggal_surat)')
+    ->pluck('total', 'bulan');
     
         $dataChart = [];
     
